@@ -1,0 +1,68 @@
+/* Import DM Sans font from Google Fonts (for general text) */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap");
+/* Import Orbitron font from Google Fonts (for titles) */
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap");
+
+:root {
+  --background-dark: #0a0f2b; /* This is the very dark blue/purple background color */
+  --text-light: #ffffff; /* White text */
+  --primary-purple: #8a40ff; /* Bright purple for accents */
+  --secondary-pink: #ff40a8; /* Bright pink for accents */
+  --tertiary-blue: #00bfff; /* Existing blue */
+
+  /* NEW GRADIENT COLORS from the provided image */
+  --new-gradient-top: #0a0f2b; /* Dark blue/black from top of image */
+  --new-gradient-middle: #0072ff; /* Bright blue from middle of image */
+  --new-gradient-bottom: #ec4dc2; /* Pink/purple from bottom of image */
+
+  /* Gradients for glowing effects and cards */
+  --glow-gradient-purple: linear-gradient(90deg, #8a40ff 0%, #b940ff 100%);
+  --glow-gradient-pink: linear-gradient(90deg, #ff40a8 0%, #ff60c8 100%);
+  --card-gradient: linear-gradient(
+    135deg,
+    rgba(29, 30, 78, 0.7) 0%,
+    rgba(10, 15, 43, 0.7) 100%
+  ); /* Retained existing card gradient base */
+  --card-border-gradient: linear-gradient(
+    135deg,
+    #8a40ff,
+    #ff40a8
+  ); /* For border glow */
+}
+
+/* Base styles for the entire page */
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "DM Sans", sans-serif; /* Primary body font */
+  background-color: var(
+    --background-dark
+  ); /* This sets the deep dark background color */
+  color: var(--text-light);
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  padding-top: 0; /* REMOVED: No longer need padding-top as navbar scrolls */
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Utility classes for consistent spacing/alignment if needed */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* Add any other global resets or base styles here */

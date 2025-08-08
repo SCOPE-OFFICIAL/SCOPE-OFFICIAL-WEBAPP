@@ -1,0 +1,82 @@
+.navbar {
+  width: 100%;
+  padding: 0px 0; /* REDUCED VERTICAL PADDING (from 20px 0) */
+  background-color: var(--background-dark); /* Ensure it has a background */
+  position: static; /* Scrolls with the page */
+  top: auto;
+  left: auto;
+  z-index: 1000;
+  margin-bottom: 0px; /* No margin-bottom here. Spacing controlled by AboutUsSection's margin-top. */
+}
+
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo img {
+  width: 124px;
+  height: 122.4px;
+  filter: drop-shadow(0 0 5px rgba(138, 64, 255, 0.5));
+}
+
+.navLinks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 30px;
+}
+
+.navLinks li a {
+  color: var(--text-light);
+  font-weight: 500;
+  font-size: 24px;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.navLinks li a:hover {
+  color: var(--primary-purple);
+  text-shadow: 0 0 8px var(--primary-purple);
+}
+
+/* Specific styling for the "About Us" link's underline */
+.navLinks li:nth-child(3) a::after {
+  /* Assuming "About Us" is the 3rd link */
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -5px;
+  width: 60%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--primary-purple),
+    var(--secondary-pink)
+  );
+  transform: translateX(-50%);
+  border-radius: 1px;
+  opacity: 1;
+  transition: width 0.3s ease;
+  box-shadow: 0 0 8px rgba(255, 64, 168, 0.5);
+}
+
+.navLinks li:nth-child(3) a:hover::after {
+  width: 80%;
+}
+
+/* Basic responsiveness for smaller screens (e.g., hide nav links) */
+@media (max-width: 768px) {
+  .navLinks {
+    display: none;
+  }
+  .navbar .container {
+    justify-content: center;
+  }
+}
