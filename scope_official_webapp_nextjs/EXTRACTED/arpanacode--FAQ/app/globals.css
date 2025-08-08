@@ -1,0 +1,10 @@
+/* Import Tailwind's base, components, and utilities styles */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Define global styles here */
+body {
+  background-color: #0C112B; /* The dark navy blue from the design */
+  color: white;
+}
