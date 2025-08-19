@@ -1,0 +1,84 @@
+.card {
+  background-color: transparent; /* Makes the card background transparent to blend with the page */
+  border-radius: 15px;
+  padding: 30px;
+  text-align: center; /* Ensures text inside is centered */
+  transition: transform 0.3s ease; /* Only keep transition for the lift effect */
+  position: relative;
+  flex: 1;
+  min-width: 280px;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.card:hover {
+  transform: translateY(-10px); /* Keep the subtle lift effect on hover */
+}
+
+.iconContainer {
+  border-radius: 50%; /* Keep circular shape */
+  padding: 15px;
+  margin-bottom: 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon {
+  width: 50px; /* Icon size */
+  height: 50px;
+}
+
+.title {
+  font-family: "DM Sans", sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: var(--text-light);
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.description {
+  font-family: "DM Sans", sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: var(--text-light);
+  opacity: 0.8;
+  margin-bottom: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card {
+    padding: 25px;
+    min-width: unset;
+    width: 100%;
+    max-width: 400px;
+  }
+  .icon {
+    width: 40px;
+    height: 40px;
+  }
+  .title {
+    font-size: 28px;
+  }
+  .description {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .title {
+    font-size: 24px;
+  }
+  .description {
+    font-size: 20px;
+  }
+}

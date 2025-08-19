@@ -1,0 +1,119 @@
+.aboutUsSection {
+  padding: 80px 0; /* Vertical padding for the section content */
+  scroll-margin-top: 100px; /* For sticky header offset when scrolling to this ID */
+  margin-top: 0px; /* REDUCED SPACING: Adjusted to remove space between Navbar and this section (from 20px) */
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.contentWrapper {
+  display: flex;
+  gap: 60px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.mission {
+  flex: 1;
+  min-width: 300px;
+  max-width: 600px;
+  text-align: left;
+}
+
+.missionTitle {
+  font-family: "Orbitron", sans-serif;
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: var(--text-light);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  position: relative;
+  padding-left: 45px;
+  white-space: nowrap;
+}
+
+.missionTitle::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 5px;
+  height: 34px;
+  background: linear-gradient(
+    to bottom,
+    var(--secondary-pink),
+    var(--primary-purple)
+  );
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.mission p {
+  font-family: "DM Sans", sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 2%;
+  color: var(--text-light);
+  opacity: 0.9;
+}
+
+.illustration {
+  flex: 1;
+  min-width: 300px;
+  max-width: 450px;
+  text-align: center;
+}
+
+.illustration img {
+  max-width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 20px rgba(138, 64, 255, 0.7));
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .contentWrapper {
+    flex-direction: column;
+    gap: 40px;
+  }
+  .mission,
+  .illustration {
+    max-width: 100%;
+    text-align: center;
+  }
+  .missionTitle {
+    padding-left: 0;
+    text-align: center;
+    font-size: 28px;
+  }
+  .missionTitle::before {
+    display: none;
+  }
+  .aboutUsSection {
+    margin-top: 0px; /* REDUCED SPACING for smaller screens (from 10px) */
+  }
+  .mission p {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .aboutUsSection {
+    padding: 60px 0;
+  }
+  .mission p {
+    font-size: 18px;
+  }
+  .missionTitle {
+    font-size: 24px;
+  }
+}
