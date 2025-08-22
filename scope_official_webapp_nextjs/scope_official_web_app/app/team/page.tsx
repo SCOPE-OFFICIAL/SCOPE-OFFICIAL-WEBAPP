@@ -1,96 +1,174 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-// Team data with images
+// Team data with group images
 const teamData = [
   {
-    category: "Leadership",
-    members: [
-      { name: "Nehasree", role: "President", image: "/team/nehasree.jpg" },
-      { name: "Brunda R", role: "Vice President", image: "/team/brunda.jpg" },
-      { name: "Guraman Singh", role: "Student Mentor", image: "/team/guraman.jpg" },
-      { name: "Nandana Rajesh", role: "Student Coordinator Head", image: "/team/nandana.jpg" },
-      { name: "Monika S", role: "Secretary", image: "/team/monika.jpg" },
-      { name: "Pratham Gupta", role: "Treasurer", image: "/team/pratham.jpg" },
-      { name: "Kishore", role: "Project Manager", image: "/team/kishore.jpg" }
-    ]
-  },
-  {
-    category: "PR & Marketing",
-    members: [
-      { name: "Kadiri Akshaya", role: "Marketing Head", image: "/team/akshaya.jpg" },
-      { name: "Dhanyashree Karnam", role: "PR Team Head", image: "/team/dhanyashree.jpg" },
-      { name: "Dhiya", role: "PR Team", image: "/team/dhiya.jpg" },
-      { name: "Jyothishree V Daroji", role: "Student Coordinator", image: "/team/jyothishree.jpg" },
-      { name: "G. Joyce Aparna", role: "Student Coordinator", image: "/team/joyce.jpg" },
-      { name: "Ashmitha", role: "Student Coordinator", image: "/team/ashmitha.jpg" },
-      { name: "Gagana K", role: "Student Coordinator", image: "/team/gagana.jpg" },
-      { name: "Vaibhav S J", role: "Student Coordinator", image: "/team/vaibhav.jpg" },
-      { name: "Vaishnavi T", role: "Student Coordinator", image: "/team/vaishnavi.jpg" },
-      { name: "Lathashree M S", role: "Student Coordinator", image: "/team/lathashree.jpg" }
-    ]
-  },
-  {
+    id: "event-management",
     category: "Event Management",
+    description: "The masterminds behind every seamless event",
+    groupImage: "/team/event-management-group.jpg",
     members: [
-      { name: "Rohan Baiju", role: "Event Management Head", image: "/team/rohan.jpg" },
-      { name: "Ananya Y", role: "Team Member", image: "/team/ananya.jpg" },
-      { name: "Nikhil Ajay", role: "Team Member", image: "/team/nikhil.jpg" },
-      { name: "Arfa", role: "Team Member", image: "/team/arfa.jpg" },
-      { name: "Imdad Aqueel", role: "Team Member", image: "/team/imdad.jpg" },
-      { name: "Pranav Kamboj", role: "Team Member", image: "/team/pranav.jpg" },
-      { name: "Viha Shomikha", role: "Team Member", image: "/team/viha.jpg" },
-      { name: "Nandish Reddy", role: "Team Member", image: "/team/nandish.jpg" },
-      { name: "Varsha V", role: "Team Member", image: "/team/varsha.jpg" },
-      { name: "Joel Jo", role: "Team Member", image: "/team/joel.jpg" }
+      { name: "Rohan Baiju", role: "Event Management Head" },
+      { name: "Ananya Y", role: "Team Member" },
+      { name: "Nikhil Ajay", role: "Team Member" },
+      { name: "Arfa", role: "Team Member" },
+      { name: "Imdad Aqueel", role: "Team Member" },
+      { name: "Pranav Kamboj", role: "Team Member" },
+      { name: "Viha Shomikha", role: "Team Member" },
+      { name: "Nandish Reddy", role: "Team Member" },
+      { name: "Varsha V", role: "Team Member" },
+      { name: "Joel Jo", role: "Team Member" }
     ]
   },
   {
+    id: "content-design",
     category: "Content & Design",
+    description: "The storytellers shaping our identity",
+    groupImage: "/team/content-design-group.jpg",
     members: [
-      { name: "Rayyan Ahamed", role: "Content Manager", image: "/team/rayyan.jpg" },
-      { name: "Anantha Sai Gudivada", role: "Designer Head", image: "/team/anantha.jpg" },
-      { name: "Nidhish MG", role: "Team Member", image: "/team/nidhish.jpg" },
-      { name: "Sruthi Subhash", role: "Team Member", image: "/team/sruthi.jpg" },
-      { name: "Srijan Srivastava", role: "Team Member", image: "/team/srijan.jpg" },
-      { name: "Vedhashri M", role: "Team Member", image: "/team/vedhashri.jpg" },
-      { name: "Nikhil N", role: "Team Member", image: "/team/nikhil-n.jpg" }
+      { name: "Rayyan Ahamed", role: "Content Manager" },
+      { name: "Anantha Sai Gudivada", role: "Designer Head" },
+      { name: "Nidhish MG", role: "Team Member" },
+      { name: "Sruthi Subhash", role: "Team Member" },
+      { name: "Srijan Srivastava", role: "Team Member" },
+      { name: "Vedhashri M", role: "Team Member" },
+      { name: "Nikhil N", role: "Team Member" }
     ]
   },
   {
-    category: "Technical",
+    id: "student-coordinators",
+    category: "Student Coordinators",
+    description: "Documenting and coordinating our activities",
+    groupImage: "/team/student-coordinators-group.jpg",
     members: [
-      { name: "Prasanna Kumaran", role: "Technical Head", image: "/team/prasanna.jpg" },
-      { name: "Sindhuja U", role: "Team Member", image: "/team/sindhuja.jpg" },
-      { name: "Divyashree N", role: "Team Member", image: "/team/divyashree.jpg" },
-      { name: "Vyshak Bharadwaj L", role: "Team Member", image: "/team/vyshak.jpg" },
-      { name: "Neha J S", role: "Team Member", image: "/team/neha.jpg" },
-      { name: "Kavyanjali", role: "Team Member", image: "/team/kavyanjali.jpg" },
-      { name: "Kunaal Raju M", role: "Team Member", image: "/team/kunaal.jpg" },
-      { name: "Mekala Abhi Rama V S Sai Kumar", role: "Team Member", image: "/team/mekala.jpg" }
+      { name: "Jyothishree V Daroji", role: "Student Coordinator" },
+      { name: "G. Joyce Aparna", role: "Student Coordinator" },
+      { name: "Ashmitha", role: "Student Coordinator" },
+      { name: "Gagana K", role: "Student Coordinator" },
+      { name: "Vaibhav S J", role: "Student Coordinator" },
+      { name: "Vaishnavi T", role: "Student Coordinator" },
+      { name: "Lathashree M S", role: "Student Coordinator" }
     ]
+  },
+  {
+    id: "pr-marketing",
+    category: "PR & Marketing",
+    description: "Building our brand and community presence",
+    groupImage: "/team/pr-marketing-group.jpg",
+    members: [
+      { name: "Kadiri Akshaya", role: "Marketing Head" },
+      { name: "Dhanyashree Karnam", role: "PR Team Head" },
+      { name: "Dhiya", role: "PR Team" }
+    ]
+  },
+  {
+    id: "technical",
+    category: "Technical",
+    description: "The innovators driving our vision forward",
+    groupImage: "/team/technical-group.jpg",
+    members: [
+      { name: "Prasanna Kumaran", role: "Technical Head" },
+      { name: "Sindhuja U", role: "Team Member" },
+      { name: "Divyashree N", role: "Team Member" },
+      { name: "Vyshak Bharadwaj L", role: "Team Member" },
+      { name: "Neha J S", role: "Team Member" },
+      { name: "Kavyanjali", role: "Team Member" },
+      { name: "Kunaal Raju M", role: "Team Member" },
+      { name: "Mekala Abhi Rama V S Sai Kumar", role: "Team Member" }
+    ]
+  },
+  {
+    id: "leadership",
+    category: "Leadership",
+    description: "Guiding SCOPE towards excellence",
+    groupImage: "/team/leadership-group.jpg",
+    members: [
+      { name: "Nehasree", role: "President" },
+      { name: "Brunda R", role: "Vice President" },
+      { name: "Guraman Singh", role: "Student Mentor" },
+      { name: "Nandana Rajesh", role: "Student Coordinator Head" },
+      { name: "Monika S", role: "Secretary" },
+      { name: "Pratham Gupta", role: "Treasurer" },
+      { name: "Kishore", role: "Project Manager" }
+    ]
+  },
+  {
+    id: "full-team",
+    category: "Full Team",
+    description: "The complete SCOPE team 2025",
+    groupImage: "/team/full-team-group.jpg",
+    members: []
   }
 ];
 
 // Categories for filtering
-const categories = ["All", "Leadership", "PR & Marketing", "Event Management", "Content & Design", "Technical"];
+const categories = [
+  { id: "all", name: "All" },
+  { id: "full-team", name: "Full Team" },
+  { id: "leadership", name: "Leadership" },
+  { id: "pr-marketing", name: "PR & Marketing" },
+  { id: "event-management", name: "Event Management" },
+  { id: "content-design", name: "Content & Design" },
+  { id: "technical", name: "Technical" },
+  { id: "student-coordinators", name: "Student Coordinators" }
+];
 
 export default function TeamGalleryPage() {
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedMember, setSelectedMember] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedTeam, setSelectedTeam] = useState(null);
+  const router = useRouter();
 
-  const filteredTeams = selectedCategory === "All" 
+  // Handle URL hash changes
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.substring(1);
+      if (hash && categories.find(cat => cat.id === hash)) {
+        setSelectedCategory(hash);
+        
+        // Scroll to the section after a short delay to ensure DOM is ready
+        setTimeout(() => {
+          const element = document.getElementById(hash);
+          if (element) {
+            element.scrollIntoView({ behavior: "smooth" });
+          }
+        }, 100);
+      }
+    };
+
+    // Initial check
+    handleHashChange();
+
+    // Listen for hash changes
+    window.addEventListener("hashchange", handleHashChange);
+
+    return () => {
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, []);
+
+  const filteredTeams = selectedCategory === "all" 
     ? teamData 
-    : teamData.filter(team => team.category === selectedCategory);
+    : teamData.filter(team => team.id === selectedCategory);
 
-  const openMemberModal = (member) => {
-    setSelectedMember(member);
+  const openTeamModal = (team) => {
+    setSelectedTeam(team);
   };
 
-  const closeMemberModal = () => {
-    setSelectedMember(null);
+  const closeTeamModal = () => {
+    setSelectedTeam(null);
+  };
+
+  const handleCategoryClick = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+    if (categoryId === "all") {
+      router.push("/team");
+    } else {
+      router.push(`/team#${categoryId}`);
+    }
   };
 
   return (
@@ -110,11 +188,11 @@ export default function TeamGalleryPage() {
         <div className="filters-container">
           {categories.map(category => (
             <button
-              key={category}
-              className={`filter-btn ${selectedCategory === category ? 'active' : ''}`}
-              onClick={() => setSelectedCategory(category)}
+              key={category.id}
+              className={`filter-btn ${selectedCategory === category.id ? 'active' : ''}`}
+              onClick={() => handleCategoryClick(category.id)}
             >
-              {category}
+              {category.name}
             </button>
           ))}
         </div>
@@ -123,56 +201,76 @@ export default function TeamGalleryPage() {
       {/* Teams Grid */}
       <section className="teams-grid-section">
         {filteredTeams.map(team => (
-          <div key={team.category} className="team-category">
+          <div key={team.id} id={team.id} className="team-category">
             <h2 className="team-category-title">{team.category}</h2>
-            <div className="members-grid">
-              {team.members.map((member, index) => (
-                <div key={index} className="member-card" onClick={() => openMemberModal(member)}>
-                  <div className="member-image-container">
-                    <Image
-                      src={member.image}
-                      alt={member.name}
-                      width={200}
-                      height={200}
-                      className="member-image"
-                    />
-                    <div className="member-overlay">
-                      <span className="view-details">View Details</span>
-                    </div>
-                  </div>
-                  <div className="member-info">
-                    <h3 className="member-name">{member.name}</h3>
-                    <p className="member-role">{member.role}</p>
-                  </div>
+            <p className="team-category-description">{team.description}</p>
+            
+            <div className="team-group-card" onClick={() => openTeamModal(team)}>
+              <div className="team-group-image-container">
+                <Image
+                  src={team.groupImage}
+                  alt={`${team.category} Team`}
+                  width={800}
+                  height={450}
+                  className="team-group-image"
+                />
+                <div className="team-group-overlay">
+                  <span className="view-details">View Team Details</span>
                 </div>
-              ))}
+              </div>
             </div>
+
+            {/* Team members list */}
+            {team.members.length > 0 && (
+              <div className="team-members-list">
+                <h3 className="members-list-title">Team Members</h3>
+                <div className="members-grid">
+                  {team.members.map((member, index) => (
+                    <div key={index} className="member-item">
+                      <h4 className="member-name">{member.name}</h4>
+                      <p className="member-role">{member.role}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </section>
 
-      {/* Member Modal */}
-      {selectedMember && (
-        <div className="modal-overlay" onClick={closeMemberModal}>
+      {/* Team Modal */}
+      {selectedTeam && (
+        <div className="modal-overlay" onClick={closeTeamModal}>
           <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <button className="modal-close" onClick={closeMemberModal}>
+            <button className="modal-close" onClick={closeTeamModal}>
               &times;
             </button>
             <div className="modal-image-container">
               <Image
-                src={selectedMember.image}
-                alt={selectedMember.name}
-                width={300}
-                height={300}
+                src={selectedTeam.groupImage}
+                alt={selectedTeam.category}
+                width={800}
+                height={450}
                 className="modal-image"
               />
             </div>
             <div className="modal-info">
-              <h2>{selectedMember.name}</h2>
-              <p className="modal-role">{selectedMember.role}</p>
-              <p className="modal-description">
-                {selectedMember.description || "Dedicated member of the SCOPE team contributing to innovation and excellence."}
-              </p>
+              <h2>{selectedTeam.category} Team</h2>
+              <p className="modal-role">{selectedTeam.description}</p>
+              
+              {selectedTeam.members.length > 0 && (
+                <div className="modal-members">
+                  <h3>Team Members</h3>
+                  <div className="modal-members-list">
+                    {selectedTeam.members.map((member, index) => (
+                      <div key={index} className="modal-member-item">
+                        <span className="modal-member-name">{member.name}</span>
+                        <span className="modal-member-role">{member.role}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -216,6 +314,12 @@ export default function TeamGalleryPage() {
         /* Category Filters */
         .category-filters {
           margin-bottom: 3rem;
+          position: sticky;
+          top: 80px;
+          z-index: 100;
+          background: rgba(4, 10, 40, 0.9);
+          padding: 1rem 0;
+          backdrop-filter: blur(10px);
         }
         
         .filters-container {
@@ -251,12 +355,13 @@ export default function TeamGalleryPage() {
         
         .team-category {
           margin-bottom: 4rem;
+          scroll-margin-top: 120px;
         }
         
         .team-category-title {
           font-size: 2rem;
           font-weight: 600;
-          margin-bottom: 2rem;
+          margin-bottom: 0.5rem;
           color: #fff;
           text-align: center;
           position: relative;
@@ -275,13 +380,15 @@ export default function TeamGalleryPage() {
           border-radius: 3px;
         }
         
-        .members-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-          gap: 2rem;
+        .team-category-description {
+          text-align: center;
+          color: #8a95c9;
+          margin-bottom: 2rem;
+          font-style: italic;
         }
         
-        .member-card {
+        /* Team Group Card */
+        .team-group-card {
           background: linear-gradient(145deg, #0c1338, #070c29);
           border-radius: 16px;
           overflow: hidden;
@@ -289,33 +396,34 @@ export default function TeamGalleryPage() {
           transition: all 0.3s ease;
           border: 1px solid rgba(108, 141, 255, 0.1);
           cursor: pointer;
+          margin-bottom: 2rem;
         }
         
-        .member-card:hover {
+        .team-group-card:hover {
           transform: translateY(-8px);
           box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
           border-color: rgba(108, 141, 255, 0.3);
         }
         
-        .member-image-container {
+        .team-group-image-container {
           position: relative;
           width: 100%;
-          height: 250px;
+          height: 400px;
           overflow: hidden;
         }
         
-        .member-image {
+        .team-group-image {
           width: 100%;
           height: 100%;
           object-fit: cover;
           transition: transform 0.3s ease;
         }
         
-        .member-card:hover .member-image {
+        .team-group-card:hover .team-group-image {
           transform: scale(1.05);
         }
         
-        .member-overlay {
+        .team-group-overlay {
           position: absolute;
           top: 0;
           left: 0;
@@ -329,27 +437,55 @@ export default function TeamGalleryPage() {
           transition: opacity 0.3s ease;
         }
         
-        .member-card:hover .member-overlay {
+        .team-group-card:hover .team-group-overlay {
           opacity: 1;
         }
         
         .view-details {
           color: #fff;
           font-weight: 500;
-          padding: 0.5rem 1rem;
+          padding: 0.8rem 1.5rem;
           background: rgba(108, 141, 255, 0.8);
           border-radius: 20px;
+          font-size: 1.1rem;
         }
         
-        .member-info {
-          padding: 1.5rem;
+        /* Team Members List */
+        .team-members-list {
+          margin-top: 2rem;
+        }
+        
+        .members-list-title {
+          font-size: 1.5rem;
+          font-weight: 600;
+          margin-bottom: 1.5rem;
+          color: #fff;
           text-align: center;
         }
         
+        .members-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+          gap: 1.5rem;
+        }
+        
+        .member-item {
+          background: rgba(108, 141, 255, 0.1);
+          padding: 1.2rem;
+          border-radius: 12px;
+          border: 1px solid rgba(108, 141, 255, 0.2);
+          transition: all 0.3s ease;
+        }
+        
+        .member-item:hover {
+          background: rgba(108, 141, 255, 0.2);
+          transform: translateY(-3px);
+        }
+        
         .member-name {
-          font-size: 1.2rem;
+          font-size: 1.1rem;
           font-weight: 600;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.3rem;
           color: #fff;
         }
         
@@ -375,7 +511,8 @@ export default function TeamGalleryPage() {
         
         .modal-content {
           position: relative;
-          max-width: 500px;
+          max-width: 800px;
+          max-height: 90vh;
           background: #0c1338;
           border-radius: 16px;
           overflow: hidden;
@@ -384,6 +521,7 @@ export default function TeamGalleryPage() {
           display: flex;
           flex-direction: column;
           align-items: center;
+          overflow-y: auto;
         }
         
         .modal-close {
@@ -405,26 +543,23 @@ export default function TeamGalleryPage() {
         }
         
         .modal-image-container {
-          width: 200px;
-          height: 200px;
-          border-radius: 50%;
-          overflow: hidden;
+          width: 100%;
           margin-bottom: 1.5rem;
-          border: 3px solid rgba(108, 141, 255, 0.3);
         }
         
         .modal-image {
           width: 100%;
-          height: 100%;
-          object-fit: cover;
+          height: auto;
+          border-radius: 12px;
         }
         
         .modal-info {
           text-align: center;
+          width: 100%;
         }
         
         .modal-info h2 {
-          font-size: 1.8rem;
+          font-size: 2rem;
           margin-bottom: 0.5rem;
           color: #fff;
         }
@@ -432,17 +567,52 @@ export default function TeamGalleryPage() {
         .modal-role {
           color: #6c8dff;
           font-weight: 500;
-          margin-bottom: 1rem;
+          margin-bottom: 2rem;
+          font-size: 1.1rem;
         }
         
-        .modal-description {
+        .modal-members {
+          margin-top: 2rem;
+        }
+        
+        .modal-members h3 {
+          font-size: 1.5rem;
+          margin-bottom: 1rem;
+          color: #fff;
+        }
+        
+        .modal-members-list {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 1rem;
+        }
+        
+        .modal-member-item {
+          background: rgba(108, 141, 255, 0.1);
+          padding: 1rem;
+          border-radius: 8px;
+          text-align: left;
+        }
+        
+        .modal-member-name {
+          display: block;
+          font-weight: 600;
+          margin-bottom: 0.3rem;
+          color: #fff;
+        }
+        
+        .modal-member-role {
           color: #aab4e8;
-          line-height: 1.6;
+          font-size: 0.9rem;
         }
         
         @media (max-width: 768px) {
           .hero-title {
             font-size: 2.5rem;
+          }
+          
+          .team-group-image-container {
+            height: 300px;
           }
           
           .members-grid {
@@ -453,19 +623,36 @@ export default function TeamGalleryPage() {
             max-width: 90vw;
             padding: 1.5rem;
           }
+          
+          .category-filters {
+            top: 60px;
+          }
+          
+          .modal-members-list {
+            grid-template-columns: 1fr;
+          }
         }
         
         @media (max-width: 480px) {
-          .members-grid {
-            grid-template-columns: 1fr;
-          }
-          
           .hero-title {
             font-size: 2rem;
           }
           
           .team-category-title {
             font-size: 1.5rem;
+          }
+          
+          .filters-container {
+            gap: 0.5rem;
+          }
+          
+          .filter-btn {
+            padding: 0.6rem 1rem;
+            font-size: 0.9rem;
+          }
+          
+          .team-group-image-container {
+            height: 250px;
           }
         }
       `}</style>
