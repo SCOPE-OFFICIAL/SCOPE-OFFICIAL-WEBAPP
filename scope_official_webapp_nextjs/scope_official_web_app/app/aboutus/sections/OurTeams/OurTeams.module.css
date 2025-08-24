@@ -9,6 +9,9 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 /* Decorative background element */
@@ -30,127 +33,152 @@
   z-index: -1;
 }
 
-.timelineContainer {
+/* Tabs container */
+.tabsContainer {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin: 40px 0;
+  width: 100%;
+}
+
+/* Tab buttons */
+.tab {
+  padding: 12px 24px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(138, 64, 255, 0.3);
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 16px;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tab:hover {
+  border-color: var(--primary-purple);
+  color: var(--primary-purple);
+  background-color: rgba(138, 64, 255, 0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(138, 64, 255, 0.2);
+}
+
+.activeTab {
+  background-color: var(--primary-purple);
+  border-color: var(--primary-purple);
+  color: var(--text-light);
+  box-shadow: 0 4px 15px rgba(138, 64, 255, 0.3);
+}
+
+/* Photo container */
+.photoContainer {
   position: relative;
-  max-width: 1100px; /* Overall width of the timeline structure */
+  max-width: 800px;
+  width: 100%;
   margin: 0 auto;
-  padding-top: 50px;
-  padding-bottom: 50px;
-
-  display: grid;
-  grid-template-columns: 1.2fr 2px 1.2fr;
-  column-gap: 0px;
-  align-items: center;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(138, 64, 255, 0.2);
 }
 
-.timelineContainer::before {
-  content: "";
+.teamPhoto {
+  width: 100%;
+  height: auto;
+  display: block;
+  transition: transform 0.5s ease;
+  min-height: 400px;
+  object-fit: cover;
+}
+
+.teamPhoto:hover {
+  transform: scale(1.03);
+}
+
+.teamNameOverlay {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  top: 0;
   bottom: 0;
-  width: 2px;
-  /* UPDATED: Background to use new gradient colors from image */
-  background: linear-gradient(
-    to bottom,
-    var(--new-gradient-top),
-    var(--new-gradient-middle),
-    var(--new-gradient-bottom)
-  );
-  border-radius: 1px;
-  box-shadow: 0 0 10px rgba(138, 64, 255, 0.3);
-  z-index: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+  color: var(--text-light);
+  padding: 25px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-.timelineItem {
-  display: flex;
-  align-items: center;
-  position: relative;
-  margin-bottom: 60px;
-  min-height: 70px;
-}
-
-.timelineItem:last-child {
-  margin-bottom: 0;
-}
-
-.timelineDot {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 12px;
-  height: 12px;
-  background: var(--primary-purple); /* Dot color can be adjusted if needed */
-  border-radius: 50%;
-  box-shadow: 0 0 8px rgba(138, 64, 255, 0.6);
-  z-index: 2;
-  border: 2px solid var(--background-dark);
-}
-
-.itemLeft {
-  grid-column: 1 / 2;
-  justify-content: flex-end;
-  padding-right: 40px; /* Adjusted space */
-  display: flex;
-  box-sizing: border-box;
-}
-
-.itemLeft .timelineDot {
-  right: -6px;
-}
-
-.itemRight {
-  grid-column: 3 / 4;
-  justify-content: flex-start;
-  padding-left: 40px; /* Adjusted space */
-  display: flex;
-  box-sizing: border-box;
-}
-
-.itemRight .timelineDot {
-  left: -6px;
+/* Responsive design */
+@media (max-width: 900px) {
+  .photoContainer {
+    max-width: 600px;
+  }
+  
+  .teamNameOverlay {
+    font-size: 20px;
+    padding: 20px;
+  }
 }
 
 @media (max-width: 768px) {
-  .timelineContainer {
-    grid-template-columns: 2px 1fr;
-    max-width: 600px;
-    padding-left: 0;
-    padding-right: 0;
+  .tabsContainer {
+    gap: 10px;
+    margin: 30px 0;
   }
-
-  .timelineContainer::before {
-    left: 20px;
+  
+  .tab {
+    padding: 10px 18px;
+    font-size: 14px;
   }
-
-  .timelineItem {
-    grid-column: 2 / 3;
-    justify-content: flex-start;
-    padding-left: 30px;
-    padding-right: 0;
-    margin-bottom: 40px;
-    min-height: 60px;
+  
+  .photoContainer {
+    max-width: 500px;
   }
-
-  .timelineDot {
-    position: absolute;
-    left: 20px;
-    transform: translate(-50%, -50%);
+  
+  .teamPhoto {
+    min-height: 350px;
   }
+}
 
-  .itemLeft,
-  .itemRight {
-    grid-column: 2 / 3;
-    padding-left: 30px;
-    padding-right: 0;
-    justify-content: flex-start;
+@media (max-width: 600px) {
+  .tabsContainer {
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .tab {
+    width: 80%;
+    text-align: center;
+  }
+  
+  .photoContainer {
+    max-width: 100%;
+  }
+  
+  .teamPhoto {
+    min-height: 300px;
+  }
+  
+  .teamNameOverlay {
+    font-size: 18px;
+    padding: 15px;
   }
 }
 
 @media (max-width: 480px) {
-  .teamCard {
-    width: 100%;
-    max-width: none;
+  .ourTeamsSection {
+    padding: 60px 0;
+  }
+  
+  .teamPhoto {
+    min-height: 250px;
+  }
+  
+  .teamNameOverlay {
+    font-size: 16px;
+    padding: 12px;
   }
 }
