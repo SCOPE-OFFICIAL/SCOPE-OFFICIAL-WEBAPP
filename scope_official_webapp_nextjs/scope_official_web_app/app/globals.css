@@ -302,3 +302,32 @@ a:hover {
 .pulse-button {
   animation: pulse-button 2s infinite;
 }
+.btn-primary {
+  @apply px-8 py-3 rounded-md font-medium transition;
+  background: linear-gradient(to right, #F24DC2, #2C97FF);
+  color: white;
+}
+.btn-primary:hover {
+  filter: brightness(1.1);
+}
+
+.btn-accent {
+  @apply px-8 py-3 rounded-full font-semibold transition;
+  background: #76101e;
+  color: white;
+}
+.btn-accent:hover {
+  background: #00058c;
+}
+
+.animate-marquee {
+  animation: marquee 20s linear infinite;
+}
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}

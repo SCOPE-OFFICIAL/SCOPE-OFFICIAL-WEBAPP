@@ -2,14 +2,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import styles from "./faq.module.css";
-import Link from "next/link";
-
-// Define types for FAQ items and form data
-interface FAQItem {
-  id?: number;
-  question: string;
-  answer: string;
-}
+import { getFAQs, submitContactForm } from "@/lib/firebase-utils";
 
 interface FormData {
   name: string;
@@ -20,7 +13,7 @@ interface FormData {
 
 export default function FaqPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [faqData, setFaqData] = useState<FAQItem[]>([]);
+  const [faqData, setFaqData] = useState<any[]>([]);
   const [formData, setFormData] = useState<FormData>({
     name: "",
     phone: "",
@@ -29,17 +22,18 @@ export default function FaqPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Fetch FAQs from backend (optional)
+  // Fetch FAQs from Firebase
   useEffect(() => {
-    const fetchFAQs = async () => {
+    const loadFAQs = async () => {
       try {
-        // Uncomment when backend is ready
-        // const response = await fetch('/api/faqs');
-        // const data = await response.json();
-        // setFaqData(data);
-        
-        // For now, use static data
+        setIsLoading(true);
+        const faqs = await getFAQs();
+        setFaqData(faqs);
+      } catch (error) {
+        console.error("Failed to load FAQs:", error);
+        // Fallback to static data if Firebase fails
         setFaqData([
           {
             question: "What is SCOPE?",
@@ -48,26 +42,14 @@ export default function FaqPage() {
           {
             question: "How can I join SCOPE?",
             answer: "You can join SCOPE by attending our introductory meetings and workshops, or by reaching out to our core team. We're always looking for enthusiastic members who want to learn and contribute."
-          },
-          {
-            question: "What kind of projects do you work on?",
-            answer: "Our projects range from basic circuit design and PCB development to advanced robotics, IoT systems, and software for embedded applications. We encourage members to bring their own ideas to life with our support."
-          },
-          {
-            question: "Are there any prerequisites to join?",
-            answer: "No prior experience is necessary. We welcome students from all backgrounds and skill levels. Our goal is to provide a supportive environment where you can learn from scratch."
-          },
-          {
-            question: "How often does the club meet?",
-            answer: "We typically have weekly meetings, workshops, and project sessions. Our schedule is flexible and is announced on our social media channels and our website's events page."
           }
         ]);
-      } catch (error) {
-        console.error("Failed to fetch FAQs:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
-    fetchFAQs();
+    loadFAQs();
   }, []);
 
   const toggleAccordion = (index: number) => {
@@ -88,24 +70,14 @@ export default function FaqPage() {
     setSubmitStatus("idle");
     
     try {
-      // Send form data to backend
-      const response = await fetch('/api/contact', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      // Send form data to Firebase
+      await submitContactForm(formData);
       
-      if (response.ok) {
-        setSubmitStatus("success");
-        setFormData({ name: "", phone: "", email: "", query: "" });
-        
-        // Reset success message after 5 seconds
-        setTimeout(() => setSubmitStatus("idle"), 5000);
-      } else {
-        setSubmitStatus("error");
-      }
+      setSubmitStatus("success");
+      setFormData({ name: "", phone: "", email: "", query: "" });
+      
+      // Reset success message after 5 seconds
+      setTimeout(() => setSubmitStatus("idle"), 5000);
     } catch (error) {
       console.error("Submission error:", error);
       setSubmitStatus("error");
@@ -127,34 +99,44 @@ export default function FaqPage() {
           </p>
         </div>
 
+        {/* --- Loading State --- */}
+        {isLoading && (
+          <div className={styles.loadingState}>
+            <div className={styles.spinner}></div>
+            <p>Loading FAQs...</p>
+          </div>
+        )}
+
         {/* --- Accordion Section --- */}
-        <div className={styles.accordionContainer}>
-          {faqData.map((item, index) => (
-            <div
-              key={index}
-              className={`${styles.accordionItem} ${
-                openIndex === index ? styles.active : ""
-              }`}
-            >
-              <button
-                className={styles.accordionHeader}
-                onClick={() => toggleAccordion(index)}
-                aria-expanded={openIndex === index}
-              >
-                {item.question}
-                <span className={styles.accordionIcon}>
-                  {openIndex === index ? "−" : "+"}
-                </span>
-              </button>
+        {!isLoading && (
+          <div className={styles.accordionContainer}>
+            {faqData.map((item, index) => (
               <div
-                className={styles.accordionContent}
-                aria-hidden={openIndex !== index}
+                key={index}
+                className={`${styles.accordionItem} ${
+                  openIndex === index ? styles.active : ""
+                }`}
               >
-                <p>{item.answer}</p>
+                <button
+                  className={styles.accordionHeader}
+                  onClick={() => toggleAccordion(index)}
+                  aria-expanded={openIndex === index}
+                >
+                  {item.question}
+                  <span className={styles.accordionIcon}>
+                    {openIndex === index ? "−" : "+"}
+                  </span>
+                </button>
+                <div
+                  className={styles.accordionContent}
+                  aria-hidden={openIndex !== index}
+                >
+                  <p>{item.answer}</p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* --- Contact Form Section --- */}
         <div className={styles.formSection}>
