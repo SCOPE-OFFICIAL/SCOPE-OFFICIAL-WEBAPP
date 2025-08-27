@@ -1,8 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import styles from "./faq.module.css";
-import { getFAQs, submitContactForm } from "@/lib/firebase-utils";
+import { submitContactForm } from "@/lib/firebase-utils";
 
 interface FormData {
   name: string;
@@ -11,9 +11,52 @@ interface FormData {
   query: string;
 }
 
+// FAQ data directly in the component
+const faqData = [
+  {
+    question: "What is SCOPE?",
+    answer: "SCOPE is a club dedicated to fostering innovation and passion for electronics, embedded systems, and robotics. We focus on hands-on learning, projects, workshops, and technical discussions."
+  },
+  {
+    question: "How can I join SCOPE?",
+    answer: "You can join SCOPE by attending our introductory meetings and workshops, or by reaching out to our core team. We're always looking for enthusiastic members who want to learn and contribute."
+  },
+  {
+    question: "What kind of projects do you work on?",
+    answer: "Our projects range from basic circuit design and PCB development to advanced robotics, IoT systems, and software for embedded applications. We encourage members to bring their own ideas to life with our support."
+  },
+  {
+    question: "Are there any prerequisites to join?",
+    answer: "No prior experience is necessary. We welcome students from all backgrounds and skill levels. Our goal is to provide a supportive environment where you can learn from scratch."
+  },
+  {
+    question: "How often does the club meet?",
+    answer: "We typically have weekly meetings, workshops, and project sessions. Our schedule is flexible and is announced on our social media channels and our website's events page."
+  },
+  {
+    question: "Do I need to bring my own equipment?",
+    answer: "No, we provide all the necessary equipment and components for workshops and projects. However, if you have your own tools, you're welcome to bring them."
+  },
+  {
+    question: "Is there a membership fee?",
+    answer: "No, SCOPE is completely free to join. We believe in making electronics and robotics accessible to everyone."
+  },
+  {
+    question: "Can beginners really participate?",
+    answer: "Absolutely! We have dedicated mentors and beginner-friendly workshops to help you get started. Many of our current members started with no prior experience."
+  },
+  {
+    question: "What if I can't attend regularly?",
+    answer: "That's okay! While regular attendance helps, we understand students have busy schedules. You can participate when you're available and still benefit from our resources."
+  },
+  {
+    question: "How can I stay updated about events?",
+    answer: "Follow us on our social media channels and check our website regularly. We also have a mailing list you can join to receive updates about upcoming events and workshops."
+  }
+];
+
 export default function FaqPage() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
-  const [faqData, setFaqData] = useState<any[]>([]);
   const [formData, setFormData] = useState<FormData>({
     name: "",
     phone: "",
@@ -22,35 +65,6 @@ export default function FaqPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Fetch FAQs from Firebase
-  useEffect(() => {
-    const loadFAQs = async () => {
-      try {
-        setIsLoading(true);
-        const faqs = await getFAQs();
-        setFaqData(faqs);
-      } catch (error) {
-        console.error("Failed to load FAQs:", error);
-        // Fallback to static data if Firebase fails
-        setFaqData([
-          {
-            question: "What is SCOPE?",
-            answer: "SCOPE is a club dedicated to fostering innovation and passion for electronics, embedded systems, and robotics. We focus on hands-on learning, projects, workshops, and technical discussions."
-          },
-          {
-            question: "How can I join SCOPE?",
-            answer: "You can join SCOPE by attending our introductory meetings and workshops, or by reaching out to our core team. We're always looking for enthusiastic members who want to learn and contribute."
-          }
-        ]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadFAQs();
-  }, []);
 
   const toggleAccordion = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
@@ -99,44 +113,34 @@ export default function FaqPage() {
           </p>
         </div>
 
-        {/* --- Loading State --- */}
-        {isLoading && (
-          <div className={styles.loadingState}>
-            <div className={styles.spinner}></div>
-            <p>Loading FAQs...</p>
-          </div>
-        )}
-
         {/* --- Accordion Section --- */}
-        {!isLoading && (
-          <div className={styles.accordionContainer}>
-            {faqData.map((item, index) => (
-              <div
-                key={index}
-                className={`${styles.accordionItem} ${
-                  openIndex === index ? styles.active : ""
-                }`}
+        <div className={styles.accordionContainer}>
+          {faqData.map((item, index) => (
+            <div
+              key={index}
+              className={`${styles.accordionItem} ${
+                openIndex === index ? styles.active : ""
+              }`}
+            >
+              <button
+                className={styles.accordionHeader}
+                onClick={() => toggleAccordion(index)}
+                aria-expanded={openIndex === index}
               >
-                <button
-                  className={styles.accordionHeader}
-                  onClick={() => toggleAccordion(index)}
-                  aria-expanded={openIndex === index}
-                >
-                  {item.question}
-                  <span className={styles.accordionIcon}>
-                    {openIndex === index ? "−" : "+"}
-                  </span>
-                </button>
-                <div
-                  className={styles.accordionContent}
-                  aria-hidden={openIndex !== index}
-                >
-                  <p>{item.answer}</p>
-                </div>
+                {item.question}
+                <span className={styles.accordionIcon}>
+                  {openIndex === index ? "−" : "+"}
+                </span>
+              </button>
+              <div
+                className={styles.accordionContent}
+                aria-hidden={openIndex !== index}
+              >
+                <p>{item.answer}</p>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
+          ))}
+        </div>
 
         {/* --- Contact Form Section --- */}
         <div className={styles.formSection}>
