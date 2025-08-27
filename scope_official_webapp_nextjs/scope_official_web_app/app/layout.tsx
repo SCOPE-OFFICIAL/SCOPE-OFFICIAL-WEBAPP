@@ -46,7 +46,7 @@ export default function RootLayout({
               >
                 Home
               </Link>
-              <Link href="/events" className="nav-link-hover-effect">Events</Link>
+              <Link href="/eventss" className="nav-link-hover-effect">Events</Link>
               <Link href="/aboutus" className="nav-link-hover-effect">About Us</Link>
               <Link href="/gallery" className="nav-link-hover-effect">Gallery</Link>
               <Link href="/teams" className="nav-link-hover-effect">Team</Link>

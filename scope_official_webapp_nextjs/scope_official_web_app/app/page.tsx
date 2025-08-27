@@ -311,7 +311,7 @@ export default function Home() {
             ≫
           </button>
           
-          <Link href="/events">
+          <Link href="/eventss">
             <button className="mt-10 px-10 py-3 bg-[#004C94] text-white font-regular rounded-md hover:bg-[#006ac4] transition duration-300 transform hover:scale-105">
               VIEW ALL EVENTS
             </button>
