@@ -196,6 +196,7 @@ export default function FaqPage() {
                   <div className={styles.colSpan}>
                     <label htmlFor="email" className={styles.label}>
                       Email
+                      
                     </label>
                     <input 
                       type="email" 

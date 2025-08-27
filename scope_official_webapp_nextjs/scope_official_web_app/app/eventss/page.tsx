@@ -7,24 +7,27 @@ export default function HomePage() {
     {
       image: "/images/past-event-1.jpg",
       title: "MATLAB Orientation Workshop",
-      description: "An intensive workshop introducing MATLAB fundamentals for signal processing and data analysis. Participants learned practical applications through hands-on exercises and real-world examples.",
+      description:
+        "An intensive workshop introducing MATLAB fundamentals for signal processing and data analysis. Participants learned practical applications through hands-on exercises and real-world examples.",
       date: "February 15, 2024",
-      attendees: "120+ students"
+      attendees: "120+ students",
     },
     {
       image: "/images/past-event-2-matlab.jpg",
       title: "Empower'25 Leadership Conference",
-      description: "A leadership development conference featuring industry experts discussing innovation, career opportunities, and personal growth strategies for engineering students.",
+      description:
+        "A leadership development conference featuring industry experts discussing innovation, career opportunities, and personal growth strategies for engineering students.",
       date: "January 20, 2025",
-      attendees: "200+ participants"
+      attendees: "200+ participants",
     },
     {
       image: "/images/past-event-3-tech.jpg",
       title: "PCB Design Masterclass",
-      description: "Hands-on workshop covering PCB design fundamentals, schematic capture, layout design, and manufacturing processes using industry-standard tools.",
+      description:
+        "Hands-on workshop covering PCB design fundamentals, schematic capture, layout design, and manufacturing processes using industry-standard tools.",
       date: "March 10, 2024",
-      attendees: "85+ engineering students"
-    }
+      attendees: "85+ engineering students",
+    },
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -76,7 +79,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-[#040A28] text-gray-200 font-sans relative overflow-hidden">
-      {/* Main Content Area */}
       <main className="container mx-auto px-4 sm:px-8 py-12 lg:py-20">
         {/* Upcoming Events Section */}
         <section className="flex flex-col lg:flex-row items-center lg:items-start justify-between mb-20 lg:mb-24">
@@ -87,24 +89,25 @@ export default function HomePage() {
             <div className="font-dm-sans text-lg sm:text-xl">
               <p className="leading-relaxed mb-6">
                 SCOPE at Reva University is hosting an IEEE Lab Orientation for
-                2nd-semester ECE students. This comprehensive session covers essential concepts, 
-                lab equipment, safety protocols, and hands-on experiments, guided by expert
-                mentors to build a strong foundation in electronics.
+                2nd-semester ECE students. This comprehensive session covers
+                essential concepts, lab equipment, safety protocols, and
+                hands-on experiments, guided by expert mentors to build a strong
+                foundation in electronics.
               </p>
               <h3 className="text-xl font-semibold mb-4 text-blue-300">
                 Key Learning Objectives
               </h3>
               <ul className="list-disc list-inside space-y-2 mb-8">
                 <li>Introduction to essential lab instruments and equipment</li>
-                <li>Hands-on experience with basic circuit design and implementation</li>
+                <li>
+                  Hands-on experience with basic circuit design and
+                  implementation
+                </li>
                 <li>Safety practices and laboratory protocols</li>
                 <li>Developing practical skills for confident experimentation</li>
                 <li>Networking with peers and industry professionals</li>
               </ul>
             </div>
-            <button className="font-dm-sans bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105">
-              REGISTER NOW
-            </button>
           </div>
           <div className="lg:w-1/2 flex justify-center lg:justify-end">
             <div className="relative">
@@ -127,6 +130,7 @@ export default function HomePage() {
             PAST EVENTS GALLERY
           </h2>
 
+          {/* Carousel */}
           <div className="relative w-full max-w-6xl mx-auto mb-12">
             <button
               onClick={handlePrev}
@@ -140,8 +144,7 @@ export default function HomePage() {
               className="flex justify-center items-center relative h-[400px] sm:h-[450px] overflow-hidden cursor-grab active:cursor-grabbing"
               onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
               onTouchEnd={(e) => {
-                const touchEndX = e.changedTouches[0].clientX;
-                const diff = touchStartX - touchEndX;
+                const diff = touchStartX - e.changedTouches[0].clientX;
                 if (diff > swipeThreshold) handleNext();
                 else if (diff < -swipeThreshold) handlePrev();
               }}
@@ -165,19 +168,13 @@ export default function HomePage() {
 
                 if (relativeIndex === 0) {
                   styleClass +=
-                    (isHovered || isCenter
-                      ? "w-72 sm:w-80 h-[380px] sm:h-[420px] z-30 scale-100 opacity-100"
-                      : "w-64 sm:w-72 h-[360px] sm:h-[400px] z-20 scale-95 opacity-90");
+                    "w-72 sm:w-80 h-[380px] sm:h-[420px] z-30 scale-100 opacity-100";
                 } else if (relativeIndex === 1) {
                   styleClass +=
-                    (isHovered
-                      ? "translate-x-[170px] sm:translate-x-[190px] scale-100 z-30 opacity-100 w-72 sm:w-80 h-[380px] sm:h-[420px]"
-                      : "translate-x-[170px] sm:translate-x-[190px] scale-90 z-10 opacity-70 w-64 sm:w-72 h-[360px] sm:h-[400px]");
+                    "translate-x-[170px] sm:translate-x-[190px] scale-90 z-10 opacity-70 w-64 sm:w-72 h-[360px]";
                 } else if (relativeIndex === pastEvents.length - 1) {
                   styleClass +=
-                    (isHovered
-                      ? "-translate-x-[170px] sm:-translate-x-[190px] scale-100 z-30 opacity-100 w-72 sm:w-80 h-[380px] sm:h-[420px]"
-                      : "-translate-x-[170px] sm:-translate-x-[190px] scale-90 z-10 opacity-70 w-64 sm:w-72 h-[360px] sm:h-[400px]");
+                    "-translate-x-[170px] sm:-translate-x-[190px] scale-90 z-10 opacity-70 w-64 sm:w-72 h-[360px]";
                 } else {
                   styleClass += "opacity-0 pointer-events-none";
                 }
@@ -239,9 +236,7 @@ export default function HomePage() {
             {pastEvents.map((_, index) => (
               <button
                 key={index}
-                onClick={() => {
-                  setCurrentIndex(index);
-                }}
+                onClick={() => setCurrentIndex(index)}
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${
                   index === currentIndex
                     ? "bg-blue-500 scale-110"
@@ -251,33 +246,13 @@ export default function HomePage() {
               />
             ))}
           </div>
-         
-           <Link href="/gallery">
-            <button className="mt-10 px-10 py-3 bg-[#004C94] text-white font-regular rounded-md hover:bg-[#006ac4] transition duration-300 transform hover:scale-105">
+
+          {/* Gallery Link */}
+          <Link href="/gallery">
+            <button className="mt-10 px-10 py-3 bg-[#004C94] text-white rounded-md hover:bg-[#006ac4] transition duration-300 transform hover:scale-105">
               VIEW EVENT GALLERY
             </button>
           </Link>
-
-        </section>
-
-        {/* Call to Action Section */}
-        <section className="text-center py-12 bg-blue-900/20 rounded-xl mb-12">
-          <h2 className="font-orbitron text-3xl sm:text-4xl font-bold text-white mb-6">
-            JOIN OUR NEXT EVENT
-          </h2>
-          <p className="font-dm-sans text-lg text-gray-300 max-w-2xl mx-auto mb-8">
-            Be part of our growing community of electronics enthusiasts and 
-            innovators. Stay updated with our upcoming workshops, seminars, 
-            and hands-on sessions.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button className="font-dm-sans bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-all duration-300">
-              SUBSCRIBE TO NEWSLETTER
-            </button>
-            <button className="font-dm-sans bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-all duration-300">
-              FOLLOW US ON SOCIAL MEDIA
-            </button>
-          </div>
         </section>
       </main>
 
@@ -288,7 +263,7 @@ export default function HomePage() {
         className="absolute bottom-0 right-0 w-48 sm:w-64 opacity-40 pointer-events-none z-0"
       />
 
-      {/* Animated background elements */}
+      {/* Animated Background Elements */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none z-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-1/3 right-1/4 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl animate-pulse delay-1000"></div>

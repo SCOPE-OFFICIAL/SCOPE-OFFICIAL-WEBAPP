@@ -24,7 +24,7 @@ export default function Home() {
   const heroRef = useRef(null);
 
   // Google Form link for Join Us
-  const JOIN_US_FORM_URL = "https://docs.google.com/forms/your-form-link-here";
+  const JOIN_US_FORM_URL = "https://forms.gle/3pxeY5nn1Afaka6G8";
 
   // Stats counter animation - Updated realistic numbers
   useEffect(() => {

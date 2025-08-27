@@ -2,9 +2,10 @@ import "./globals.css";
 import Link from "next/link";
 import { Orbitron, Inter, DM_Sans } from "next/font/google";
 import type { Metadata } from "next";
+import PageTransition from "./components/PageTransition"; // ✅ add transition wrapper
 
 // Load fonts
-const orbitron = Orbitron({ subsets: ["latin"], weight: ["600", "600"], variable: "--font-orbitron" });
+const orbitron = Orbitron({ subsets: ["latin"], weight: ["600"], variable: "--font-orbitron" });
 const inter = Inter({ subsets: ["latin"], weight: ["400", "700"], variable: "--font-inter" });
 const dmSans = DM_Sans({ subsets: ["latin"], weight: ["400", "500", "700"], variable: "--font-dm-sans" });
 
@@ -14,7 +15,8 @@ export const metadata: Metadata = {
     default: "SCOPE Club",
     template: "%s | SCOPE Club"
   },
-  description: "Wired for Innovation, Powered by Passion. Learn more about SCOPE and our mission, what we do, and our teams.",
+  description:
+    "Wired for Innovation, Powered by Passion. Learn more about SCOPE and our mission, what we do, and our teams.",
 };
 
 // Root Layout Component
@@ -26,26 +28,21 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${orbitron.variable} ${inter.variable} ${dmSans.variable}`}>
       <body className="min-h-screen flex flex-col bg-[#040A28] text-white font-inter">
+        
         {/* ✅ NAVBAR with hover effects */}
         <header className="bg-[#040A28] shadow-md">
           <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <div className="flex items-center gap-2">
               <Link href="/" passHref>
-                {/* Increased logo size */}
-                <img 
-                  src="/assets/logo.png" 
-                  alt="SCOPE Club Logo" 
-                  className="h-20 w-20 transition-transform duration-300 hover:scale-105 cursor-pointer" 
+                <img
+                  src="/assets/logo.png"
+                  alt="SCOPE Club Logo"
+                  className="h-20 w-20 transition-transform duration-300 hover:scale-105 cursor-pointer"
                 />
               </Link>
             </div>
             <nav className="space-x-6 text-gray-200">
-              <Link
-                href="/"
-                className="nav-link-hover-effect"
-              >
-                Home
-              </Link>
+              <Link href="/" className="nav-link-hover-effect">Home</Link>
               <Link href="/eventss" className="nav-link-hover-effect">Events</Link>
               <Link href="/aboutus" className="nav-link-hover-effect">About Us</Link>
               <Link href="/gallery" className="nav-link-hover-effect">Gallery</Link>
@@ -55,8 +52,10 @@ export default function RootLayout({
           </div>
         </header>
 
-        {/* ✅ PAGE CONTENT */}
-        <main className="flex-grow">{children}</main>
+        {/* ✅ PAGE CONTENT with transition */}
+        <main className="flex-grow">
+          <PageTransition>{children}</PageTransition>
+        </main>
 
         {/* ✅ FOOTER with hover effects and corrected links */}
         <footer className="bg-[#040A28] text-white py-6 mt-10 border-t border-gray-700">

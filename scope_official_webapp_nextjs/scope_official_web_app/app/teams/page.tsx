@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 
-// --- Data for Faculty Members ---
+// --- Faculty Members ---
 const facultyMembers = [
   {
     role: "SCOPE COORDINATOR",
@@ -25,7 +25,7 @@ const facultyMembers = [
   },
 ];
 
-// --- Data for Student Team Members ---
+// --- Student Team Members ---
 const studentMembers = [
   {
     role: "PRESIDENT",
@@ -52,42 +52,42 @@ const studentMembers = [
     role: "STUDENT COORDINATOR HEAD",
     name: "Nandana Rajesh",
     image: "/images/nandana pick.jpg",
-    instagram: "https://www.instagram.com/nandana2628?igsh=MXQzMHBtNTY0ejZmYw==",
+    instagram: "https://www.instagram.com/nandana2628",
     linkedin: "https://www.linkedin.com/in/nandana-rajesh-583827294",
   },
   {
     role: "SECRETARY",
     name: "Monika S",
     image: "/images/monika pick.jpg",
-    instagram: "https://www.instagram.com/_m.o.n.i.k.a_16?igsh=MXNiaHd4cDl2ZWM4Zg==",
+    instagram: "https://www.instagram.com/_m.o.n.i.k.a_16",
     linkedin: "http://linkedin.com/in/monika-s-85b275341",
   },
   {
     role: "TREASURER",
     name: "Pratham Gupta",
     image: "/images/pratham pick.png",
-    instagram: "https://www.instagram.com/__pratham__01?igsh=aTFnb2k1YzBkeWJh",
+    instagram: "https://www.instagram.com/__pratham__01",
     linkedin: "https://linkedin.com/in/pratham21gupta",
   },
   {
     role: "PROJECT MANAGER",
     name: "Kishore",
     image: "/images/kishor pick.jpg",
-    instagram: "https://www.instagram.com/mhskreddy_04?igsh=MWxtbWo5MDFvZTlhdA==",
+    instagram: "https://www.instagram.com/mhskreddy_04",
     linkedin: "https://www.linkedin.com/in/m-hema-siva-kishore-reddy-26407734b/",
   },
   {
     role: "PR HEAD",
     name: "Dhanya Karnam",
     image: "/images/dhanya pick.jpg",
-    instagram: "https://www.instagram.com/dhanyaaayyy?igsh=MXVnZGtmcWE4cWtuMg==",
+    instagram: "https://www.instagram.com/dhanyaaayyy",
     linkedin: "https://www.linkedin.com/in/dhanya-karnam-3921a01bb?",
   },
   {
     role: "MARKETING HEAD",
     name: "Kadiri Akshaya",
     image: "/images/akshaya pick.jpg",
-    instagram: "https://www.instagram.com/borahae_hearts?igsh=eGs2bzEzcmV3NGJq",
+    instagram: "https://www.instagram.com/borahae_hearts",
     linkedin: "http://www.linkedin.com/in/kadiriakshaya",
   },
   {
@@ -108,7 +108,7 @@ const studentMembers = [
     role: "DESIGN HEAD",
     name: "Ananta Sai Gudivada",
     image: "/images/ananth pick.jpg",
-    instagram: "https://www.instagram.com/ananthasaigudivada?igsh=ZHlweXAxZXRxa2Qx",
+    instagram: "https://www.instagram.com/ananthasaigudivada",
     linkedin: "https://www.linkedin.com/in/ananthasaigudivada",
   },
   {
@@ -120,12 +120,12 @@ const studentMembers = [
   },
 ];
 
-// Team Card Component
+// --- Team Card ---
 const TeamCard = ({ member, isFaculty = false }) => {
   const [imageError, setImageError] = useState(false);
-  
+
   return (
-    <div className={`team-member-card ${isFaculty ? 'faculty-card' : ''}`}>
+    <div className={`team-member-card ${isFaculty ? "faculty-card" : ""}`}>
       <div className="member-image-container">
         <Image
           src={imageError ? "/images/placeholder avatar.jpg" : member.image}
@@ -181,15 +181,17 @@ const TeamCard = ({ member, isFaculty = false }) => {
   );
 };
 
+// --- Team Page ---
 export default function TeamPage() {
   return (
     <div className="team-page-container">
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="team-hero-section">
         <div className="team-hero-content">
           <h1 className="team-hero-title">OUR TEAM</h1>
           <p className="team-hero-subtitle">
-            Meet the brilliant minds behind SCOPE - our dedicated faculty mentors and passionate student leaders driving innovation forward.
+            Meet the brilliant minds behind SCOPE - our dedicated faculty
+            mentors and passionate student leaders driving innovation forward.
           </p>
         </div>
         <div className="team-hero-image">
@@ -203,7 +205,7 @@ export default function TeamPage() {
         </div>
       </section>
 
-      {/* Faculty Members Section */}
+      {/* Faculty */}
       <section className="team-section faculty-section">
         <div className="section-header">
           <h2 className="section-title">Faculty Mentors</h2>
@@ -213,12 +215,16 @@ export default function TeamPage() {
         </div>
         <div className="team-grid faculty-grid">
           {facultyMembers.map((member, index) => (
-            <TeamCard key={`faculty-${index}`} member={member} isFaculty={true} />
+            <TeamCard
+              key={`faculty-${index}`}
+              member={member}
+              isFaculty={true}
+            />
           ))}
         </div>
       </section>
 
-      {/* Student Members Section */}
+      {/* Students */}
       <section className="team-section student-section">
         <div className="section-header">
           <h2 className="section-title">Student Core Team</h2>
@@ -233,14 +239,14 @@ export default function TeamPage() {
         </div>
       </section>
 
+      {/* --- Styles --- */}
       <style jsx>{`
         .team-page-container {
           min-height: 100vh;
-          background: linear-gradient(135deg, #040A28 0%, #0a1039 100%);
+          background: linear-gradient(135deg, #040a28 0%, #0a1039 100%);
           color: #fff;
           padding: 2rem 1rem;
         }
-        
         .team-hero-section {
           display: flex;
           flex-direction: column;
@@ -249,23 +255,16 @@ export default function TeamPage() {
           padding: 3rem 1rem;
           max-width: 1200px;
           margin: 0 auto 4rem;
+          animation: fadeIn 1.2s ease;
         }
-        
-        .team-hero-content {
-          margin-bottom: 2rem;
-          max-width: 800px;
-        }
-        
         .team-hero-title {
-          font-size: 3.5rem;
-          font-weight: 700;
-          margin-bottom: 1rem;
-          background: linear-gradient(135deg, #6c8dff 0%, #8a5eff 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          text-shadow: 0 4px 20px rgba(108, 141, 255, 0.3);
-        }
-        
+  font-size: 3.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #fff; /* ✅ pure white */
+  text-shadow: 0 4px 20px rgba(255, 255, 255, 0.15); /* optional subtle glow */
+}
+
         .team-hero-subtitle {
           font-size: 1.2rem;
           color: #aab4e8;
@@ -273,7 +272,6 @@ export default function TeamPage() {
           max-width: 600px;
           margin: 0 auto;
         }
-        
         .team-hero-image {
           max-width: 800px;
           width: 100%;
@@ -282,47 +280,35 @@ export default function TeamPage() {
           box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
           transition: transform 0.3s ease;
         }
-        
         .team-hero-image:hover {
-          transform: translateY(-5px);
+          transform: translateY(-5px) scale(1.02);
         }
-        
         .team-section {
           max-width: 1200px;
           margin: 0 auto 5rem;
           padding: 0 1rem;
         }
-        
-        .section-header {
-          text-align: center;
-          margin-bottom: 3rem;
-        }
-        
         .section-title {
           font-size: 2.5rem;
           font-weight: 700;
           margin-bottom: 0.5rem;
           color: #fff;
         }
-        
         .section-subtitle {
           font-size: 1.1rem;
           color: #aab4e8;
           max-width: 600px;
           margin: 0 auto;
         }
-        
         .team-grid {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
           gap: 2rem;
           justify-items: center;
         }
-        
         .faculty-grid {
           grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
         }
-        
         .team-member-card {
           background: linear-gradient(145deg, #0c1338, #070c29);
           border-radius: 16px;
@@ -335,34 +321,29 @@ export default function TeamPage() {
           overflow: hidden;
           width: 100%;
           max-width: 300px;
+          animation: fadeUp 1s ease;
         }
-        
         .team-member-card:hover {
-          transform: translateY(-8px);
+          transform: translateY(-8px) scale(1.03);
           box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
           border-color: rgba(108, 141, 255, 0.3);
         }
-        
         .team-member-card::before {
-          content: '';
+          content: "";
           position: absolute;
           top: 0;
           left: 0;
           right: 0;
           height: 4px;
           background: linear-gradient(90deg, #6c8dff, #8a5eff);
-          opacity: 0.8;
         }
-        
         .faculty-card {
           background: linear-gradient(145deg, #101945, #0a1039);
           max-width: 350px;
         }
-        
         .faculty-card::before {
           background: linear-gradient(90deg, #ff40a8, #ff6b6b);
         }
-        
         .member-image-container {
           position: relative;
           width: 150px;
@@ -371,25 +352,22 @@ export default function TeamPage() {
           border-radius: 50%;
           overflow: hidden;
           border: 3px solid rgba(108, 141, 255, 0.2);
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
-        
         .image-overlay {
           position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(135deg, rgba(108, 141, 255, 0.2), rgba(138, 94, 255, 0.2));
+          inset: 0;
+          background: linear-gradient(
+            135deg,
+            rgba(108, 141, 255, 0.2),
+            rgba(138, 94, 255, 0.2)
+          );
           opacity: 0;
           transition: opacity 0.3s ease;
           border-radius: 50%;
         }
-        
         .team-member-card:hover .image-overlay {
           opacity: 1;
         }
-        
         .member-role {
           font-size: 0.9rem;
           font-weight: 600;
@@ -398,70 +376,75 @@ export default function TeamPage() {
           text-transform: uppercase;
           letter-spacing: 1px;
         }
-        
         .faculty-card .member-role {
           color: #ff6b6b;
         }
-        
         .member-name {
           font-size: 1.2rem;
           font-weight: 600;
           margin-bottom: 1.5rem;
-          color: #fff;
         }
-        
         .member-socials {
           display: flex;
           justify-content: center;
           gap: 1rem;
         }
-        
         .social-icon-link {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 40px;
-          height: 40px;
+          width: 42px;
+          height: 42px;
           border-radius: 50%;
           background: rgba(108, 141, 255, 0.1);
           color: #6c8dff;
           transition: all 0.3s ease;
         }
-        
         .social-icon-link:hover {
           background: #6c8dff;
           color: #fff;
           transform: translateY(-3px);
         }
-        
         .icon {
           width: 20px;
           height: 20px;
         }
-        
+        @keyframes fadeUp {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+          }
+          to {
+            opacity: 1;
+          }
+        }
         @media (max-width: 768px) {
           .team-hero-title {
             font-size: 2.5rem;
           }
-          
           .team-grid {
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
           }
-          
           .faculty-grid {
             grid-template-columns: 1fr;
           }
         }
-        
         @media (max-width: 480px) {
           .team-hero-title {
             font-size: 2rem;
           }
-          
           .section-title {
             font-size: 2rem;
           }
-          
           .team-grid {
             grid-template-columns: 1fr;
           }

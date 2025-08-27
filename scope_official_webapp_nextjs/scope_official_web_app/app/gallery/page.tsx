@@ -237,10 +237,12 @@ export default function GalleryPage() {
           margin-bottom: 1rem;
           background: linear-gradient(135deg, #6c8dff 0%, #8a5eff 100%);
           -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          
+          color: #fff; /* ✅ pure white */
           text-shadow: 0 4px 20px rgba(108, 141, 255, 0.3);
         }
         
+
         .hero-subtitle {
           font-size: 1.2rem;
           color: #aab4e8;
