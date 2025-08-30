@@ -109,7 +109,8 @@ export default function FaqPage() {
             FREQUENTLY ASKED QUESTIONS
           </h1>
           <p className={styles.sectionSubtitle}>
-            Navigating Your Queries with Precision. Explore answers to common questions about circuits, components, electronics fundamentals and the upcoming events. Need more help? Reach out to us!
+            Explore answers to common questions about circuits, components, electronics fundamentals and the upcoming events. 
+            Need more help? Reach out to us!
           </p>
         </div>
 
