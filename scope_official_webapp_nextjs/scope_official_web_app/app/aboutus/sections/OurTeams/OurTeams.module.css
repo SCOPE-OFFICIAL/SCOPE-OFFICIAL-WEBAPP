@@ -1,3 +1,5 @@
+/* OurTeams.module.css */
+
 .ourTeamsSection {
   padding: 80px 0;
   background-color: var(--background-dark);
@@ -71,12 +73,20 @@
   box-shadow: 0 4px 15px rgba(138, 64, 255, 0.3);
 }
 
+/* Main container for the photo and members list */
+.contentAndDetails {
+  display: flex;
+  flex-direction: column; /* Stacked by default on small screens */
+  align-items: center;
+  gap: 30px; /* Space between the photo and the members list */
+  width: 100%;
+}
+
 /* Photo container */
 .photoContainer {
   position: relative;
   max-width: 800px;
   width: 100%;
-  margin: 0 auto;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -96,29 +106,55 @@
   transform: scale(1.03);
 }
 
-.teamNameOverlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
-  color: var(--text-light);
-  padding: 25px;
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+/* Members list container */
+.membersContainer {
+  width: 100%;
+  padding: 1.5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(138, 64, 255, 0.2);
 }
 
+.teamDescription {
+  font-size: 1.1rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-light);
+}
+
+.memberList {
+  list-style-type: disc; /* Ensures bullet points are visible */
+  padding-left: 20px;
+}
+
+.memberItem {
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  color: var(--text-light);
+}
+
+
 /* Responsive design */
+@media (min-width: 768px) {
+  .contentAndDetails {
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 50px;
+  }
+
+  .photoContainer {
+    max-width: 50%; /* Adjusts photo width for side-by-side layout */
+  }
+
+  .membersContainer {
+    width: 50%; /* Adjusts members list width */
+  }
+}
+
 @media (max-width: 900px) {
   .photoContainer {
     max-width: 600px;
-  }
-  
-  .teamNameOverlay {
-    font-size: 20px;
-    padding: 20px;
   }
 }
 
@@ -161,11 +197,6 @@
   .teamPhoto {
     min-height: 300px;
   }
-  
-  .teamNameOverlay {
-    font-size: 18px;
-    padding: 15px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -175,10 +206,5 @@
   
   .teamPhoto {
     min-height: 250px;
-  }
-  
-  .teamNameOverlay {
-    font-size: 16px;
-    padding: 12px;
   }
 }

@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import HomePageIntroAnimation from "./components/HomePageIntroAnimation";
 
 const metadata = {
   title: "SCOPE Club",
@@ -19,26 +20,24 @@ export default function Home() {
   const [touchStartX, setTouchStartX] = useState(0);
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [isVisible, setIsVisible] = useState(false);
-  const [stats, setStats] = useState({ members: 0, events: 0 }); // Removed projects
+  const [stats, setStats] = useState({ members: 0, events: 0 }); 
   const swipeThreshold = 50;
   const heroRef = useRef(null);
 
-  // Google Form link for Join Us
   const JOIN_US_FORM_URL = "https://forms.gle/3pxeY5nn1Afaka6G8";
 
-  // Stats counter animation - Updated realistic numbers
+  // Stats counter animation
   useEffect(() => {
     const interval = setInterval(() => {
       setStats(prev => ({
-        members: Math.min(prev.members + 3, 50), // Realistic member count
-        events: Math.min(prev.events + 1, 6)     // Realistic event count
+        members: Math.min(prev.members + 3, 50),
+        events: Math.min(prev.events + 1, 6)
       }));
     }, 100);
-
     return () => clearInterval(interval);
   }, []);
 
-  // Intersection Observer for animations
+  // Intersection Observer
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -71,34 +70,33 @@ export default function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  // Scroll to section function
   const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      element.scrollIntoView({ behavior: "smooth" });
     }
   };
 
-  // Newsletter form submission
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // You can add Firebase integration here later
     alert("Thank you for subscribing! We'll keep you updated.");
   };
 
   return (
-    <main className="bg-[#040A28] text-white font-inter">
-      {/* ✅ Back to Top Button */}
-      <button
-        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className="fixed bottom-6 right-6 z-50 bg-[#004C94] hover:bg-[#006ac4] text-white p-3 rounded-full shadow-lg transition-all duration-300 opacity-0 hover:opacity-100 group"
-        aria-label="Back to top"
-      >
-        ↑
-        <span className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs py-1 px-2 rounded">
-          Back to Top
-        </span>
-      </button>
+    <HomePageIntroAnimation>
+      <main className="bg-[#040A28] text-white font-inter">
+        {/* ✅ Back to Top Button */}
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-6 right-6 z-50 bg-[#004C94] hover:bg-[#006ac4] text-white p-3 rounded-full shadow-lg transition-all duration-300 opacity-0 hover:opacity-100 group"
+          aria-label="Back to top"
+        >
+          ↑
+          <span className="absolute bottom-full mb-2 hidden group-hover:block bg-black text-white text-xs py-1 px-2 rounded">
+            Back to Top
+          </span>
+        </button>
+
 
       {/* ✅ HERO SECTION with aligned text and image */}
       <section ref={heroRef} className="py-20 relative overflow-hidden">
@@ -396,30 +394,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ✅ NEWSLETTER SIGNUP - Simple implementation for now */}
-      <section className="py-16 px-6 bg-[#0A1430]">
-        <div className="max-w-2xl mx-auto text-center">
-          <h3 className="text-2xl font-bold mb-4">Stay Updated</h3>
-          <p className="text-gray-300 mb-6">Get the latest news about events, workshops, and activities</p>
-          <form onSubmit={handleNewsletterSubmit} className="flex gap-4 justify-center">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="px-4 py-2 bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-400 focus:outline-none focus:border-[#004C94] w-64"
-              required
-            />
-            <button 
-              type="submit"
-              className="px-6 py-2 bg-[#004C94] text-white rounded-md hover:bg-[#006ac4] transition"
-            >
-              Subscribe
-            </button>
-          </form>
-          <p className="text-sm text-gray-400 mt-4">
-            We'll email you about upcoming events - no spam, just updates!
-          </p>
-        </div>
-      </section>
+      
 
       {/* ✅ OUR PARTNERS (Animated Scroll) */}
       <section className="py-16 px-6 text-center overflow-hidden">
@@ -451,5 +426,6 @@ export default function Home() {
         </div>
       </section>
     </main>
+    </HomePageIntroAnimation>
   );
 }
