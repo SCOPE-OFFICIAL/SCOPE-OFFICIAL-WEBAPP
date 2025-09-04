@@ -36,7 +36,7 @@ export default function Home() {
   return (
     <main className="bg-[#040A28] text-white font-inter">
       {/* ✅ HERO SECTION with aligned text and image */}
-      <section className="py-20">
+      <section className="pt-10 pb-0">
         <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center gap-10 md:gap-20">
           {/* Left: Hero Text */}
           <div className="md:w-1/2 w-full">
@@ -66,9 +66,11 @@ export default function Home() {
             </div>
 
             {/* ✅ Learn More Button */}
-            <button className="mt-10 px-10 py-3 bg-[#004C94] text-white font-regular rounded-md hover:bg-[#006ac4] transition duration-300">
-              LEARN MORE
-            </button>
+            <a href="/aboutus">
+              <button className="mt-6 px-10 py-3 bg-[#004C94] text-white font-regular rounded-md hover:bg-[#006ac4] transition duration-300">
+                LEARN MORE
+              </button>
+            </a>
           </div>
 
           {/* Right: Hero Image */}
@@ -76,7 +78,7 @@ export default function Home() {
             <img
               src="/assets/pcb.png"
               alt="PCB Background"
-              className="w-full h-auto object-cover opacity-80 mix-blend-lighten"
+              className="w-full h-auto object-cover opacity-90 mix-blend-lighten"
             />
 
             {/* Faint grid lines */}
@@ -88,53 +90,73 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ✅ WHAT DO WE DO */}
-      <section className="py-16 px-6 text-center">
-        <h3 className="text-3xl font-bold mb-4 font-orbitron">
-          WHAT DO WE DO?
-        </h3>
-        <p className="max-w-2xl mx-auto text-gray-300 font-dm-sans mb-10">
-          SCOPE fosters innovation through hands-on training and discussions,
-          empowering future electronics leaders.
-        </p>
+     {/* ✅ FUELING THE FUTURE OF ELECTRONICS */}
+<section className="py-16 -mt-10">
+  <div className="max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row items-center gap-10 md:gap-20">
+    {/* Left: Image */}
+    <div className="md:w-1/2 w-full flex justify-center">
+      {/* ✅ Hexagon Image */}
+      <div className="relative flex flex-col items-center">
+        {/* ✅ Hexagon */}
+        <img
+          src="/assets/hex-design.png"
+          alt="Hexagonal electronics design"
+          className="w-full max-w-lg md:max-w-xl object-contain animate-float animate-spin-slow relative z-10"
+        />
+        <br />
+        <br />
 
-        <div className="flex flex-col md:flex-row gap-8 justify-center items-stretch">
-          <div className="w-full md:w-1/4 max-w-xs mx-auto flex flex-col items-center">
-            <div className="w-full aspect-[4/3] overflow-hidden rounded-xl shadow-lg mb-4">
-              <img
-                src="/assets/projects.jpg"
-                alt="Projects"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <h4 className="text-xl font-dm-sans text-white">Projects</h4>
-          </div>
+        {/* ✅ Ring as glow base */}
+        <img
+          src="/assets/hex_ring.jpg"
+          alt="Hexagonal glowing ring"
+          className="absolute bottom-[-50px] w-[85%] object-contain mix-blend-screen opacity-100 translate-x-5"
+        />
+      </div>
+    </div>
 
-          <div className="w-full md:w-1/4 max-w-xs mx-auto flex flex-col items-center">
-            <div className="w-full aspect-[4/3] overflow-hidden rounded-xl shadow-lg mb-4">
-              <img
-                src="/assets/technical.jpg"
-                alt="Technical Talks"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <h4 className="text-xl  font-dm-sans text-white">
-              Technical Talks
-            </h4>
-          </div>
+    {/* Right: Text and buttons */}
+    <div className="md:w-1/2 w-full text-center md:text-left">
+      <h2 className="text-4xl md:text-5xl font-regulur font-dm-sans mb-4">
+        Fueling the <br />
+        <span className="font-DMSans font-bold">
+          <span className="text-[#DF9E65]">future</span>{" "}
+          <span className="text-white font-dm-sans font-normal">
+            of electronics.
+          </span>
+        </span>
+      </h2>
 
-          <div className="w-full md:w-1/4 max-w-xs mx-auto flex flex-col items-center">
-            <div className="w-full aspect-[4/3] overflow-hidden rounded-xl shadow-lg mb-4">
-              <img
-                src="/assets/workshops.jpg"
-                alt="Workshops"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <h4 className="text-xl  font-dm-sans text-white">Workshops</h4>
-          </div>
+      <p className="text-lg text-gray-300 mb-8 max-w-md md:max-w-none mx-auto md:mx-0">
+        SCOPE fosters innovation through hands-on training and discussions.
+      </p>
+
+      {/* Buttons Grid */}
+      <div className="grid grid-cols-2 gap-4 max-w-md mx-auto md:mx-0">
+        <div className="flex items-center p-4 bg-gray-900 rounded-lg border border-gray-700 space-x-2 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-gray-700 hover:translate-y-[-5px]">
+          <img src="/assets/tech-talk-icon.png" alt="Tech talks icon" className="w-10 h-10" />
+          <span className="text-white">Tech talks</span>
         </div>
-      </section>
+
+        <div className="flex items-center p-4 bg-gray-900 rounded-lg border border-gray-700 space-x-2 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-gray-700 hover:translate-y-[-5px]">
+          <img src="/assets/projects-icon.png" alt="Projects icon" className="w-10 h-10" />
+          <span className="text-white">Projects</span>
+        </div>
+
+        <div className="flex items-center p-4 bg-gray-900 rounded-lg border border-gray-700 space-x-2 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-gray-700 hover:translate-y-[-5px]">
+          <img src="/assets/workshops-icon.png" alt="Workshops icon" className="w-10 h-10" />
+          <span className="text-white">Workshops</span>
+        </div>
+
+        <div className="flex items-center p-4 bg-gray-900 rounded-lg border border-gray-700 space-x-2 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-105 hover:bg-gray-700 hover:translate-y-[-5px]">
+          <img src="/assets/competitions-icon.png" alt="Competitions icon" className="w-10 h-10" />
+          <span className="text-white">Competitions</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* ✅ UPCOMING EVENTS */}
       <section className="py-16 px-6 text-center" id="events">
@@ -218,14 +240,15 @@ export default function Home() {
             ≫
           </button>
           {/* ✅ Learn More Button */}
-          <button className="mt-10 px-10 py-3 bg-[#004C94] text-white font-regular rounded-md hover:bg-[#006ac4] transition duration-300">
-            LEARN MORE
-          </button>
+          <a href="/eventss">
+            <button className="mt-10 px-10 py-3 bg-[#004C94] text-white font-regular rounded-md hover:bg-[#006ac4] transition duration-300">
+              LEARN MORE
+            </button>
+          </a>
         </div>
       </section>
 
       {/* ✅ JOIN US */}
-
       <section className="bg-[#040A28] py-40 px-6">
         <div className="relative max-w-6xl mx-auto bg-white/3 border border-white/10 rounded-2xl py-10 px-20 backdrop-blur-3xl overflow-hidden flex items-center justify-between">
           {/* Glow Spots */}
@@ -245,9 +268,9 @@ export default function Home() {
 
           {/* Button */}
           <div className="z-10">
-            <button className="px-8 py-3 bg-[#76101E] text-white font-semibold rounded-full hover:bg-[#00058C] transition">
+           <a href="https://forms.gle/u8199gt9FwKentwGA"> <button className="px-8 py-3 bg-[#76101E] text-white font-semibold rounded-full hover:bg-[#00058C] transition">
               Join Us
-            </button>
+            </button></a>
           </div>
         </div>
       </section>

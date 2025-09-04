@@ -1,26 +1,296 @@
+/* --- FONT IMPORTS --- */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: "Inter", Orbitron, DM_Sans;
-  background-color: #040a28; /* ✅ Set deep blue as base */
-  color: white;
+/* --- CSS VARIABLES --- */
+:root {
+  --background-dark: #040a28;
+  --text-light: #ffffff;
+  --accent-blue: #ffffff;
+  --card-background: #040a28;
+  --primary-purple: #8a40ff;
+  --secondary-pink: #ff40a8;
+  --tertiary-blue: #00bfff;
+  --new-gradient-top: #0a0f2b;
+  --new-gradient-middle: #0072ff;
+  --new-gradient-bottom: #ec4dc2;
+  --glow-gradient-purple: linear-gradient(90deg, #8a40ff 0%, #b940ff 100%);
+  --glow-gradient-pink: linear-gradient(90deg, #ff40a8 0%, #ff60c8 100%);
+  --card-gradient: linear-gradient(
+    135deg,
+    rgba(29, 30, 78, 0.7) 0%,
+    rgba(10, 15, 43, 0.7) 100%
+  );
+  --card-border-gradient: linear-gradient(135deg, #8a40ff, #ff40a8);
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* --- BASE STYLES --- */
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "DM Sans", "Inter", sans-serif;
+  background-color: var(--background-dark);
+  color: var(--text-light);
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--accent-blue);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* --- NAVBAR STYLES --- */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  padding: 1rem 2rem;
+  background: var(--background-dark);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ✅ Gradient underline effect for navbar links */
+/* Gradient underline effect ONLY on hover */
+a::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(90deg, #040A28, #F24DC2, #040A28);
+  transform: scaleX(0);          /* hidden by default */
+  transform-origin: bottom right;
+  transition: transform 0.3s ease-out;
+}
+
+/* Show underline only on hover */
+a:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+/* 🔥 Remove constant underline (active state) */
+a:active::after,
+a[aria-current="page"]::after {
+  transform: scaleX(0) !important;  /* prevent permanent underline */
+}
+
+
+
+/* --- UTILITY CLASSES --- */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.text-center {
+  text-align: center;
+}
+.team-top-image-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+/* --- COMPONENT-SPECIFIC STYLES FROM TEAMS PAGE --- */
+.our-team-section {
+  padding: 4rem 5%;
+  text-align: center;
+}
+
+.section-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: var(--accent-blue);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.section-subtitle {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 600px;
+  margin: 0 auto 3rem auto;
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2.5rem 2rem;
+  justify-items: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.team-member-card {
+  background-color: var(--card-background);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  max-width: 350px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.team-member-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+}
+
+.member-role {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--accent-blue);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.member-name {
+  font-size: 1.1rem;
+  color: var(--text-light);
+  margin-bottom: 1rem;
+}
+
+.member-image-container {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  border: 3px solid var(--accent-blue);
+  box-shadow: 0 0 0 5px rgba(0, 123, 255, 0.2);
+}
+
+.member-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.member-socials {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: auto;
+}
+
+.social-icon-link {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.social-icon-link:hover {
+  background-color: var(--accent-blue);
+  color: var(--background-dark);
+}
+
+.social-icon-link .icon {
+  width: 22px;
+  height: 22px;
+}
+
+/* --- Media Queries for Responsiveness --- */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 2.2rem;
+  }
+  .section-subtitle {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+  .team-grid {
+    grid-template-columns: 1fr;
+  }
+  .team-member-card {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-title {
+    font-size: 1.8rem;
+  }
+  .team-member-card {
+    max-width: 300px;
+  }
+  .member-image-container {
+    width: 120px;
+    height: 120px;
+  }
+  .member-role {
+    font-size: 1.3rem;
+  }
+  .member-name {
+    font-size: 1rem;
+  }
+}
+
+/* --- SCROLLBAR STYLES FROM EVENTS PAGE --- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #2a3447;
+}
+::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #60a5fa;
+}
+
+/* --- MARQUEE ANIMATION FROM HOMEPAGE --- */
 @keyframes marquee {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
 }
 
 .animate-marquee {
   animation: marquee 10s linear infinite;
+}
+
+/* ✅ Floating animation for hexagonal image */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }

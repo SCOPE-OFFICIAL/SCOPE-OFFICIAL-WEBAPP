@@ -1,0 +1,166 @@
+.ourTeamsSection {
+  position: relative;
+  padding: 60px 20px;
+  background-color: 040A28;
+  font-family: 'Montserrat', sans-serif;
+  color: white;
+}
+
+.heading {
+  text-align: center;
+  font-family: 'Orbitron', sans-serif; /* You'll need to import this font */
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-bottom: 50px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.timeline {
+  position: relative;
+  max-width: 900px;
+  margin: auto;
+  padding: 0 20px;
+}
+
+/* Vertical center line with gradient and fading effect */
+.timeline::after {
+  content: "";
+  position: absolute;
+  width: 1px;
+  background-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #4a4a87 5%,
+    #a44d8c 95%,
+    transparent 100%
+  );
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+.card {
+  position: relative;
+  width: 35%; /* Block length made even shorter */
+  padding: 25px;
+  border-radius: 50px;
+  color: white;
+  margin-bottom: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 90px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+/* Hover effect for the cards */
+.card:hover {
+  transform: scale(1.05);
+}
+
+/* Horizontal connecting lines */
+.card::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 44px;
+  height: 1px;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.left::before {
+  right: -52px;
+  background: linear-gradient(to left, #4a4a87 0%, transparent 100%);
+}
+
+.right::before {
+  left: -48px;
+  background: linear-gradient(to right, #4a4a87 0%, transparent 100%);
+}
+
+/* Dots on the timeline */
+.card::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #6a11cb;
+  border: 1px solid #2575fc;
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+}
+
+/* Position dots for left and right cards */
+.left::after {
+  right: -56px;
+}
+
+.right::after {
+  left: -48px;
+}
+
+/* Gradient backgrounds for cards */
+.card:nth-child(1) {
+  background: linear-gradient(135deg, #152238, #301934);
+}
+.card:nth-child(2) {
+  background: linear-gradient(135deg, #1a233b, #30263f);
+}
+.card:nth-child(3) {
+  background: linear-gradient(135deg, #1a233b, #30263f);
+}
+.card:nth-child(4) {
+  background: linear-gradient(135deg, #1a233b, #30263f);
+}
+.card:nth-child(5) {
+  background: linear-gradient(135deg, #1a233b, #30263f);
+}
+
+.left {
+  left: 9%;
+}
+
+.right {
+  left: 55%;
+}
+
+.card h3 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Adjust for smaller screens */
+@media screen and (max-width: 768px) {
+  .timeline::after {
+    left: 8px;
+    transform: none;
+  }
+
+  .card {
+    width: 90%;
+    left: 0 !important;
+    margin-left: 20px;
+    margin-right: 0;
+  }
+
+  /* Hide horizontal lines on mobile for cleaner look */
+  .card::before {
+    display: none;
+  }
+
+  /* Adjust dot positions for mobile */
+  .card::after {
+    left: -20px;
+    right: auto;
+  }
+}

@@ -1,0 +1,25 @@
+.divider {
+  border: none;
+  height: 1px !important; /* Set the height with !important to prevent overriding */
+  display: block; /* Ensures the element does not stretch in a flex container */
+  /* Pink -> Purple -> Blue gradient, fading only on the right side */
+  background: linear-gradient(
+    to right,
+    #E751C5,
+    #5188F3,
+    #004C94,
+    transparent
+  );
+  max-width: 1000px; /* This fixed width ensures both lines are the same length */
+  margin: 0 auto; /* Center the line */
+  opacity: 1;
+  box-shadow: 0 0 10px rgba(138, 64, 255, 0.5);
+  border-radius: 1px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .divider {
+    width: 95%; /* Responsive width for smaller screens */
+  }
+}

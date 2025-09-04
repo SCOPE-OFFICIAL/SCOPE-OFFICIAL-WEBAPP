@@ -1,0 +1,99 @@
+.titleContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 60px;
+  position: relative;
+}
+
+.line {
+  height: 1px;
+  width: 30%; /* Increased width to make the lines longer */
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    #e81cff 20%,
+    #4079ff 80%,
+    transparent 100%
+  );
+  border-radius: 1px;
+  opacity: 0.8;
+}
+
+.lineLeft {
+  margin-right: 40px; /* Increased margin to move the line further away */
+  background: linear-gradient(
+    to left,
+    transparent 0%,
+    #4079ff 20%,
+    #e81cff 80%,
+    transparent 100%
+  );
+}
+
+.lineRight {
+  margin-left: 40px; /* Increased margin to move the line further away */
+}
+
+.title {
+  font-family: "Orbitron", sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-light);
+  text-align: center;
+  white-space: nowrap;
+  letter-spacing: 2px;
+}
+
+.subtitle {
+  font-family: "DM Sans", sans-serif;
+  font-size: 1.2rem;
+  color: var(--text-light);
+  text-align: center;
+  opacity: 0.7;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 10px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .title {
+    font-size: 3rem;
+  }
+  .line {
+    width: 25%;
+  }
+  .lineLeft {
+    margin-right: 35px;
+  }
+  .lineRight {
+    margin-left: 35px;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.5rem;
+  }
+  .line {
+    width: 20%;
+  }
+  .lineLeft {
+    margin-right: 30px;
+  }
+  .lineRight {
+    margin-left: 30px;
+  }
+}
+
+@media (max-width: 576px) {
+  .title {
+    font-size: 2rem;
+  }
+  .line {
+    display: none;
+  }
+}
