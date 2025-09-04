@@ -10,7 +10,8 @@
     "clean": "rm -rf node_modules"
   },
   "dependencies": {
-    "next": "15.2.0",
+    "framer-motion": "^12.23.12",
+    "next": "^15.5.0",
     "react": "19.0.0",
     "react-dom": "19.0.0"
   },

@@ -1,0 +1,120 @@
+.aboutUsSection {
+  padding: 40px 0; /* Reduced from 80px to 40px */
+  scroll-margin-top: 100px;
+  margin-top: 0px;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.contentWrapper {
+  display: flex;
+  gap: 40px; /* Reduced from 60px to 40px */
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.mission {
+  flex: 1;
+  min-width: 300px;
+  max-width: 600px;
+  text-align: left;
+}
+
+.missionTitle {
+  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 28px; /* Reduced from 34px */
+  font-weight: 400;
+  line-height: 110%; /* Improved from 100% */
+  letter-spacing: 0%;
+  color: var(--text-light);
+  text-transform: uppercase;
+  margin-bottom: 16px; /* Reduced from 20px */
+  position: relative;
+  padding-left: 40px; /* Reduced from 45px */
+  white-space: nowrap;
+}
+
+.missionTitle::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px; /* Reduced from 5px */
+  height: 28px; /* Reduced from 34px */
+  background: linear-gradient(
+    to bottom,
+    var(--secondary-pink),
+    var(--primary-purple)
+  );
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.mission p {
+  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 18px; /* Reduced from 24px */
+  font-weight: 400;
+  line-height: 140%; /* Improved from 100% */
+  letter-spacing: 1%; /* Reduced from 2% */
+  color: var(--text-light);
+  opacity: 0.9;
+}
+
+.illustration {
+  flex: 1;
+  min-width: 300px;
+  max-width: 450px;
+  text-align: center;
+}
+
+.illustration img {
+  max-width: 100%;
+  height: auto;
+  filter: drop-shadow(0 0 20px rgba(138, 64, 255, 0.7));
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .contentWrapper {
+    flex-direction: column;
+    gap: 30px; /* Reduced from 40px */
+  }
+  .mission,
+  .illustration {
+    max-width: 100%;
+    text-align: center;
+  }
+  .missionTitle {
+    padding-left: 0;
+    text-align: center;
+    font-size: 24px; /* Reduced from 28px */
+  }
+  .missionTitle::before {
+    display: none;
+  }
+  .aboutUsSection {
+    padding: 30px 0; /* Reduced from original */
+    margin-top: 0px;
+  }
+  .mission p {
+    font-size: 16px; /* Reduced from 20px */
+  }
+}
+
+@media (max-width: 480px) {
+  .aboutUsSection {
+    padding: 20px 0; /* Reduced from 60px */
+  }
+  .mission p {
+    font-size: 14px; /* Reduced from 18px */
+  }
+  .missionTitle {
+    font-size: 20px; /* Reduced from 24px */
+  }
+}

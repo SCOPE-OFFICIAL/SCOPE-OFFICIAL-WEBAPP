@@ -1,0 +1,208 @@
+"use client";
+
+import OriginalHomePage from "./components/OriginalHomePage";
+import AboutUsPage from "./aboutus/page";
+import TeamsPage from "./teams/page";
+import EventsPage from "./eventss/page";
+import FaqPage from "./faq/page";
+
+export default function HomePage() {
+  return (
+    <div className="unified-scroll-container">
+      {/* Section 1: Home */}
+      <section id="Home" className="min-h-screen scroll-snap-start">
+        <OriginalHomePage />
+      </section>
+
+      {/* Section 2: Events */}
+      <section id="Events" className="min-h-screen scroll-snap-start">
+        <EventsPage />
+      </section>
+
+      {/* Section 3: About Us */}
+      <section id="About Us" className="min-h-screen scroll-snap-start">
+        <AboutUsPage />
+      </section>
+
+      {/* Section 4: Teams */}
+      <section id="Teams" className="min-h-screen scroll-snap-start">
+        <TeamsPage />
+      </section>
+
+      {/* Section 5: FAQ */}
+      <section id="FAQ" className="min-h-screen scroll-snap-start">
+        <FaqPage />
+      </section>
+    </div>
+  );
+}
+import FaqPage from "./faq/page";
+
+export default function HomePage() {
+  return (
+    <div className="unified-scroll-container">
+      {/* Section 1: Home */}
+      <section id="Home" className="min-h-screen scroll-snap-start">
+        <OriginalHomePage />
+      </section>
+
+      {/* Section 2: Events */}
+      <section id="Events" className="min-h-screen scroll-snap-start">
+        <EventsPage />
+      </section>
+
+      {/* Section 3: About Us */}
+      <section id="About Us" className="min-h-screen scroll-snap-start">
+        <AboutUsPage />
+      </section>
+
+      {/* Section 4: Teams */}
+      <section id="Teams" className="min-h-screen scroll-snap-start">
+        <TeamsPage />
+      </section>
+
+      {/* Section 5: FAQ */}
+      <section id="FAQ" className="min-h-screen scroll-snap-start">
+        <FaqPage />
+      </section>
+    </div>
+  );
+}
+            <div className="w-full h-32 md:h-36 lg:h-40 overflow-hidden rounded-lg shadow-lg mb-3 md:mb-4 transform hover:scale-105 transition-all duration-500">
+              <img
+                src="/assets/technical.jpg"
+                alt="Technical Talks"
+        </StaggerContainer>
+      </section>
+
+      {/* ✅ UPCOMING EVENTS */}
+      <section className="py-12 px-6 text-center" id="events">
+        <ScrollAnimation direction="up" duration={0.7}>
+          <h3 className="text-2xl md:text-3xl font-bold font-orbitron mb-4">
+            UPCOMING EVENTS
+          </h3>
+          <p className="text-gray-300 mb-8 max-w-lg mx-auto font-dm-sans text-sm md:text-base">
+            Learn, innovate, and compete in our hands-on sessions. Stay tuned for
+            updates!
+          </p>
+        </ScrollAnimation>
+
+        <ScrollAnimation direction="fade" duration={0.8} delay={0.3}>
+          <div className="relative w-full max-w-4xl mx-auto">
+          <button
+            onClick={prevSlide}
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 z-20 text-3xl md:text-4xl text-white hover:text-gray-300 px-2 md:px-4"
+          >
+            ≪
+          </button>
+              const diff = touchStartX - e.clientX;
+              if (diff > swipeThreshold) nextSlide();
+              else if (diff < -swipeThreshold) prevSlide();
+            }}
+          >
+            {eventImages.map((src, index) => {
+              const relativeIndex =
+                (index + eventImages.length - currentIndex) %
+                eventImages.length;
+              const isHovered = hoverIndex === index;
+              const isCenter = relativeIndex === 0 && hoverIndex === null;
+
+              let styleClass =
+                "absolute transition-all duration-700 ease-in-out rounded-xl shadow-xl object-cover ";
+
+              if (relativeIndex === 0) {
+                styleClass +=
+                  isHovered || isCenter
+                    ? "w-60 h-[280px] md:w-64 md:h-[320px] z-30 scale-100 opacity-100"
+                    : "w-52 h-[260px] md:w-56 md:h-[300px] z-20 scale-95 opacity-90";
+              } else if (relativeIndex === 1) {
+                styleClass += isHovered
+                  ? "translate-x-[140px] md:translate-x-[150px] scale-100 z-30 opacity-100 w-60 h-[280px] md:w-64 md:h-[320px]"
+                  : "translate-x-[140px] md:translate-x-[150px] scale-90 z-10 opacity-60 w-52 h-[260px] md:w-56 md:h-[300px]";
+              } else if (relativeIndex === eventImages.length - 1) {
+                styleClass += isHovered
+                  ? "-translate-x-[140px] md:-translate-x-[150px] scale-100 z-30 opacity-100 w-60 h-[280px] md:w-64 md:h-[320px]"
+                  : "-translate-x-[140px] md:-translate-x-[150px] scale-90 z-10 opacity-60 w-52 h-[260px] md:w-56 md:h-[300px]";
+              } else {
+                styleClass += "opacity-0 pointer-events-none";
+              }
+
+              return (
+                <img
+                  key={index}
+                  src={src}
+                  alt={`Event ${index + 1}`}
+                  className={styleClass}
+                  draggable={false}
+                  onMouseEnter={() => setHoverIndex(index)}
+                  onMouseLeave={() => setHoverIndex(null)}
+                />
+              );
+            })}
+          </div>
+
+          <button
+            onClick={nextSlide}
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 z-20 text-3xl md:text-4xl text-white hover:text-gray-300 px-2 md:px-4"
+          >
+            ≫
+          </button>
+          {/* ✅ Learn More Button */}
+          <button className="mt-6 md:mt-8 px-8 py-2 md:px-10 md:py-3 bg-[#004C94] text-white font-regular rounded-md hover:bg-[#006ac4] transition duration-300 text-sm md:text-base">
+            LEARN MORE
+          </button>
+        </div>
+        </ScrollAnimation>
+      </section>
+
+      {/* ✅ JOIN US */}
+
+      <ScrollAnimation direction="up" duration={0.8}>
+        <section className="bg-[#040A28] py-40 px-6">
+          <div className="relative max-w-6xl mx-auto bg-white/3 border border-white/10 rounded-2xl py-10 px-20 backdrop-blur-3xl overflow-hidden flex items-center justify-between">
+            {/* Glow Spots */}
+            <div className="absolute -top-10 -left-10 w-24 h-24 bg-[#76101E] rounded-full blur-xl opacity-70" />
+            <div className="absolute top-0 right-20 w-20 h-20 bg-[#00058C] rounded-full blur-xl opacity-30" />
+            <div className="absolute -bottom-10 left-5 w-20 h-20 bg-[#444AE4] rounded-full blur-xl opacity-40" />
+            <div className="absolute -bottom-10 right-5 w-20 h-20 bg-[#76101E] rounded-full blur-xl opacity-40" />
+            <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 w-20 h-20 bg-[#00058C] rounded-full blur-xl opacity-40" />
+            <div className="absolute -top-10 left-1/3 -translate-x-1/2 w-20 h-20 bg-[#444AE4] rounded-full blur-xl opacity-40" />
+            <div className="absolute -top-10 right-1/4 -translate-x-1/2 w-20 h-20 bg-[#76101E] rounded-full blur-xl opacity-40" />
+            {/* Text */}
+            <div className="z-10 text-left text-white max-w-xl">
+            <p className="text-lg md:text-xl">
+              Turn your ideas into reality! Join our club and start creating!
+            </p>
+          </div>
+
+          {/* Button */}
+          <div className="z-10">
+            <button className="px-6 py-2 md:px-8 md:py-3 bg-[#76101E] text-white font-semibold rounded-full hover:bg-[#00058C] transition text-sm md:text-base">
+              Join Us
+            </button>
+          </div>
+        </div>
+      </section>
+      </ScrollAnimation>
+
+      {/* ✅ OUR PARTNERS (Animated Scroll) */}
+      <ScrollAnimation direction="up" duration={0.7}>
+        <section className="py-12 px-6 text-center overflow-hidden">
+          <h3 className="text-xl md:text-2xl mb-12">Our Partners</h3>
+          <div className="relative w-full overflow-hidden">
+            <div className="flex gap-8 md:gap-12 animate-marquee w-max">
+              {[1, 2, 3, 4, 5, 6, 7, 1, 2, 3, 4, 5, 6, 7].map((n, idx) => (
+                <img
+                  key={`partner-${idx}`}
+                  src={`/assets/partner${n}.png`}
+                  alt={`Partner ${n}`}
+                  className="h-10 md:h-12"
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+      </ScrollAnimation>
+    </main>
+  );
+}

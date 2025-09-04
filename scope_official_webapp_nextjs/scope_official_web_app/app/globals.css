@@ -1,26 +1,899 @@
+/* stylelint-disable at-rule-no-unknown */
+/* --- FONT IMPORTS --- */
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
+@import url("https://fonts.cdnfonts.com/css/mango-grotesque");
+
+/* Tailwind CSS directives */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: "Inter", Orbitron, DM_Sans;
-  background-color: #040a28; /* ✅ Set deep blue as base */
-  color: white;
+/* --- CSS VARIABLES --- */
+:root {
+  --background-dark: #040a28; /* Deep blue/black from homepage */
+  --text-light: #ffffff; /* White text */
+  --accent-blue: #ffffff; /* Standard blue for accents from teams page */
+  --card-background: #040a28; /* Card background color */
+  --primary-purple: #8a40ff; /* Bright purple for accents */
+  --secondary-pink: #ff40a8; /* Bright pink for accents */
+  --tertiary-blue: #00bfff; /* Existing blue */
+  --new-gradient-top: #0a0f2b;
+  --new-gradient-middle: #0072ff;
+  --new-gradient-bottom: #ec4dc2;
+  --glow-gradient-purple: linear-gradient(90deg, #8a40ff 0%, #b940ff 100%);
+  --glow-gradient-pink: linear-gradient(90deg, #ff40a8 0%, #ff60c8 100%);
+  --card-gradient: linear-gradient(
+    135deg,
+    rgba(29, 30, 78, 0.7) 0%,
+    rgba(10, 15, 43, 0.7) 100%
+  );
+  --card-border-gradient: linear-gradient(135deg, #8a40ff, #ff40a8);
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* --- BASE STYLES --- */
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: var(--background-dark);
+  color: var(--text-light);
+  line-height: 1.6;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden; /* Prevent horizontal scroll */
+  cursor: auto !important; /* Ensure cursor is always visible */
+}
 
-@keyframes marquee {
+/* Force cursor visibility on all elements */
+*, *::before, *::after {
+  cursor: inherit !important;
+}
+
+/* Enhanced smooth scrolling */
+html {
+  scroll-padding-top: 80px;
+}
+
+/* Smooth page transitions */
+* {
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+/* Section transition container */
+.unified-scroll-container {
+  position: relative;
+  background: linear-gradient(180deg, 
+    var(--background-dark) 0%, 
+    rgba(13, 27, 61, 0.95) 50%, 
+    var(--background-dark) 100%
+  );
+}
+
+/* Smooth section transitions */
+section {
+  position: relative;
+  z-index: 1;
+}
+
+section:not(:first-child) {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* --- GLOBAL SCROLLBAR STYLES --- */
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #F24DC2 transparent;
+}
+
+/* For Webkit browsers (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #F24DC2;
+  border-radius: 4px;
+  border: none;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #ff60c8;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Prevent body scroll when unified scroll is active */
+body.unified-scroll-active {
+  overflow: hidden;
+}
+
+/* --- ENHANCED SMOOTH SCROLLING --- */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 100px; /* Account for fixed header */
+}
+
+/* --- UNIFIED SCROLL CONTAINER --- */
+.unified-scroll-container {
+  scroll-snap-type: y mandatory;
+  overflow-y: auto;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: #F24DC2 transparent;
+}
+
+.unified-scroll-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.unified-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.unified-scroll-container::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #F24DC2, #2C97FF);
+  border-radius: 3px;
+}
+
+.unified-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #2C97FF, #F24DC2);
+}
+
+.scroll-snap-start {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Smooth scroll transitions */
+@media (prefers-reduced-motion: no-preference) {
+  .unified-scroll-container {
+    scroll-behavior: smooth;
+  }
+}
+
+/* --- ANIMATION UTILITIES --- */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInFromBottom {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(242, 77, 194, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(242, 77, 194, 0.8), 0 0 30px rgba(44, 151, 255, 0.6);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes gradientShift {
   0% {
-    transform: translateX(0%);
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
   }
   100% {
-    transform: translateX(-50%);
+    background-position: 0% 50%;
   }
+}
+
+/* --- UTILITY CLASSES FOR ANIMATIONS --- */
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s ease-out forwards;
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown 0.6s ease-out forwards;
+}
+
+.animate-fade-in-left {
+  animation: fadeInLeft 0.6s ease-out forwards;
+}
+
+.animate-fade-in-right {
+  animation: fadeInRight 0.6s ease-out forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.6s ease-out forwards;
+}
+
+.animate-slide-in-top {
+  animation: slideInFromTop 0.6s ease-out forwards;
+}
+
+.animate-slide-in-bottom {
+  animation: slideInFromBottom 0.6s ease-out forwards;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-rotate {
+  animation: rotate 1s linear infinite;
+}
+
+.animate-gradient-shift {
+  animation: gradientShift 3s ease infinite;
+  background-size: 200% 200%;
+}
+
+/* --- STAGGER ANIMATION DELAYS --- */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+.stagger-6 { animation-delay: 0.6s; }
+
+/* --- HOVER EFFECTS --- */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(242, 77, 194, 0.5);
+}
+
+.hover-scale {
+  transition: transform 0.3s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+}
+
+/* --- GRADIENT TEXT ANIMATIONS --- */
+.gradient-text {
+  background: linear-gradient(45deg, #F24DC2, #2C97FF);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 3s ease infinite;
+}
+
+/* --- LOADING SPINNER --- */
+.loading-spinner {
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-top: 3px solid #F24DC2;
+  border-radius: 50%;
+  animation: rotate 1s linear infinite;
+}
+
+/* --- PARALLAX EFFECTS --- */
+.parallax {
+  transform-style: preserve-3d;
+}
+
+.parallax-slow {
+  animation: float 6s ease-in-out infinite;
+}
+
+.parallax-medium {
+  animation: float 4s ease-in-out infinite;
+}
+
+.parallax-fast {
+  animation: float 2s ease-in-out infinite;
+}
+
+/* Delay classes for staggered animations */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+
+/* --- ENHANCED CARD ANIMATIONS --- */
+.card-hover-lift {
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card-hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.card-hover-glow {
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card-hover-glow:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 30px rgba(242, 77, 194, 0.2);
+}
+
+.card-hover-scale {
+  transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.card-hover-scale:hover {
+  transform: scale(1.05);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--accent-blue);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* --- UTILITY CLASSES --- */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.text-center {
+  text-align: center;
+}
+.team-top-image-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+/* --- COMPONENT-SPECIFIC STYLES FROM TEAMS PAGE --- */
+.our-team-section {
+  padding: 2.5rem 5%; /* Reduced from 4rem */
+  text-align: center;
+}
+
+.section-title {
+  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 3.2rem; /* Updated to match new elegant size */
+  font-weight: 600; /* Slightly lighter for elegance */
+  margin-bottom: 1.5rem; /* More generous spacing */
+  color: var(--text-light); /* Updated to match About Us heading */
+  letter-spacing: 2px; /* Updated to match new style */
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(138, 64, 255, 0.4); /* Softer shadow */
+  text-align: center;
+}
+
+.section-subtitle {
+  font-size: 1rem; /* Reduced from 1.1rem */
+  color: rgba(255, 255, 255, 0.7);
+  max-width: 500px; /* Reduced from 600px */
+  margin: 0 auto 2rem auto; /* Reduced from 3rem */
+}
+
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* Reduced from 300px */
+  gap: 1.5rem 1.5rem; /* Reduced from 2.5rem 2rem */
+  justify-items: center;
+  max-width: 1000px; /* Reduced from 1200px */
+  margin: 0 auto;
+}
+
+.team-member-card {
+  background-color: var(--card-background);
+  padding: 1.5rem; /* Reduced from 2rem */
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+  width: 100%;
+  max-width: 280px; /* Reduced from 350px */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.team-member-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
+}
+
+.member-role {
+  font-size: 1.2rem; /* Reduced from 1.5rem */
+  font-weight: 600;
+  color: var(--accent-blue);
+  margin-bottom: 0.3rem; /* Reduced from 0.5rem */
+  text-transform: uppercase;
+}
+
+.member-name {
+  font-size: 1rem; /* Reduced from 1.1rem */
+  color: var(--text-light);
+  margin-bottom: 0.8rem; /* Reduced from 1rem */
+}
+
+.member-image-container {
+  width: 120px; /* Reduced from 150px */
+  height: 120px; /* Reduced from 150px */
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 1rem; /* Reduced from 1.5rem */
+  border: 3px solid var(--accent-blue);
+  box-shadow: 0 0 0 5px rgba(0, 123, 255, 0.2);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.member-image-container:hover {
+  transform: scale(1.1);
+}
+
+.member-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.member-image:hover {
+  transform: scale(1.05);
+}
+
+.member-socials {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.2rem;
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  min-height: 60px; /* Ensure consistent height */
+  flex-wrap: wrap; /* Allow wrapping on very small screens */
+}
+
+.social-icon-link {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-light);
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  vertical-align: top; /* Ensure consistent vertical alignment */
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.social-icon-link::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.3s ease;
+}
+
+.social-icon-link:hover::before {
+  left: 100%;
+}
+
+.social-icon-link:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(242, 77, 194, 0.4);
+  background: linear-gradient(135deg, rgba(242, 77, 194, 0.15), rgba(44, 151, 255, 0.15));
+  border: 1px solid rgba(242, 77, 194, 0.3);
+}
+
+/* Instagram specific hover - like footer */
+.social-icon-link[href*="instagram"]:hover {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, rgba(225, 48, 108, 0.15), rgba(225, 48, 108, 0.1));
+  border: 1px solid rgba(225, 48, 108, 0.4);
+  box-shadow: 0 8px 25px rgba(225, 48, 108, 0.4);
+}
+
+/* LinkedIn specific hover - like footer */
+.social-icon-link[href*="linkedin"]:hover {
+  transform: scale(1.1);
+  background: linear-gradient(135deg, rgba(0, 119, 181, 0.15), rgba(0, 119, 181, 0.1));
+  border: 1px solid rgba(0, 119, 181, 0.4);
+  box-shadow: 0 8px 25px rgba(0, 119, 181, 0.4);
+}
+
+.social-icon-link .icon {
+  width: 20px !important;
+  height: 20px !important;
+  transition: all 0.2s ease;
+  z-index: 1;
+  position: relative;
+  opacity: 0.8;
+  display: block;
+  margin: 0 auto;
+}
+
+.social-icon-link:hover .icon {
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+.social-icon-link:active {
+  transform: scale(1.05);
+}
+
+/* --- Media Queries for Responsiveness --- */
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 2.4rem; /* Updated to match elegant responsive size */
+  }
+  .section-subtitle {
+    font-size: 0.9rem; /* Reduced from 1rem */
+    margin-bottom: 1.5rem; /* Reduced from 2rem */
+  }
+  .team-grid {
+    grid-template-columns: 1fr;
+    gap: 1.2rem; /* Added reduced gap */
+  }
+  .team-member-card {
+    padding: 1.2rem; /* Reduced from 1.5rem */
+    max-width: 250px; /* Added smaller max-width */
+  }
+}
+
+@media (max-width: 480px) {
+  .section-title {
+    font-size: 2rem; /* Updated to match About Us heading responsive size */
+  }
+  .team-member-card {
+    max-width: 220px; /* Reduced from 300px */
+    padding: 1rem; /* Added smaller padding */
+  }
+  .member-image-container {
+    width: 100px; /* Reduced from 120px */
+    height: 100px; /* Reduced from 120px */
+    margin-bottom: 0.8rem; /* Added smaller margin */
+  }
+  .member-role {
+    font-size: 1.1rem; /* Reduced from 1.3rem */
+  }
+  .member-name {
+    font-size: 0.9rem; /* Reduced from 1rem */
+  }
+  .member-socials {
+    gap: 0.8rem; /* Reduced gap for mobile */
+    padding: 0.6rem; /* Reduced padding */
+    min-height: 50px; /* Smaller min-height for mobile */
+  }
+  .social-icon-link {
+    width: 30px; /* Added smaller social icons */
+    height: 30px;
+    border-radius: 8px; /* Smaller border radius */
+  }
+  .social-icon-link .icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* --- SCROLLBAR STYLES FROM EVENTS PAGE --- */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #2a3447;
+}
+::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #60a5fa;
+}
+
+/* --- MARQUEE ANIMATION FROM HOMEPAGE --- */
+@keyframes marquee {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-50%); }
 }
 
 .animate-marquee {
   animation: marquee 10s linear infinite;
+}
+
+/* --- PERFORMANCE OPTIMIZATIONS --- */
+/* Enable hardware acceleration for animated elements */
+.animate-fade-in-up,
+.animate-fade-in-down,
+.animate-fade-in-left,
+.animate-fade-in-right,
+.animate-scale-in,
+.card-hover-lift,
+.card-hover-glow,
+.card-hover-scale {
+  will-change: transform, opacity;
+}
+
+/* Reduce motion for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* --- CIRCUIT BOARD BACKGROUND ENHANCEMENTS --- */
+.circuit-background {
+  background-image: url('/images/circuitbg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Video background specific styles */
+.circuit-video-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+/* --- SEAMLESS SECTION TRANSITIONS --- */
+.section-transition-wrapper {
+  position: relative;
+  overflow: visible;
+}
+
+/* Remove gaps by making sections overlap */
+.section-transition-wrapper:not(:first-child) {
+  margin-top: -1px;
+}
+
+/* Enhanced smooth fade transitions between sections */
+.fade-transition-top {
+  background: linear-gradient(to bottom,
+    transparent 0%,
+    rgba(4, 10, 40, 0.01) 10%,
+    rgba(242, 77, 194, 0.02) 20%,
+    rgba(44, 151, 255, 0.03) 30%,
+    rgba(4, 10, 40, 0.05) 40%,
+    rgba(4, 10, 40, 0.1) 60%,
+    rgba(4, 10, 40, 0.2) 80%,
+    rgba(4, 10, 40, 0.4) 100%
+  );
+  height: 80px;
+  position: absolute;
+  top: -40px;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  pointer-events: none;
+  backdrop-filter: blur(1px);
+}
+
+.fade-transition-bottom {
+  background: linear-gradient(to top,
+    transparent 0%,
+    rgba(4, 10, 40, 0.01) 10%,
+    rgba(242, 77, 194, 0.02) 20%,
+    rgba(44, 151, 255, 0.03) 30%,
+    rgba(4, 10, 40, 0.05) 40%,
+    rgba(4, 10, 40, 0.1) 60%,
+    rgba(4, 10, 40, 0.2) 80%,
+    rgba(4, 10, 40, 0.4) 100%
+  );
+  height: 80px;
+  position: absolute;
+  bottom: -40px;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  pointer-events: none;
+  backdrop-filter: blur(1px);
+}
+
+/* Enhanced section blending with subtle gradient accent */
+.smooth-section-blend {
+  background: linear-gradient(180deg,
+    rgba(4, 10, 40, 0.95) 0%,
+    rgba(13, 27, 61, 0.96) 15%,
+    rgba(242, 77, 194, 0.03) 25%,
+    rgba(4, 10, 40, 0.98) 35%,
+    rgba(4, 10, 40, 1) 50%,
+    rgba(4, 10, 40, 0.98) 65%,
+    rgba(44, 151, 255, 0.03) 75%,
+    rgba(13, 27, 61, 0.96) 85%,
+    rgba(4, 10, 40, 0.95) 100%
+  );
+}
+
+/* Animated circuit glow effect for video */
+@keyframes circuit-video-glow {
+  0%, 100% { 
+    filter: brightness(1) contrast(1.1) hue-rotate(0deg);
+  }
+  50% { 
+    filter: brightness(1.1) contrast(1.2) hue-rotate(5deg);
+  }
+}
+
+/* Animated circuit glow effect */
+@keyframes circuit-glow {
+  0%, 100% { 
+    filter: brightness(1) contrast(1.1) hue-rotate(0deg);
+  }
+  50% { 
+    filter: brightness(1.1) contrast(1.2) hue-rotate(5deg);
+  }
+}
+
+.circuit-background-animated {
+  animation: circuit-glow 10s ease-in-out infinite;
+}
+
+/* Circuit pattern overlay animations */
+@keyframes circuit-pulse {
+  0%, 100% { 
+    opacity: 0.1;
+    transform: scale(1);
+  }
+  50% { 
+    opacity: 0.2;
+    transform: scale(1.02);
+  }
+}
+
+.circuit-overlay {
+  animation: circuit-pulse 8s ease-in-out infinite;
 }

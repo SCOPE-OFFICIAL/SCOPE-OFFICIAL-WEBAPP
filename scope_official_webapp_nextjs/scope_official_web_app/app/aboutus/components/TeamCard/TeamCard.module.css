@@ -1,0 +1,89 @@
+.teamCard {
+  background: linear-gradient(
+    135deg,
+    rgba(29, 30, 78, 0.7),
+    rgba(10, 15, 43, 0.7)
+  );
+  border-radius: 30px; /* Reduced from 40px */
+  width: 320px; /* Reduced from 400px */
+  height: 65px; /* Reduced from 80px */
+  padding: 15px 40px; /* Reduced from 20px 50px */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  cursor: pointer;
+  transform: rotate(0.75deg);
+}
+
+/* Gradient border effect for TeamCard */
+.teamCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: var(--card-border-gradient) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0.8; /* Make border visible by default, matching goal image */
+  transition: opacity 0.3s ease;
+}
+
+.teamCard:hover {
+  transform: translateY(-5px) rotate(0.75deg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Stronger shadow on hover */
+}
+
+.teamCard:hover::before {
+  opacity: 1; /* Full opacity on hover */
+}
+
+.teamName {
+  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 28px; /* Reduced from 36px */
+  font-weight: 400;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: var(--text-light); /* Ensure text is bright white */
+  margin: 0;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.7); /* Stronger text glow */
+}
+
+/* Specific positioning classes for TeamCard are handled by OurTeams.module.css */
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .teamCard {
+    width: 100%;
+    max-width: 280px; /* Reduced from 350px */
+    height: 60px; /* Reduced from 75px */
+    padding: 12px 30px; /* Reduced from 15px 40px */
+    transform: rotate(0deg);
+  }
+  .teamCard:hover {
+    transform: translateY(-5px) rotate(0deg);
+  }
+  .teamName {
+    font-size: 22px; /* Reduced from 26px */
+  }
+}
+
+@media (max-width: 480px) {
+  .teamCard {
+    height: 55px; /* Reduced from 65px */
+    padding: 10px 25px; /* Reduced from 12px 35px */
+  }
+  .teamName {
+    font-size: 18px; /* Reduced from 22px */
+  }
+}
