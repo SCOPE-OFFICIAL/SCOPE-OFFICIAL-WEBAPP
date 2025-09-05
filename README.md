@@ -64,7 +64,7 @@ This repository contains the source code for the web-based frontend and backend 
 This project is actively being developed — progress may change frequently.
 
 <!-- static progress badge (update percentage manually or automate via CI if desired) -->
-<img src="https://img.shields.io/badge/Progress-65%25-blue?style=for-the-badge" alt="Progress 80%"/>
+<img src="https://img.shields.io/badge/Progress-80%25-blue?style=for-the-badge" alt="Progress 80%"/>
 
 </div>
 
