@@ -2,6 +2,7 @@ import Image from "next/image";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimatedButton from '../components/AnimatedButton';
+import FooterComponent from '../components/FooterComponent';
 
 export default function FaqPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
@@ -62,7 +63,7 @@ export default function FaqPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen text-white font-sans relative overflow-hidden">
+    <div id="faq-section" data-section="faq" className="flex flex-col min-h-screen text-white font-sans relative overflow-hidden">
       {/* Static Vibrant Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#040A28] via-[#0d1b3d] to-[#040A28]">
         <div 
@@ -79,53 +80,78 @@ export default function FaqPage() {
       
       {/* Animated Background Elements (Balls) */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-72 h-72 rounded-full opacity-5"
-            style={{
-              background: `linear-gradient(45deg, #F24DC2, #2C97FF)`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              x: [0, 100, 0],
-              y: [0, -100, 0],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: 20 + Math.random() * 10,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        ))}
+        {[...Array(6)].map((_, i) => {
+          // Static positions that don't change on re-render
+          const positions = [
+            { left: '10%', top: '20%' },
+            { left: '80%', top: '10%' },
+            { left: '20%', top: '80%' },
+            { left: '70%', top: '60%' },
+            { left: '50%', top: '30%' },
+            { left: '15%', top: '50%' }
+          ];
+          const durations = [25, 30, 20, 28, 22, 26];
+          
+          return (
+            <motion.div
+              key={i}
+              className="absolute w-72 h-72 rounded-full opacity-5"
+              style={{
+                background: `linear-gradient(45deg, #F24DC2, #2C97FF)`,
+                left: positions[i].left,
+                top: positions[i].top,
+              }}
+              animate={{
+                x: [0, 100, 0],
+                y: [0, -100, 0],
+                rotate: [0, 180, 360],
+              }}
+              transition={{
+                duration: durations[i],
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            />
+          );
+        })}
       </div>
 
       {/* Animated Background Particles */}
       <div className="absolute inset-0 pointer-events-none">
-        {[...Array(12)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -7, 0],
-              x: [0, 3, 0],
-              opacity: [0.3, 0.6, 0.3],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 15 + Math.random() * 5,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
+        {[...Array(12)].map((_, i) => {
+          // Static positions for particles
+          const particlePositions = [
+            { left: '5%', top: '15%' }, { left: '25%', top: '25%' }, { left: '45%', top: '35%' },
+            { left: '65%', top: '15%' }, { left: '85%', top: '25%' }, { left: '15%', top: '55%' },
+            { left: '35%', top: '65%' }, { left: '55%', top: '75%' }, { left: '75%', top: '85%' },
+            { left: '95%', top: '45%' }, { left: '25%', top: '85%' }, { left: '85%', top: '65%' }
+          ];
+          const particleDurations = [18, 16, 20, 22, 19, 17, 21, 15, 23, 19, 16, 18];
+          const particleDelays = [0, 0.5, 1, 1.5, 2, 0.3, 0.8, 1.3, 1.8, 0.2, 0.7, 1.2];
+          
+          return (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full"
+              style={{
+                left: particlePositions[i].left,
+                top: particlePositions[i].top,
+              }}
+              animate={{
+                y: [0, -7, 0],
+                x: [0, 3, 0],
+                opacity: [0.3, 0.6, 0.3],
+                scale: [1, 1.2, 1],
+              }}
+              transition={{
+                duration: particleDurations[i],
+                repeat: Infinity,
+                delay: particleDelays[i],
+                ease: "easeInOut",
+              }}
+            />
+          );
+        })}
       </div>
 
       <motion.main 
@@ -192,7 +218,7 @@ export default function FaqPage() {
                 }}
               >
                 <motion.button
-                  className="w-full px-6 py-5 text-left flex items-center justify-between focus:outline-none"
+                  className="w-full px-6 py-5 text-left flex items-center justify-between focus:outline-none cursor-pointer"
                   onClick={() => toggleFAQ(index)}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
@@ -404,35 +430,47 @@ export default function FaqPage() {
 
                 {/* Floating question marks animation */}
                 <div className="absolute inset-0">
-                  {['?', '?', '?'].map((mark, i) => (
-                    <motion.div
-                      key={i}
-                      className="absolute text-4xl text-[#F24DC2] opacity-30"
-                      style={{
-                        left: `${50 + Math.random() * 100}px`,
-                        top: `${50 + Math.random() * 100}px`,
-                      }}
-                      animate={{
-                        y: [0, -20, 0],
-                        rotate: [0, 10, -10, 0],
-                        opacity: [0.3, 0.6, 0.3],
-                      }}
-                      transition={{
-                        duration: 3 + i,
-                        repeat: Infinity,
-                        delay: i * 0.5,
-                        ease: "easeInOut",
-                      }}
-                    >
-                      {mark}
-                    </motion.div>
-                  ))}
+                  {['?', '?', '?'].map((mark, i) => {
+                    // Static positions for question marks
+                    const questionPositions = [
+                      { left: '60px', top: '70px' },
+                      { left: '280px', top: '90px' },
+                      { left: '170px', top: '200px' }
+                    ];
+                    
+                    return (
+                      <motion.div
+                        key={i}
+                        className="absolute text-4xl text-[#F24DC2] opacity-30"
+                        style={{
+                          left: questionPositions[i].left,
+                          top: questionPositions[i].top,
+                        }}
+                        animate={{
+                          y: [0, -20, 0],
+                          rotate: [0, 10, -10, 0],
+                          opacity: [0.3, 0.6, 0.3],
+                        }}
+                        transition={{
+                          duration: 3 + i,
+                          repeat: Infinity,
+                          delay: i * 0.5,
+                          ease: "easeInOut",
+                        }}
+                      >
+                        {mark}
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </motion.div>
             </motion.div>
           </motion.div>
         </motion.div>
       </motion.main>
+      
+      {/* Footer - Only appears at the end of the website */}
+      <FooterComponent />
     </div>
   );
 }

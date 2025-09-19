@@ -43,27 +43,38 @@ function OriginalHome() {
       
       {/* Floating Particles Animation */}
       <div className="absolute inset-0 pointer-events-none">
-        {[...Array(8)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -100, 0],
-              opacity: [0.3, 0.8, 0.3],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 4 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
+        {[...Array(8)].map((_, i) => {
+          // Static positions for particles
+          const particlePositions = [
+            { left: '10%', top: '20%' }, { left: '30%', top: '15%' }, { left: '50%', top: '25%' },
+            { left: '70%', top: '10%' }, { left: '90%', top: '30%' }, { left: '20%', top: '60%' },
+            { left: '40%', top: '70%' }, { left: '80%', top: '65%' }
+          ];
+          const particleDurations = [4, 5, 6, 5.5, 4.5, 6.5, 4.2, 5.8];
+          const particleDelays = [0, 0.5, 1, 1.5, 2, 0.3, 0.8, 1.3];
+          
+          return (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full"
+              style={{
+                left: particlePositions[i].left,
+                top: particlePositions[i].top,
+              }}
+              animate={{
+                y: [0, -100, 0],
+                opacity: [0.3, 0.8, 0.3],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{
+                duration: particleDurations[i],
+                repeat: Infinity,
+                delay: particleDelays[i],
+                ease: "easeInOut",
+              }}
+            />
+          );
+        })}
       </div>
       
       <ScrollAnimation>

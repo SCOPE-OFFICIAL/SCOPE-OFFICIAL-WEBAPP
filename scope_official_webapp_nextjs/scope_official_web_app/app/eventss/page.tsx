@@ -16,6 +16,7 @@ export default function HomePage() {
   const [hoverIndex, setHoverIndex] = useState<number | null>(null);
   const [touchStartX, setTouchStartX] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [showExpandedView, setShowExpandedView] = useState(false);
   const swipeThreshold = 50;
 
   const handlePrev = () => {
@@ -24,7 +25,7 @@ export default function HomePage() {
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? pastEvents.length - 1 : prevIndex - 1
     );
-    setTimeout(() => setIsTransitioning(false), 600);
+    setTimeout(() => setIsTransitioning(false), 300); // Reduced from 600ms
   };
 
   const handleNext = () => {
@@ -33,12 +34,69 @@ export default function HomePage() {
     setCurrentIndex((prevIndex) =>
       prevIndex === pastEvents.length - 1 ? 0 : prevIndex + 1
     );
-    setTimeout(() => setIsTransitioning(false), 600);
+    setTimeout(() => setIsTransitioning(false), 300); // Reduced from 600ms
   };
 
   const handleImageClick = (index: number) => {
     setCurrentIndex(index);
   };
+
+  const handlePosterClick = (index: number) => {
+    // Store the gallery folder selection in localStorage
+    if (index === 0) { // Tech Innovation Workshop -> ATLASSIAN
+      localStorage.setItem('galleryFolder', 'ATLASSIAN');
+    } else if (index === 1) { // MATLAB Programming Session -> MATLAB
+      localStorage.setItem('galleryFolder', 'MATLAB');
+    }
+    
+    // Navigate to gallery section on main page
+    window.location.href = '/#Gallery';
+  };
+
+  useEffect(() => {
+    // Optimize browser performance
+    const style = document.createElement('style');
+    style.textContent = `
+      * {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .motion-container {
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        perspective: 1000px;
+      }
+    `;
+    document.head.appendChild(style);
+
+    const orbitronLink = document.createElement("link");
+    orbitronLink.href =
+      "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap";
+    orbitronLink.rel = "stylesheet";
+    document.head.appendChild(orbitronLink);
+
+    const dmSansLink = document.createElement("link");
+    dmSansLink.href =
+      "https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap";
+    dmSansLink.rel = "stylesheet";
+    document.head.appendChild(dmSansLink);
+
+    // Handle ESC key to close expanded view
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && showExpandedView) {
+        setShowExpandedView(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.head.removeChild(orbitronLink);
+      document.head.removeChild(dmSansLink);
+      document.head.removeChild(style);
+    };
+  }, [showExpandedView]);
 
   useEffect(() => {
     const orbitronLink = document.createElement("link");
@@ -61,54 +119,80 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#040a28] via-[#0d1b3d] to-[#040a28] text-gray-200 font-sans relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-72 h-72 rounded-full opacity-5"
-            style={{
-              background: `linear-gradient(45deg, #F24DC2, #2C97FF)`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              x: [0, 100, 0],
-              y: [0, -100, 0],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: 20 + Math.random() * 10,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        ))}
+      {/* Optimized Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden" style={{ willChange: 'transform' }}>
+        {[...Array(6)].map((_, i) => {
+          // Static positions that don't change on re-render
+          const positions = [
+            { left: '20%', top: '15%' },
+            { left: '70%', top: '25%' },
+            { left: '30%', top: '75%' },
+            { left: '85%', top: '65%' },
+            { left: '40%', top: '40%' },
+            { left: '5%', top: '55%' }
+          ];
+          const durations = [25, 30, 20, 28, 22, 26];
+          
+          return (
+            <motion.div
+              key={i}
+              className="absolute w-72 h-72 rounded-full opacity-5"
+              style={{
+                background: `linear-gradient(45deg, #F24DC2, #2C97FF)`,
+                left: positions[i].left,
+                top: positions[i].top,
+                willChange: 'transform'
+              }}
+              animate={{
+                x: [0, 100, 0],
+                y: [0, -100, 0],
+                rotate: [0, 180, 360],
+              }}
+              transition={{
+                duration: durations[i],
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            />
+          );
+        })}
       </div>
 
       {/* Animated Background Particles */}
       <div className="absolute inset-0 pointer-events-none">
-        {[...Array(12)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -50, 0],
-              opacity: [0.2, 0.8, 0.2],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
+        {[...Array(12)].map((_, i) => {
+          // Static positions for particles
+          const particlePositions = [
+            { left: '8%', top: '12%' }, { left: '28%', top: '22%' }, { left: '48%', top: '32%' },
+            { left: '68%', top: '12%' }, { left: '88%', top: '22%' }, { left: '18%', top: '52%' },
+            { left: '38%', top: '62%' }, { left: '58%', top: '72%' }, { left: '78%', top: '82%' },
+            { left: '92%', top: '42%' }, { left: '22%', top: '82%' }, { left: '82%', top: '62%' }
+          ];
+          const particleDurations = [5, 4, 6, 7, 5.5, 4.5, 6.5, 3.5, 7.5, 5.5, 4.5, 5.5];
+          const particleDelays = [0, 0.5, 1, 1.5, 2, 0.3, 0.8, 1.3, 1.8, 0.2, 0.7, 1.2];
+          
+          return (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full"
+              style={{
+                left: particlePositions[i].left,
+                top: particlePositions[i].top,
+              }}
+              animate={{
+                y: [0, -50, 0],
+                opacity: [0.2, 0.8, 0.2],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{
+                duration: particleDurations[i],
+                repeat: Infinity,
+                delay: particleDelays[i],
+                ease: "easeInOut",
+              }}
+            />
+          );
+        })}
       </div>
 
       {/* Main Content Area */}
@@ -275,10 +359,11 @@ export default function HomePage() {
           >
             <motion.button
               onClick={handlePrev}
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-20 text-5xl text-white hover:text-gray-300 px-4"
-              whileHover={{ scale: 1.2, x: -5 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 z-20 text-5xl text-white hover:text-gray-300 px-4 cursor-pointer"
+              whileHover={{ scale: 1.1, x: -3 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 500, damping: 25 }}
+              style={{ willChange: 'transform' }}
             >
               ≪
             </motion.button>
@@ -306,51 +391,88 @@ export default function HomePage() {
                 const isHovered = hoverIndex === index;
                 const isCenter = relativeIndex === 0 && hoverIndex === null;
 
-                let styleClass =
-                  "absolute transition-all duration-700 ease-in-out rounded-xl shadow-xl object-cover ";
+                // Calculate positions and scales for smooth Framer Motion animations
+                let x = 0;
+                let scale = 0.9;
+                let opacity = 0.6;
+                let z = 10;
+                let width = 288; // w-72
+                let height = 400; // h-[400px]
 
                 if (relativeIndex === 0) {
-                  styleClass +=
-                    (isHovered || isCenter
-                      ? "w-80 h-[420px] z-30 scale-100 opacity-100"
-                      : "w-72 h-[400px] z-20 scale-95 opacity-90");
+                  x = 0;
+                  scale = isHovered || isCenter ? 1 : 0.95;
+                  opacity = isHovered || isCenter ? 1 : 0.9;
+                  z = isHovered || isCenter ? 30 : 20;
+                  width = isHovered || isCenter ? 320 : 288;
+                  height = isHovered || isCenter ? 420 : 400;
                 } else if (relativeIndex === 1) {
-                  styleClass +=
-                    (isHovered
-                      ? "translate-x-[190px] scale-100 z-30 opacity-100 w-80 h-[420px]"
-                      : "translate-x-[190px] scale-90 z-10 opacity-60 w-72 h-[400px]");
+                  x = 190;
+                  scale = isHovered ? 1 : 0.9;
+                  opacity = isHovered ? 1 : 0.6;
+                  z = isHovered ? 30 : 10;
+                  width = isHovered ? 320 : 288;
+                  height = isHovered ? 420 : 400;
                 } else if (relativeIndex === pastEvents.length - 1) {
-                  styleClass +=
-                    (isHovered
-                      ? "-translate-x-[190px] scale-100 z-30 opacity-100 w-80 h-[420px]"
-                      : "-translate-x-[190px] scale-90 z-10 opacity-60 w-72 h-[400px]");
+                  x = -190;
+                  scale = isHovered ? 1 : 0.9;
+                  opacity = isHovered ? 1 : 0.6;
+                  z = isHovered ? 30 : 10;
+                  width = isHovered ? 320 : 288;
+                  height = isHovered ? 420 : 400;
                 } else {
-                  styleClass += "opacity-0 pointer-events-none";
+                  opacity = 0;
+                  scale = 0.8;
                 }
 
                 return (
-                  <Image
+                  <motion.div
                     key={index}
-                    src={src}
-                    alt={`Past Event ${index + 1}`}
-                    width={320}
-                    height={420}
-                    className={styleClass}
-                    draggable={false}
+                    className="absolute"
+                    initial={false}
+                    animate={{
+                      x: x,
+                      scale: scale,
+                      opacity: opacity,
+                      zIndex: z,
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 300,
+                      damping: 30,
+                      mass: 0.8,
+                    }}
+                    style={{
+                      willChange: 'transform, opacity',
+                    }}
                     onMouseEnter={() => setHoverIndex(index)}
                     onMouseLeave={() => setHoverIndex(null)}
                     onClick={() => handleImageClick(index)}
-                  />
+                  >
+                    <Image
+                      src={src}
+                      alt={`Past Event ${index + 1}`}
+                      width={width}
+                      height={height}
+                      className="rounded-xl shadow-xl object-cover cursor-pointer"
+                      draggable={false}
+                      style={{
+                        width: `${width}px`,
+                        height: `${height}px`,
+                      }}
+                    />
+                  </motion.div>
                 );
               })}
             </div>
 
             <motion.button
               onClick={handleNext}
-              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-20 text-5xl text-white hover:text-gray-300 px-4"
-              whileHover={{ scale: 1.2, x: 5 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              className="absolute right-0 top-1/2 transform -translate-y-1/2 z-20 text-5xl text-white hover:text-gray-300 px-4 cursor-pointer"
+              whileHover={{ scale: 1.1, x: 3 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ type: "spring", stiffness: 500, damping: 25 }}
+              style={{ willChange: 'transform' }}
             >
               ≫
             </motion.button>
@@ -360,6 +482,7 @@ export default function HomePage() {
             variant="secondary"
             size="lg"
             className="mt-12 bg-[rgb(0,76,148)] hover:bg-[#003E7A] border-[rgb(0,76,148)]"
+            onClick={() => setShowExpandedView(true)}
           >
             KNOW MORE
           </AnimatedButton>
@@ -373,8 +496,168 @@ export default function HomePage() {
         className="absolute bottom-0 right-0 w-64 opacity-60 pointer-events-none z-0"
         initial={{ opacity: 0, x: 50, y: 50 }}
         animate={{ opacity: 0.6, x: 0, y: 0 }}
-        transition={{ duration: 1.5, delay: 1 }}
+        transition={{ duration: 1.2, delay: 0.8, ease: "easeOut" }}
+        style={{ willChange: 'transform, opacity' }}
       />
+
+      {/* Expanded Posters View */}
+      {showExpandedView && (
+        <motion.div
+          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          onClick={() => setShowExpandedView(false)}
+          style={{ willChange: 'opacity' }}
+        >
+          <motion.div
+            className="relative w-full max-w-7xl mx-auto"
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ 
+              duration: 0.3, 
+              type: "spring", 
+              stiffness: 400, 
+              damping: 30,
+              ease: "easeOut"
+            }}
+            onClick={(e) => e.stopPropagation()}
+            style={{ willChange: 'transform, opacity' }}
+          >
+            {/* Close button */}
+            <motion.button
+              onClick={() => setShowExpandedView(false)}
+              className="absolute top-4 right-4 z-60 text-white text-4xl hover:text-gray-300 cursor-pointer"
+              whileHover={{ scale: 1.1, rotate: 90 }}
+              whileTap={{ scale: 0.9 }}
+              transition={{ type: "spring", stiffness: 600, damping: 25 }}
+              style={{ willChange: 'transform' }}
+            >
+              ✕
+            </motion.button>
+
+            {/* Title */}
+            <motion.h3
+              className="text-center text-white text-3xl font-bold mb-8"
+              style={{
+                fontFamily: '"Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif',
+                textShadow: '0 0 20px rgba(138, 64, 255, 0.4)',
+                letterSpacing: '2px',
+                willChange: 'transform, opacity'
+              }}
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1, ease: "easeOut" }}
+            >
+              PAST EVENTS GALLERY
+            </motion.h3>
+
+            {/* Posters Grid */}
+            <motion.div
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
+              style={{ willChange: 'transform, opacity' }}
+            >
+              {pastEvents.map((src, index) => (
+                <motion.div
+                  key={index}
+                  className={`relative group ${(index === 0 || index === 1) ? 'cursor-pointer' : 'cursor-default'}`}
+                  initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ 
+                    duration: 0.3, 
+                    delay: 0.3 + index * 0.05, // Reduced staggering
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 30,
+                    ease: "easeOut"
+                  }}
+                  whileHover={{ 
+                    scale: (index === 0 || index === 1) ? 1.05 : 1.03, // More scale for clickable posters
+                    rotateY: 3,
+                    transition: { duration: 0.2, ease: "easeOut" }
+                  }}
+                  style={{ willChange: 'transform' }}
+                  onClick={() => handlePosterClick(index)}
+                >
+                  <Image
+                    src={src}
+                    alt={`Past Event ${index + 1}`}
+                    width={350}
+                    height={460}
+                    className="rounded-xl shadow-2xl object-cover w-full h-auto max-w-[350px]"
+                    draggable={false}
+                    style={{ willChange: 'transform' }}
+                  />
+                  
+                  {/* Overlay with event info */}
+                  <motion.div
+                    className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent rounded-xl"
+                    initial={{ opacity: 0 }}
+                    whileHover={{ opacity: 1 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    style={{ willChange: 'opacity' }}
+                  >
+                    <div className="absolute bottom-4 left-4 right-4 text-white">
+                      <h4 className="text-lg font-bold mb-2">
+                        {index === 0 && "Tech Innovation Workshop"}
+                        {index === 1 && "MATLAB Programming Session"}
+                        {index === 2 && "Advanced Technology Seminar"}
+                      </h4>
+                      <p className="text-sm opacity-90">
+                        {index === 0 && "Interactive workshop on cutting-edge technology trends"}
+                        {index === 1 && "Comprehensive MATLAB training for engineering students"}
+                        {index === 2 && "Deep dive into emerging technologies and their applications"}
+                      </p>
+                      {/* Subtle click hint for specific posters */}
+                      {(index === 0 || index === 1) && (
+                        <motion.div
+                          className="mt-3 flex items-center justify-center"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 0.1 }}
+                        >
+                          <span className="text-xs text-blue-300 opacity-80">
+                            {index === 0 && "Click to open Atlassian Workshop gallery"}
+                            {index === 1 && "Click to open MATLAB Workshop gallery"}
+                          </span>
+                        </motion.div>
+                      )}
+                    </div>
+
+                    {/* Hand cursor indicator for clickable posters */}
+                    {(index === 0 || index === 1) && (
+                      <motion.div
+                        className="absolute top-4 right-4 text-white text-2xl"
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 0.8, scale: 1 }}
+                        transition={{ delay: 0.2 }}
+                      >
+                        👆
+                      </motion.div>
+                    )}
+                  </motion.div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Instructions */}
+            <motion.p
+              className="text-center text-gray-300 mt-8 text-lg"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.5, ease: "easeOut" }}
+              style={{ willChange: 'opacity' }}
+            >
+              Hover over posters to see details • Click MATLAB or Tech Innovation posters to open their workshop galleries directly • Press ESC or click outside to close
+            </motion.p>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   ); 
 }

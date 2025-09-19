@@ -119,26 +119,36 @@ export default function VideoHeroSection({
 
       {/* Floating Elements */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full opacity-60"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -100, 0],
-              opacity: [0.6, 1, 0.6],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
+        {[...Array(6)].map((_, i) => {
+          // Static positions for particles
+          const particlePositions = [
+            { left: '15%', top: '25%' }, { left: '75%', top: '15%' }, { left: '35%', top: '65%' },
+            { left: '85%', top: '45%' }, { left: '25%', top: '80%' }, { left: '65%', top: '75%' }
+          ];
+          const particleDurations = [3, 4, 5, 4.5, 3.5, 4.2];
+          const particleDelays = [0, 0.5, 1, 1.5, 2, 0.8];
+          
+          return (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full opacity-60"
+              style={{
+                left: particlePositions[i].left,
+                top: particlePositions[i].top,
+              }}
+              animate={{
+                y: [0, -100, 0],
+                opacity: [0.6, 1, 0.6],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{
+                duration: particleDurations[i],
+                repeat: Infinity,
+                delay: particleDelays[i],
+              }}
+            />
+          );
+        })}
       </div>
 
       {/* Scroll Indicator */}

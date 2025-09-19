@@ -3,7 +3,6 @@ import { Orbitron, Inter, DM_Sans } from "next/font/google";
 import type { Metadata } from "next";
 import Navigation from "./components/Navigation";
 import { ViewModeProvider } from "./components/ViewModeContext";
-import FooterComponent from "./components/FooterComponent";
 import PageTransitionWrapper from "./components/PageTransitionWrapper";
 
 // Load fonts
@@ -65,7 +64,6 @@ export default function RootLayout({
             </PageTransitionWrapper>
           </main>
 
-          <FooterComponent />
         </ViewModeProvider>
       </body>
     </html>

@@ -90,28 +90,35 @@ export default function SectionTransition({
 
       {/* Floating particles for elegance */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(3)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2]/30 to-[#2C97FF]/30 rounded-full"
-            style={{
-              left: `${20 + Math.random() * 60}%`,
-              top: `${20 + Math.random() * 60}%`,
-            }}
-            animate={{
-              y: [0, -20, 0],
-              x: [0, 10, 0],
-              opacity: [0.3, 0.8, 0.3],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 6 + i * 2,
-              repeat: Infinity,
-              delay: i * 2,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
+        {[...Array(3)].map((_, i) => {
+          // Static positions for particles
+          const particlePositions = [
+            { left: '25%', top: '30%' }, { left: '65%', top: '45%' }, { left: '40%', top: '70%' }
+          ];
+          
+          return (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2]/30 to-[#2C97FF]/30 rounded-full"
+              style={{
+                left: particlePositions[i].left,
+                top: particlePositions[i].top,
+              }}
+              animate={{
+                y: [0, -20, 0],
+                x: [0, 10, 0],
+                opacity: [0.3, 0.8, 0.3],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{
+                duration: 6 + i * 2,
+                repeat: Infinity,
+                delay: i * 2,
+                ease: "easeInOut",
+              }}
+            />
+          );
+        })}
       </div>
     </motion.section>
   );

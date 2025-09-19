@@ -1,12 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import AnimatedButton from './AnimatedButton';
 
 const Gallery: React.FC = () => {
   const [selectedFolder, setSelectedFolder] = useState<'MATLAB' | 'ATLASSIAN' | null>(null);
+  const [cameFromEvents, setCameFromEvents] = useState(false);
+
+  // Check for localStorage to auto-select gallery folder
+  useEffect(() => {
+    const storedFolder = localStorage.getItem('galleryFolder');
+    
+    if (storedFolder === 'MATLAB' || storedFolder === 'ATLASSIAN') {
+      setSelectedFolder(storedFolder);
+      setCameFromEvents(true); // Mark that user came from events page
+      // Clear the stored folder after using it
+      localStorage.removeItem('galleryFolder');
+    }
+  }, []);
 
   // MATLAB event images
   const matlabGallery = [
@@ -98,6 +111,16 @@ const Gallery: React.FC = () => {
     return folderCards.find(folder => folder.id === selectedFolder);
   };
 
+  const handleBackNavigation = () => {
+    if (cameFromEvents) {
+      // Navigate back to events page
+      window.location.href = '/eventss';
+    } else {
+      // Regular back to folders behavior
+      setSelectedFolder(null);
+    }
+  };
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -124,29 +147,48 @@ const Gallery: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#040A28] via-[#0d1b3d] to-[#040A28] py-20 px-6 relative overflow-hidden">
+      {/* Ensure background covers full viewport */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#040A28] via-[#0d1b3d] to-[#040A28]"></div>
+      
+      {/* Content wrapper with relative positioning */}
+      <div className="relative z-10">
+      
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-72 h-72 rounded-full opacity-5"
-            style={{
-              background: `linear-gradient(45deg, #F24DC2, #2C97FF)`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              x: [0, 100, 0],
-              y: [0, -100, 0],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: 20 + Math.random() * 10,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        ))}
+        {[...Array(6)].map((_, i) => {
+          // Static positions that don't change on re-render
+          const positions = [
+            { left: '12%', top: '18%' },
+            { left: '72%', top: '8%' },
+            { left: '28%', top: '78%' },
+            { left: '88%', top: '68%' },
+            { left: '48%', top: '38%' },
+            { left: '8%', top: '58%' }
+          ];
+          const durations = [25, 30, 20, 28, 22, 26];
+          
+          return (
+            <motion.div
+              key={i}
+              className="absolute w-72 h-72 rounded-full opacity-5"
+              style={{
+                background: `linear-gradient(45deg, #F24DC2, #2C97FF)`,
+                left: positions[i].left,
+                top: positions[i].top,
+              }}
+              animate={{
+                x: [0, 100, 0],
+                y: [0, -100, 0],
+                rotate: [0, 180, 360],
+              }}
+              transition={{
+                duration: durations[i],
+                repeat: Infinity,
+                ease: "linear",
+              }}
+            />
+          );
+        })}
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -297,12 +339,12 @@ const Gallery: React.FC = () => {
                 transition={{ duration: 0.6, delay: 0.2 }}
               >
                 <AnimatedButton
-                  onClick={() => setSelectedFolder(null)}
+                  onClick={handleBackNavigation}
                   variant="secondary"
                   size="md"
                   className="mb-6"
                 >
-                  ← Back to Folders
+                  {cameFromEvents ? '← Back to Events' : '← Back to Folders'}
                 </AnimatedButton>
               </motion.div>
 
@@ -421,7 +463,7 @@ const Gallery: React.FC = () => {
                   <motion.div
                     key={item.id}
                     variants={itemVariants}
-                    className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/30 hover:border-[#F24DC2]/30 transition-all duration-500"
+                    className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/30 hover:border-[#F24DC2]/30 transition-all duration-500 cursor-pointer"
                     whileHover={{ 
                       scale: 1.05,
                       y: -10,
@@ -496,6 +538,7 @@ const Gallery: React.FC = () => {
             </AnimatedButton>
           </motion.div>
         )}
+      </div>
       </div>
     </div>
   );

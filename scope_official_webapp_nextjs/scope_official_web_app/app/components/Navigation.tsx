@@ -104,28 +104,29 @@ export default function Navigation() {
         opacity: isVisible ? 1 : 0 
       }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="fixed top-0 left-0 right-0 z-50 bg-white/5 backdrop-blur-xl border-b border-white/10 shadow-lg"
+      className="fixed top-0 left-0 right-0 z-50 bg-white/8 backdrop-blur-xl border-b border-white/15 shadow-lg"
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center py-3 min-h-[4rem]">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className="flex justify-between items-center py-4 min-h-[4.5rem]">
           {/* Logo */}
           <motion.div
-            whileHover={{ scale: 1.2 }}
+            whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            transition={{ type: "spring", stiffness: 400, damping: 15 }}
+            className="flex-shrink-0"
           >
-            <Link href="/" className="flex items-center">
+            <Link href="/" className="flex items-center cursor-pointer">
               <motion.img 
                 src="/images/scope_logo.png" 
                 alt="SCOPE Logo" 
-                className="h-12 w-12 object-contain"
+                className="h-10 w-10 object-contain"
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
               />
             </Link>
           </motion.div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-2">
             {/* Navigation Links */}
             {navItems.map((item, index) => (
               <motion.div
@@ -140,45 +141,43 @@ export default function Navigation() {
                 className="flex-shrink-0"
               >
                 <motion.div
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                  className="relative"
                 >
                   <Link
                     href={item.href}
                     onClick={(e) => handleNavigation(e, item)}
-                    className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 ease-in-out whitespace-nowrap group relative overflow-hidden ${
+                    className={`relative inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-medium transition-all duration-300 ease-out whitespace-nowrap group overflow-hidden cursor-pointer ${
                       (viewMode === 'pages' && isActive(item.href))
-                        ? 'bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] text-white shadow-lg'
-                        : 'bg-white/15 backdrop-blur-sm text-white hover:text-white shadow-md border border-white/20'
+                        ? 'text-white shadow-lg'
+                        : 'text-white/85 hover:text-white shadow-md'
                     }`}
                   >
-                    {/* Expanding blue dot - only show when not active */}
-                    {!(viewMode === 'pages' && isActive(item.href)) && (
-                      <span className="absolute left-2 top-1/2 transform -translate-y-1/2 w-1.5 h-1.5 bg-[#2C97FF] rounded-full transition-all duration-700 ease-out origin-center group-hover:w-20 group-hover:h-20 group-hover:left-1/2 group-hover:top-1/2 group-hover:-translate-x-1/2 group-hover:-translate-y-1/2 group-hover:scale-[3] group-hover:bg-[#2C97FF] group-hover:rounded-full"></span>
+                    {/* Background layers */}
+                    <div className="absolute inset-0 bg-white/12 backdrop-blur-sm rounded-lg border border-white/25"></div>
+                    
+                    {/* Animated gradient background for active state */}
+                    {(viewMode === 'pages' && isActive(item.href)) && (
+                      <motion.div
+                        className="absolute inset-0 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-lg"
+                        initial={{ scale: 0.8, opacity: 0 }}
+                        animate={{ scale: 1, opacity: 1 }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                      />
                     )}
                     
-                    <span className="relative z-10 flex items-center">
-                      {/* Invisible spacer for dot positioning - only when not active */}
-                      {!(viewMode === 'pages' && isActive(item.href)) && (
-                        <span className="w-1.5 h-1.5 mr-2 opacity-0"></span>
-                      )}
-                      
+                    {/* Hover effect for non-active items */}
+                    {!(viewMode === 'pages' && isActive(item.href)) && (
+                      <>
+                        {/* Sliding background on hover */}
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#F24DC2]/25 to-[#2C97FF]/25 rounded-lg transform translate-x-full transition-transform duration-400 ease-out group-hover:translate-x-0"></div>
+                      </>
+                    )}
+                    
+                    <span className="relative z-10 font-medium tracking-wide">
                       {item.label}
-                      
-                      {/* Arrow - only visible on hover for non-active items */}
-                      <svg
-                        className={`w-2.5 h-2.5 flex-shrink-0 transition-all duration-300 ${
-                          (viewMode === 'pages' && isActive(item.href))
-                            ? 'ml-1.5 opacity-100'
-                            : 'ml-0 opacity-0 group-hover:opacity-100 group-hover:ml-1.5'
-                        }`}
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                      </svg>
                     </span>
                   </Link>
                 </motion.div>
@@ -192,7 +191,7 @@ export default function Navigation() {
             whileTap={{ scale: 0.95 }}
           >
             <motion.button
-              className="relative px-2.5 py-1.5 rounded-full bg-white/15 backdrop-blur-sm text-white hover:text-white transition-all duration-300 ease-in-out shadow-md group overflow-hidden border border-white/20"
+              className="relative px-2.5 py-1.5 rounded-full bg-white/15 backdrop-blur-sm text-white hover:text-white transition-all duration-300 ease-in-out shadow-md group overflow-hidden border border-white/20 cursor-pointer"
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >

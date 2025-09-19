@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import AnimatedButton from './AnimatedButton';
 
 interface TeamData {
   id: string;
@@ -151,26 +150,38 @@ export default function TeamMembers() {
       
       {/* Floating Particles */}
       <div className="absolute inset-0 pointer-events-none">
-        {[...Array(12)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -30, 0],
-              opacity: [0.3, 1, 0.3],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
+        {[...Array(12)].map((_, i) => {
+          // Static positions for particles
+          const particlePositions = [
+            { left: '8%', top: '15%' }, { left: '25%', top: '20%' }, { left: '42%', top: '30%' },
+            { left: '65%', top: '18%' }, { left: '85%', top: '25%' }, { left: '15%', top: '55%' },
+            { left: '35%', top: '65%' }, { left: '55%', top: '75%' }, { left: '75%', top: '85%' },
+            { left: '90%', top: '45%' }, { left: '20%', top: '85%' }, { left: '80%', top: '65%' }
+          ];
+          const particleDurations = [3, 4, 5, 4.5, 3.5, 4.8, 3.2, 5.2, 4.2, 3.8, 4.6, 3.6];
+          const particleDelays = [0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 0.2, 0.5, 0.8, 1.1, 1.4];
+          
+          return (
+            <motion.div
+              key={i}
+              className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full"
+              style={{
+                left: particlePositions[i].left,
+                top: particlePositions[i].top,
+              }}
+              animate={{
+                y: [0, -30, 0],
+                opacity: [0.3, 1, 0.3],
+                scale: [1, 1.5, 1],
+              }}
+              transition={{
+                duration: particleDurations[i],
+                repeat: Infinity,
+                delay: particleDelays[i],
+              }}
+            />
+          );
+        })}
       </div>
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -259,33 +270,49 @@ export default function TeamMembers() {
       {/* Modal for Team Details */}
       <AnimatePresence>
         {selectedTeam && (
-          <motion.div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedTeam(null)}
-          >
+          <>
+            {/* Full screen overlay */}
+            <div 
+              className="fixed inset-0 bg-black/90 z-[9998]"
+              onClick={() => setSelectedTeam(null)}
+            />
             <motion.div
-              className="bg-white/10 backdrop-blur-xl rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden border border-white/20"
-              variants={modalVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              onClick={(e) => e.stopPropagation()}
+              className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
             >
+              <motion.div
+                className="bg-white/10 backdrop-blur-xl rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-white/20 relative pointer-events-auto"
+                variants={modalVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                onClick={(e) => e.stopPropagation()}
+                style={{ zIndex: 10000 }}
+              >
+                {/* Close Button - positioned relative to modal container */}
+                <div className="absolute top-6 right-6 z-[10001]">
+                  <button
+                    onClick={() => setSelectedTeam(null)}
+                    className="group/close bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full p-4 w-14 h-14 flex items-center justify-center border border-white/20 hover:border-white/40 transition-all duration-200 cursor-pointer"
+                  >
+                    <svg className="w-6 h-6 text-white group-hover/close:text-gray-200 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                    
+                    {/* Hover tooltip - positioned to the left to avoid cutoff */}
+                    <div className="absolute right-full top-1/2 transform -translate-y-1/2 mr-4 opacity-0 group-hover/close:opacity-100 transition-all duration-200 pointer-events-none">
+                      <div className="bg-black/95 backdrop-blur-sm text-white px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap border border-white/40 shadow-xl">
+                        Close
+                        {/* Arrow pointing right */}
+                        <div className="absolute left-full top-1/2 transform -translate-y-1/2 w-0 h-0 border-t-4 border-b-4 border-l-4 border-transparent border-l-black/95"></div>
+                      </div>
+                    </div>
+                  </button>
+                </div>
+
               <div className="relative">
-                {/* Close Button */}
-                <AnimatedButton
-                  onClick={() => setSelectedTeam(null)}
-                  variant="secondary"
-                  size="sm"
-                  className="absolute top-4 right-4 z-10 bg-white/20 hover:bg-white/30 rounded-full p-2 min-w-0 w-10 h-10"
-                >
-                  <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </AnimatedButton>
 
                 {/* Team Image */}
                 <div className="relative h-96">
@@ -309,7 +336,7 @@ export default function TeamMembers() {
                       }}
                     >
                       {/* Hover Area */}
-                      <div className="w-16 h-20 cursor-pointer relative">
+                      <div className="w-32 h-32 cursor-pointer relative">
                         {/* Invisible hover trigger */}
                         <div className="absolute inset-0 bg-transparent hover:bg-white/5 rounded-full transition-all duration-200"></div>
                         
@@ -322,8 +349,8 @@ export default function TeamMembers() {
                           </div>
                         </div>
                         
-                        {/* Dot indicator with theme colors - visible by default, centered on Y-axis, more to the right */}
-                        <div className="absolute top-1/2 left-1/2 transform translate-x-1/4 -translate-y-1/2 w-3 h-3 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full opacity-80 group-hover/member:opacity-100 transition-all duration-300 shadow-lg border border-white/30 group-hover/member:scale-125"></div>
+                        {/* Dot indicator - invisible but larger hover area */}
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full opacity-0 group-hover/member:opacity-30 transition-all duration-300 shadow-lg border border-white/30"></div>
                       </div>
                     </div>
                   ))}
@@ -338,9 +365,10 @@ export default function TeamMembers() {
                     {selectedTeam.description}
                   </p>
                 </div>
-              </div>
+                </div>
+              </motion.div>
             </motion.div>
-          </motion.div>
+          </>
         )}
       </AnimatePresence>
     </div>

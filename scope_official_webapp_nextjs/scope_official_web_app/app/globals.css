@@ -45,12 +45,21 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden; /* Prevent horizontal scroll */
-  cursor: auto !important; /* Ensure cursor is always visible */
 }
 
-/* Force cursor visibility on all elements */
-*, *::before, *::after {
-  cursor: inherit !important;
+/* Ensure cursor-pointer works on all clickable elements */
+button,
+[role="button"],
+.cursor-pointer,
+a[href],
+[onClick] {
+  cursor: pointer !important;
+}
+
+/* Ensure proper cursor for disabled elements */
+button:disabled,
+[disabled] {
+  cursor: not-allowed !important;
 }
 
 /* Enhanced smooth scrolling */
