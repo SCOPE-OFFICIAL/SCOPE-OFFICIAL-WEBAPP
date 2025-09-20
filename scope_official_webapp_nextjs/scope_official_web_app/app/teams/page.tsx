@@ -127,8 +127,8 @@ const LinkedInIcon = (
 
 export default function TeamPage() {
   return (
-    <div className="team-page-container">
-     
+    <div className="team-page-container min-h-screen relative">
+      <div className="relative z-10">
 
       {/* --- Main Our Team Section --- */}
       <section className="our-team-section">
@@ -214,6 +214,7 @@ export default function TeamPage() {
         </div>
       </section>
 
+      </div>
     </div>
   );
 }

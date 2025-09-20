@@ -1,6 +1,6 @@
 .whatWeDoSection {
   padding: 40px 0; /* Reduced from 80px */
-  background: var(--background-dark);
+  background: linear-gradient(to bottom right, #040a28, #0d1b3d, #040a28);
   scroll-margin-top: 100px;
 }
 

@@ -53,12 +53,12 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/images/scope_logo.png" />
         <link rel="shortcut icon" href="/images/scope_logo.png" />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#040A28] text-white font-inter">
+      <body className="min-h-screen flex flex-col bg-[#040A28] text-white font-inter overflow-x-hidden max-w-full">
         <ViewModeProvider>
           <Navigation />
           
           {/* Page Content with Transition Wrapper */}
-          <main className="flex-grow">
+          <main className="flex-grow overflow-x-hidden max-w-full">
             <PageTransitionWrapper>
               {children}
             </PageTransitionWrapper>

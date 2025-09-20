@@ -14,6 +14,7 @@ interface AnimatedButtonProps {
   href?: string;
   target?: string;
   rel?: string;
+  arrowDirection?: 'left' | 'right';
 }
 
 export default function AnimatedButton({
@@ -26,7 +27,8 @@ export default function AnimatedButton({
   type = 'button',
   href,
   target,
-  rel
+  rel,
+  arrowDirection = 'right'
 }: AnimatedButtonProps) {
   
   const getVariantClasses = () => {
@@ -80,6 +82,18 @@ export default function AnimatedButton({
       )}
       
       <span className="relative z-10 flex items-center">
+        {/* Left Arrow - appears on hover for left direction */}
+        {arrowDirection === 'left' && (
+          <svg
+            className="w-2.5 h-2.5 flex-shrink-0 transition-all duration-300 mr-0 opacity-0 group-hover:opacity-100 group-hover:mr-1.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+          </svg>
+        )}
+        
         {/* Invisible spacer for dot positioning - only for non-primary variants */}
         {variant !== 'primary' && (
           <span className="w-1.5 h-1.5 mr-2 opacity-0"></span>
@@ -87,15 +101,17 @@ export default function AnimatedButton({
         
         {children}
         
-        {/* Arrow icon - appears on hover */}
-        <svg
-          className="w-2.5 h-2.5 flex-shrink-0 transition-all duration-300 ml-0 opacity-0 group-hover:opacity-100 group-hover:ml-1.5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-        </svg>
+        {/* Right Arrow - appears on hover for right direction */}
+        {arrowDirection === 'right' && (
+          <svg
+            className="w-2.5 h-2.5 flex-shrink-0 transition-all duration-300 ml-0 opacity-0 group-hover:opacity-100 group-hover:ml-1.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+          </svg>
+        )}
       </span>
     </>
   );

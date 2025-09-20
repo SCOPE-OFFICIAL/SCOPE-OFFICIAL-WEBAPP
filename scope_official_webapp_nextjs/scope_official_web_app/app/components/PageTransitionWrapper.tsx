@@ -21,7 +21,7 @@ export default function PageTransitionWrapper({ children }: PageTransitionWrappe
           duration: 0.5,
           ease: [0.22, 1, 0.36, 1], // Custom easing for smooth feel
         }}
-        className="w-full"
+        className="w-full overflow-x-hidden max-w-full"
       >
         {children}
       </motion.div>

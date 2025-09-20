@@ -155,14 +155,14 @@ export default function FaqPage() {
       </div>
 
       <motion.main 
-        className="flex-grow container mx-auto px-6 py-16 relative z-10"
+        className="flex-grow container mx-auto px-6 py-20 pb-64 relative z-10"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
         {/* Centered Heading Section */}
         <motion.div 
-          className="text-center mb-8 max-w-7xl mx-auto"
+          className="text-center mb-12 max-w-7xl mx-auto mt-8"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
@@ -468,6 +468,9 @@ export default function FaqPage() {
           </motion.div>
         </motion.div>
       </motion.main>
+      
+      {/* Spacer to ensure gap between FAQ and Footer */}
+      <div className="h-32 md:h-48"></div>
       
       {/* Footer - Only appears at the end of the website */}
       <FooterComponent />

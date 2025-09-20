@@ -49,8 +49,14 @@ export default function HomePage() {
       localStorage.setItem('galleryFolder', 'MATLAB');
     }
     
-    // Navigate to gallery section on main page
-    window.location.href = '/#Gallery';
+    // Close the expanded view modal first
+    setShowExpandedView(false);
+    
+    // Small delay to ensure modal closes, then navigate
+    setTimeout(() => {
+      // Navigate to gallery section on main page
+      window.location.href = '/#Gallery';
+    }, 100);
   };
 
   useEffect(() => {
@@ -118,83 +124,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#040a28] via-[#0d1b3d] to-[#040a28] text-gray-200 font-sans relative overflow-hidden">
-      {/* Optimized Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden" style={{ willChange: 'transform' }}>
-        {[...Array(6)].map((_, i) => {
-          // Static positions that don't change on re-render
-          const positions = [
-            { left: '20%', top: '15%' },
-            { left: '70%', top: '25%' },
-            { left: '30%', top: '75%' },
-            { left: '85%', top: '65%' },
-            { left: '40%', top: '40%' },
-            { left: '5%', top: '55%' }
-          ];
-          const durations = [25, 30, 20, 28, 22, 26];
-          
-          return (
-            <motion.div
-              key={i}
-              className="absolute w-72 h-72 rounded-full opacity-5"
-              style={{
-                background: `linear-gradient(45deg, #F24DC2, #2C97FF)`,
-                left: positions[i].left,
-                top: positions[i].top,
-                willChange: 'transform'
-              }}
-              animate={{
-                x: [0, 100, 0],
-                y: [0, -100, 0],
-                rotate: [0, 180, 360],
-              }}
-              transition={{
-                duration: durations[i],
-                repeat: Infinity,
-                ease: "linear",
-              }}
-            />
-          );
-        })}
-      </div>
-
-      {/* Animated Background Particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(12)].map((_, i) => {
-          // Static positions for particles
-          const particlePositions = [
-            { left: '8%', top: '12%' }, { left: '28%', top: '22%' }, { left: '48%', top: '32%' },
-            { left: '68%', top: '12%' }, { left: '88%', top: '22%' }, { left: '18%', top: '52%' },
-            { left: '38%', top: '62%' }, { left: '58%', top: '72%' }, { left: '78%', top: '82%' },
-            { left: '92%', top: '42%' }, { left: '22%', top: '82%' }, { left: '82%', top: '62%' }
-          ];
-          const particleDurations = [5, 4, 6, 7, 5.5, 4.5, 6.5, 3.5, 7.5, 5.5, 4.5, 5.5];
-          const particleDelays = [0, 0.5, 1, 1.5, 2, 0.3, 0.8, 1.3, 1.8, 0.2, 0.7, 1.2];
-          
-          return (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full"
-              style={{
-                left: particlePositions[i].left,
-                top: particlePositions[i].top,
-              }}
-              animate={{
-                y: [0, -50, 0],
-                opacity: [0.2, 0.8, 0.2],
-                scale: [1, 1.5, 1],
-              }}
-              transition={{
-                duration: particleDurations[i],
-                repeat: Infinity,
-                delay: particleDelays[i],
-                ease: "easeInOut",
-              }}
-            />
-          );
-        })}
-      </div>
-
+    <div className="min-h-screen text-gray-200 font-sans relative">
       {/* Main Content Area */}
       <main className="container mx-auto px-8 py-16 lg:py-24 relative z-10">
         {/* Upcoming Events Section */}
@@ -213,7 +143,7 @@ export default function HomePage() {
             viewport={{ once: true }}
           >
             <motion.h2 
-              className="mb-12 lg:mb-20 text-center"
+              className="mb-6 lg:mb-8 text-center"
               style={{
                 fontFamily: '"Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif',
                 fontSize: '3.2rem',
@@ -503,7 +433,7 @@ export default function HomePage() {
       {/* Expanded Posters View */}
       {showExpandedView && (
         <motion.div
-          className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/95 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -604,12 +534,12 @@ export default function HomePage() {
                   >
                     <div className="absolute bottom-4 left-4 right-4 text-white">
                       <h4 className="text-lg font-bold mb-2">
-                        {index === 0 && "Tech Innovation Workshop"}
+                        {index === 0 && "Atlassian 2025"}
                         {index === 1 && "MATLAB Programming Session"}
                         {index === 2 && "Advanced Technology Seminar"}
                       </h4>
                       <p className="text-sm opacity-90">
-                        {index === 0 && "Interactive workshop on cutting-edge technology trends"}
+                        {index === 0 && "Interactive technical talk on cutting-edge technology trends"}
                         {index === 1 && "Comprehensive MATLAB training for engineering students"}
                         {index === 2 && "Deep dive into emerging technologies and their applications"}
                       </p>
@@ -628,33 +558,10 @@ export default function HomePage() {
                         </motion.div>
                       )}
                     </div>
-
-                    {/* Hand cursor indicator for clickable posters */}
-                    {(index === 0 || index === 1) && (
-                      <motion.div
-                        className="absolute top-4 right-4 text-white text-2xl"
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 0.8, scale: 1 }}
-                        transition={{ delay: 0.2 }}
-                      >
-                        👆
-                      </motion.div>
-                    )}
                   </motion.div>
                 </motion.div>
               ))}
             </motion.div>
-
-            {/* Instructions */}
-            <motion.p
-              className="text-center text-gray-300 mt-8 text-lg"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4, delay: 0.5, ease: "easeOut" }}
-              style={{ willChange: 'opacity' }}
-            >
-              Hover over posters to see details • Click MATLAB or Tech Innovation posters to open their workshop galleries directly • Press ESC or click outside to close
-            </motion.p>
           </motion.div>
         </motion.div>
       )}

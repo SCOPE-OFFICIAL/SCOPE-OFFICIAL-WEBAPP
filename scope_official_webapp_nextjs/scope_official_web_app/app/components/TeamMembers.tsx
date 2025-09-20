@@ -143,41 +143,40 @@ export default function TeamMembers() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#040A28] via-[#0d1b3d] to-[#040A28] py-20 px-4 relative overflow-hidden">
-      {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#040A28]/30 to-[#0d1b3d]/30"></div>
-      <div className="absolute inset-0 bg-[url('/images/circuit-background.jpg')] opacity-5 bg-cover bg-center"></div>
-      
-      {/* Floating Particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(12)].map((_, i) => {
-          // Static positions for particles
-          const particlePositions = [
-            { left: '8%', top: '15%' }, { left: '25%', top: '20%' }, { left: '42%', top: '30%' },
-            { left: '65%', top: '18%' }, { left: '85%', top: '25%' }, { left: '15%', top: '55%' },
-            { left: '35%', top: '65%' }, { left: '55%', top: '75%' }, { left: '75%', top: '85%' },
-            { left: '90%', top: '45%' }, { left: '20%', top: '85%' }, { left: '80%', top: '65%' }
+    <div className="min-h-screen py-20 px-4 relative">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {[...Array(6)].map((_, i) => {
+          // Static positions that don't change on re-render - adjusted to prevent overflow
+          const positions = [
+            { left: '15%', top: '10%' },
+            { left: '60%', top: '20%' },
+            { left: '25%', top: '70%' },
+            { left: '70%', top: '60%' },
+            { left: '35%', top: '35%' },
+            { left: '10%', top: '50%' }
           ];
-          const particleDurations = [3, 4, 5, 4.5, 3.5, 4.8, 3.2, 5.2, 4.2, 3.8, 4.6, 3.6];
-          const particleDelays = [0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 0.2, 0.5, 0.8, 1.1, 1.4];
+          const durations = [25, 30, 20, 28, 22, 26];
           
           return (
             <motion.div
               key={i}
-              className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full"
+              className="absolute w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full opacity-10"
               style={{
-                left: particlePositions[i].left,
-                top: particlePositions[i].top,
+                background: `linear-gradient(45deg, #F24DC2, #2C97FF)`,
+                left: positions[i].left,
+                top: positions[i].top,
+                willChange: 'transform'
               }}
               animate={{
-                y: [0, -30, 0],
-                opacity: [0.3, 1, 0.3],
-                scale: [1, 1.5, 1],
+                x: [0, 50, 0],
+                y: [0, -50, 0],
+                rotate: [0, 180, 360],
               }}
               transition={{
-                duration: particleDurations[i],
+                duration: durations[i],
                 repeat: Infinity,
-                delay: particleDelays[i],
+                ease: "linear",
               }}
             />
           );
@@ -194,20 +193,27 @@ export default function TeamMembers() {
           viewport={{ once: true }}
         >
           <motion.h1 
-            className="mb-4 text-center"
+            className="mb-4 text-center relative inline-block"
             style={{
               fontFamily: '"Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif',
               fontSize: '3.2rem',
               fontWeight: 600,
               color: 'var(--text-light)',
               textShadow: '0 0 20px rgba(138, 64, 255, 0.4)',
-              letterSpacing: '2px'
+              letterSpacing: '2px',
+              paddingLeft: '40px'
             }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
             viewport={{ once: true }}
           >
+            <span 
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-7 rounded"
+              style={{
+                background: 'linear-gradient(to bottom, var(--secondary-pink), var(--primary-purple))'
+              }}
+            ></span>
             Our Team Members
           </motion.h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -270,27 +276,31 @@ export default function TeamMembers() {
       {/* Modal for Team Details */}
       <AnimatePresence>
         {selectedTeam && (
-          <>
-            {/* Full screen overlay */}
-            <div 
-              className="fixed inset-0 bg-black/90 z-[9998]"
-              onClick={() => setSelectedTeam(null)}
-            />
-            <motion.div
-              className="fixed inset-0 z-[9999] flex items-center justify-center p-4 pointer-events-none"
+          <motion.div
+            className="fixed inset-0 z-[99999] flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {/* Full screen backdrop overlay */}
+            <motion.div 
+              className="absolute inset-0 bg-black/95 backdrop-blur-sm"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              onClick={() => setSelectedTeam(null)}
+            />
+            
+            {/* Modal content container */}
+            <motion.div
+              className="relative z-[100000] bg-white/10 backdrop-blur-xl rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-white/20 mx-4"
+              variants={modalVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              onClick={(e) => e.stopPropagation()}
             >
-              <motion.div
-                className="bg-white/10 backdrop-blur-xl rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-white/20 relative pointer-events-auto"
-                variants={modalVariants}
-                initial="hidden"
-                animate="visible"
-                exit="exit"
-                onClick={(e) => e.stopPropagation()}
-                style={{ zIndex: 10000 }}
-              >
                 {/* Close Button - positioned relative to modal container */}
                 <div className="absolute top-6 right-6 z-[10001]">
                   <button
@@ -368,7 +378,6 @@ export default function TeamMembers() {
                 </div>
               </motion.div>
             </motion.div>
-          </>
         )}
       </AnimatePresence>
     </div>

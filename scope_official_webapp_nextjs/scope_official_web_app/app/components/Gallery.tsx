@@ -146,39 +146,34 @@ const Gallery: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#040A28] via-[#0d1b3d] to-[#040A28] py-20 px-6 relative overflow-hidden">
-      {/* Ensure background covers full viewport */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#040A28] via-[#0d1b3d] to-[#040A28]"></div>
-      
-      {/* Content wrapper with relative positioning */}
-      <div className="relative z-10">
-      
+    <div className="min-h-screen py-20 px-6 relative">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(6)].map((_, i) => {
-          // Static positions that don't change on re-render
+          // Static positions that don't change on re-render - adjusted to prevent overflow
           const positions = [
-            { left: '12%', top: '18%' },
-            { left: '72%', top: '8%' },
-            { left: '28%', top: '78%' },
-            { left: '88%', top: '68%' },
-            { left: '48%', top: '38%' },
-            { left: '8%', top: '58%' }
+            { left: '15%', top: '10%' },
+            { left: '60%', top: '20%' },
+            { left: '25%', top: '70%' },
+            { left: '70%', top: '60%' },
+            { left: '35%', top: '35%' },
+            { left: '10%', top: '50%' }
           ];
           const durations = [25, 30, 20, 28, 22, 26];
           
           return (
             <motion.div
               key={i}
-              className="absolute w-72 h-72 rounded-full opacity-5"
+              className="absolute w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full opacity-10"
               style={{
                 background: `linear-gradient(45deg, #F24DC2, #2C97FF)`,
                 left: positions[i].left,
                 top: positions[i].top,
+                willChange: 'transform'
               }}
               animate={{
-                x: [0, 100, 0],
-                y: [0, -100, 0],
+                x: [0, 50, 0],
+                y: [0, -50, 0],
                 rotate: [0, 180, 360],
               }}
               transition={{
@@ -191,6 +186,9 @@ const Gallery: React.FC = () => {
         })}
       </div>
 
+      {/* Content wrapper with relative positioning */}
+      <div className="relative z-10">
+      
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Section Header */}
         <motion.div 
@@ -201,20 +199,27 @@ const Gallery: React.FC = () => {
           viewport={{ once: true }}
         >
           <motion.h2 
-            className="mb-6 text-center"
+            className="mb-6 text-center relative inline-block"
             style={{
               fontFamily: '"Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif',
               fontSize: '3.2rem',
               fontWeight: 600,
               color: 'var(--text-light)',
               textShadow: '0 0 20px rgba(138, 64, 255, 0.4)',
-              letterSpacing: '2px'
+              letterSpacing: '2px',
+              paddingLeft: '40px'
             }}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
           >
+            <span 
+              className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-7 rounded"
+              style={{
+                background: 'linear-gradient(to bottom, var(--secondary-pink), var(--primary-purple))'
+              }}
+            ></span>
             Gallery
           </motion.h2>
           <motion.p 
@@ -343,8 +348,9 @@ const Gallery: React.FC = () => {
                   variant="secondary"
                   size="md"
                   className="mb-6"
+                  arrowDirection="left"
                 >
-                  {cameFromEvents ? '← Back to Events' : '← Back to Folders'}
+                  {cameFromEvents ? 'Back to Events' : 'Back to Gallery'}
                 </AnimatedButton>
               </motion.div>
 
