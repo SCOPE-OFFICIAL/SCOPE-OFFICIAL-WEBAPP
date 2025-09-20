@@ -575,3 +575,4 @@ export default function HomePage() {
 // This is Team Zero
 /* This code is part of the SCOPE official web app built with Next.js.*/
 
+

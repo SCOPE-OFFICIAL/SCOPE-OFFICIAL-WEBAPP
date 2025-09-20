@@ -5,10 +5,12 @@ const Navbar: React.FC = () => {
   return (
     <nav className={styles.navbar}>
       <div className={styles.container}>
-        {/* <div className={styles.logo}>
-          {/* Using scope-logo.png */}
-          {/* <img src="/scope-logo.png" alt="SCOPE Logo" /> */}
+        {/* 
+        <div className={styles.logo}>
+          Using scope-logo.png
+          <img src="/scope-logo.png" alt="SCOPE Logo" />
         </div> 
+        */}
         <ul className={styles.navLinks}>
           <li>
             <a href="#home">Home</a>

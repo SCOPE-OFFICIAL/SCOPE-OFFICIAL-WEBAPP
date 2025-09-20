@@ -3,7 +3,6 @@ import styles from "./OurTeams.module.css";
 import SectionTitle from "../../components/SectionTitle/SectionTitle";
 import TeamCard from "../../components/TeamCard/TeamCard";
 import HorizontalDivider from "../../components/HorizontalDivider/HorizontalDivider";
-import ScrollAnimation, { StaggerContainer } from "../../../components/ScrollAnimationFixed";
 
 const OurTeams: React.FC = () => {
   const teams: Array<{ name: string; position: "left" | "right" }> = [
