@@ -5,9 +5,90 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import AnimatedButton from './AnimatedButton';
 
+// MATLAB event images
+const matlabGallery = [
+  {
+    id: 1,
+    image: "/images/MATLAB/matlab1.jpg",
+  },
+  {
+    id: 2,
+    image: "/images/MATLAB/matlab2.jpg",
+  },
+  {
+    id: 3,
+    image: "/images/MATLAB/matlab3.jpg",
+  },
+  {
+    id: 4,
+    image: "/images/MATLAB/matlab4.jpg",
+  },
+  {
+    id: 5,
+    image: "/images/MATLAB/matlab5.jpg",
+  }
+];
+
+// ATLASSIAN event images
+const atlassianGallery = [
+  {
+    id: 1,
+    image: "/images/ATLASSIAN/WhatsApp Image 2025-08-30 at 21.38.46_45e28e7e.jpg",
+  },
+  {
+    id: 2,
+    image: "/images/ATLASSIAN/WhatsApp Image 2025-08-30 at 21.38.47_700ced33.jpg",
+  },
+  {
+    id: 3,
+    image: "/images/ATLASSIAN/WhatsApp Image 2025-08-30 at 21.38.47_7dca8d71.jpg",
+  },
+  {
+    id: 4,
+    image: "/images/ATLASSIAN/WhatsApp Image 2025-08-30 at 21.38.48_3525b7ff.jpg",
+  }
+];
+
+// Folder cards data with detailed descriptions
+const folderCards = [
+  {
+    id: 'MATLAB',
+    title: 'MATLAB WORKSHOP',
+    subtitle: 'Learn, Analyze, Innovate with MATLAB workshops and training sessions',
+    description: 'Our MATLAB workshop series is designed to empower students and professionals with comprehensive knowledge of MATLAB programming and its applications. These intensive sessions cover everything from basic programming concepts to advanced data analysis, signal processing, and simulation techniques. Participants engage in hands-on coding exercises, real-world problem solving, and collaborative projects that demonstrate the power and versatility of MATLAB in engineering and scientific applications. The workshop emphasizes practical learning through interactive demonstrations, group activities, and individual coding challenges.',
+    eventDetails: {
+      date: 'March 15-16, 2024',
+      duration: '2 Days',
+      participants: '50+ Students',
+      topics: ['MATLAB Fundamentals', 'Data Visualization', 'Signal Processing', 'Simulink Basics', 'Real-world Applications']
+    },
+    image: '/images/MATLAB/matlab1.jpg',
+    gradient: 'from-blue-600 via-indigo-600 to-purple-600',
+    photoCount: matlabGallery.length,
+    gallery: matlabGallery
+  },
+  {
+    id: 'ATLASSIAN',
+    title: 'ATLASSIAN WORKSHOP',
+    subtitle: 'Master project management and collaboration with Atlassian tools',
+    description: 'The Atlassian workshop series introduces students to industry-standard project management and collaboration tools used by leading technology companies worldwide. Through comprehensive training sessions, participants learn to effectively use Jira for project tracking, Confluence for documentation and knowledge sharing, and Bitbucket for version control. The workshop emphasizes practical team collaboration scenarios, agile project management methodologies, and best practices for software development workflows. Students gain valuable experience in professional development environments and learn essential skills for modern software engineering careers.',
+    eventDetails: {
+      date: 'April 20-21, 2024',
+      duration: '2 Days',
+      participants: '40+ Students',
+      topics: ['Jira Project Management', 'Confluence Documentation', 'Bitbucket Version Control', 'Agile Workflows', 'Team Collaboration']
+    },
+    image: '/images/ATLASSIAN/WhatsApp Image 2025-08-30 at 21.38.46_45e28e7e.jpg',
+    gradient: 'from-blue-700 via-indigo-700 to-cyan-700',
+    photoCount: atlassianGallery.length,
+    gallery: atlassianGallery
+  }
+];
+
 const Gallery: React.FC = () => {
   const [selectedFolder, setSelectedFolder] = useState<'MATLAB' | 'ATLASSIAN' | null>(null);
   const [cameFromEvents, setCameFromEvents] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<{ image: string; alt: string } | null>(null);
 
   // Check for localStorage to auto-select gallery folder
   useEffect(() => {
@@ -21,85 +102,56 @@ const Gallery: React.FC = () => {
     }
   }, []);
 
-  // MATLAB event images
-  const matlabGallery = [
-    {
-      id: 1,
-      image: "/images/MATLAB/matlab1.jpg",
-    },
-    {
-      id: 2,
-      image: "/images/MATLAB/matlab2.jpg",
-    },
-    {
-      id: 3,
-      image: "/images/MATLAB/matlab3.jpg",
-    },
-    {
-      id: 4,
-      image: "/images/MATLAB/matlab4.jpg",
-    },
-    {
-      id: 5,
-      image: "/images/MATLAB/matlab5.jpg",
-    }
-  ];
+  // Handle keyboard events for image modal
+  useEffect(() => {
+    const navigateImage = (direction: 'prev' | 'next') => {
+      if (!selectedImage) return;
+      
+      const currentGallery = selectedFolder === 'MATLAB' ? matlabGallery : 
+                            selectedFolder === 'ATLASSIAN' ? atlassianGallery : [];
+      const currentIndex = currentGallery.findIndex(img => img.image === selectedImage.image);
+      
+      if (currentIndex === -1) return;
+      
+      let newIndex;
+      if (direction === 'prev') {
+        newIndex = currentIndex > 0 ? currentIndex - 1 : currentGallery.length - 1;
+      } else {
+        newIndex = currentIndex < currentGallery.length - 1 ? currentIndex + 1 : 0;
+      }
+      
+      const newImage = currentGallery[newIndex];
+      const folderData = folderCards.find(folder => folder.id === selectedFolder);
+      setSelectedImage({
+        image: newImage.image,
+        alt: `${folderData?.title} - Photo ${newImage.id}`
+      });
+    };
 
-  // ATLASSIAN event images
-  const atlassianGallery = [
-    {
-      id: 1,
-      image: "/images/ATLASSIAN/WhatsApp Image 2025-08-30 at 21.38.46_45e28e7e.jpg",
-    },
-    {
-      id: 2,
-      image: "/images/ATLASSIAN/WhatsApp Image 2025-08-30 at 21.38.47_700ced33.jpg",
-    },
-    {
-      id: 3,
-      image: "/images/ATLASSIAN/WhatsApp Image 2025-08-30 at 21.38.47_7dca8d71.jpg",
-    },
-    {
-      id: 4,
-      image: "/images/ATLASSIAN/WhatsApp Image 2025-08-30 at 21.38.48_3525b7ff.jpg",
-    }
-  ];
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!selectedImage) return;
+      
+      if (e.key === 'Escape') {
+        setSelectedImage(null);
+      } else if (e.key === 'ArrowLeft') {
+        navigateImage('prev');
+      } else if (e.key === 'ArrowRight') {
+        navigateImage('next');
+      }
+    };
 
-  // Folder cards data with detailed descriptions
-  const folderCards = [
-    {
-      id: 'MATLAB',
-      title: 'MATLAB WORKSHOP',
-      subtitle: 'Learn, Analyze, Innovate with MATLAB workshops and training sessions',
-      description: 'Our MATLAB workshop series is designed to empower students and professionals with comprehensive knowledge of MATLAB programming and its applications. These intensive sessions cover everything from basic programming concepts to advanced data analysis, signal processing, and simulation techniques. Participants engage in hands-on coding exercises, real-world problem solving, and collaborative projects that demonstrate the power and versatility of MATLAB in engineering and scientific applications. The workshop emphasizes practical learning through interactive demonstrations, group activities, and individual coding challenges.',
-      eventDetails: {
-        date: 'March 15-16, 2024',
-        duration: '2 Days',
-        participants: '50+ Students',
-        topics: ['MATLAB Fundamentals', 'Data Visualization', 'Signal Processing', 'Simulink Basics', 'Real-world Applications']
-      },
-      image: '/images/MATLAB/matlab1.jpg',
-      gradient: 'from-blue-600 via-indigo-600 to-purple-600',
-      photoCount: matlabGallery.length,
-      gallery: matlabGallery
-    },
-    {
-      id: 'ATLASSIAN',
-      title: 'ATLASSIAN WORKSHOP',
-      subtitle: 'Master project management and collaboration with Atlassian tools',
-      description: 'The Atlassian workshop series introduces students to industry-standard project management and collaboration tools used by leading technology companies worldwide. Through comprehensive training sessions, participants learn to effectively use Jira for project tracking, Confluence for documentation and knowledge sharing, and Bitbucket for version control. The workshop emphasizes practical team collaboration scenarios, agile project management methodologies, and best practices for software development workflows. Students gain valuable experience in professional development environments and learn essential skills for modern software engineering careers.',
-      eventDetails: {
-        date: 'April 20-21, 2024',
-        duration: '2 Days',
-        participants: '40+ Students',
-        topics: ['Jira Project Management', 'Confluence Documentation', 'Bitbucket Version Control', 'Agile Workflows', 'Team Collaboration']
-      },
-      image: '/images/ATLASSIAN/WhatsApp Image 2025-08-30 at 21.38.46_45e28e7e.jpg',
-      gradient: 'from-blue-700 via-indigo-700 to-cyan-700',
-      photoCount: atlassianGallery.length,
-      gallery: atlassianGallery
+    if (selectedImage) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    } else {
+      document.body.style.overflow = 'unset';
     }
-  ];
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedImage, selectedFolder]);
 
   const getCurrentGallery = () => {
     if (selectedFolder === 'MATLAB') return matlabGallery;
@@ -109,6 +161,30 @@ const Gallery: React.FC = () => {
 
   const getCurrentFolderData = () => {
     return folderCards.find(folder => folder.id === selectedFolder);
+  };
+
+  const navigateImage = (direction: 'prev' | 'next') => {
+    if (!selectedImage) return;
+    
+    const currentGallery = selectedFolder === 'MATLAB' ? matlabGallery : 
+                          selectedFolder === 'ATLASSIAN' ? atlassianGallery : [];
+    const currentIndex = currentGallery.findIndex(img => img.image === selectedImage.image);
+    
+    if (currentIndex === -1) return;
+    
+    let newIndex;
+    if (direction === 'prev') {
+      newIndex = currentIndex > 0 ? currentIndex - 1 : currentGallery.length - 1;
+    } else {
+      newIndex = currentIndex < currentGallery.length - 1 ? currentIndex + 1 : 0;
+    }
+    
+    const newImage = currentGallery[newIndex];
+    const folderData = folderCards.find(folder => folder.id === selectedFolder);
+    setSelectedImage({
+      image: newImage.image,
+      alt: `${folderData?.title} - Photo ${newImage.id}`
+    });
   };
 
   const handleBackNavigation = () => {
@@ -482,6 +558,10 @@ const Gallery: React.FC = () => {
                       stiffness: 300, 
                       damping: 30 
                     }}
+                    onClick={() => setSelectedImage({ 
+                      image: item.image, 
+                      alt: `${getCurrentFolderData()?.title} - Photo ${item.id}` 
+                    })}
                   >
                     {/* Image Container - Full card */}
                     <div className="relative h-64 overflow-hidden">
@@ -546,6 +626,119 @@ const Gallery: React.FC = () => {
         )}
       </div>
       </div>
+
+      {/* Image Modal */}
+      <AnimatePresence>
+        {selectedImage && (
+          <motion.div
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/95 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            onClick={() => setSelectedImage(null)}
+          >
+            {/* Modal Content */}
+            <motion.div
+              className="relative max-w-[90vw] max-h-[90vh] w-auto h-auto"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="absolute -top-4 -right-4 z-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-3 text-white transition-all duration-200 border border-white/20"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* Previous Button */}
+              <button
+                onClick={() => navigateImage('prev')}
+                className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-3 text-white transition-all duration-200 border border-white/20 hover:scale-110"
+                aria-label="Previous image"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+
+              {/* Next Button */}
+              <button
+                onClick={() => navigateImage('next')}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-full p-3 text-white transition-all duration-200 border border-white/20 hover:scale-110"
+                aria-label="Next image"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+
+              {/* Image */}
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
+                <Image
+                  src={selectedImage.image}
+                  alt={selectedImage.alt}
+                  width={1200}
+                  height={800}
+                  className="object-contain w-auto h-auto max-w-[90vw] max-h-[90vh]"
+                  sizes="90vw"
+                  priority
+                />
+                
+                {/* Image gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-black/20 pointer-events-none"></div>
+              </div>
+
+              {/* Image Caption */}
+              <motion.div
+                className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/60 to-transparent p-6 text-white"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.3 }}
+              >
+                <p className="text-lg font-medium text-center mb-2">
+                  {selectedImage.alt}
+                </p>
+                
+                {/* Image counter */}
+                {(() => {
+                  const currentGallery = selectedFolder === 'MATLAB' ? matlabGallery : 
+                                        selectedFolder === 'ATLASSIAN' ? atlassianGallery : [];
+                  const currentIndex = currentGallery.findIndex(img => img.image === selectedImage.image);
+                  return (
+                    <div className="flex justify-center items-center space-x-2">
+                      <span className="text-sm text-gray-300">
+                        {currentIndex + 1} of {currentGallery.length}
+                      </span>
+                      <div className="flex space-x-1">
+                        {currentGallery.map((_, index) => (
+                          <div
+                            key={index}
+                            className={`w-2 h-2 rounded-full transition-all duration-200 ${
+                              index === currentIndex 
+                                ? 'bg-[#F24DC2] scale-110' 
+                                : 'bg-white/30 hover:bg-white/50'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                      <span className="text-xs text-gray-400">
+                        Use ← → keys or buttons to navigate
+                      </span>
+                    </div>
+                  );
+                })()}
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
