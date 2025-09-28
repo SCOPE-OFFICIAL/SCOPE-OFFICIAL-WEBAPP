@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import AnimatedButton from './AnimatedButton';
 
 interface TeamData {
   id: string;
@@ -92,6 +91,22 @@ const teamData: TeamData[] = [
 
 export default function TeamMembers() {
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
+
+  // Hide navbar and footer when modal is open
+  useEffect(() => {
+    if (selectedTeam) {
+      // Add class to body to hide navbar and footer
+      document.body.classList.add('modal-open');
+    } else {
+      // Remove class from body
+      document.body.classList.remove('modal-open');
+    }
+
+    // Cleanup function to remove class when component unmounts
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [selectedTeam]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -260,7 +275,7 @@ export default function TeamMembers() {
       <AnimatePresence>
         {selectedTeam && (
           <motion.div
-            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[9999] flex items-center justify-center p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -276,16 +291,15 @@ export default function TeamMembers() {
             >
               <div className="relative">
                 {/* Close Button */}
-                <AnimatedButton
+                <button
                   onClick={() => setSelectedTeam(null)}
-                  variant="secondary"
-                  size="sm"
-                  className="absolute top-4 right-4 z-10 bg-white/20 hover:bg-white/30 rounded-full p-2 min-w-0 w-10 h-10"
+                  className="absolute top-4 right-4 z-50 bg-white/20 hover:bg-white/30 rounded-full p-2 w-10 h-10 flex items-center justify-center transition-colors duration-200"
+                  style={{ right: '1rem', left: 'auto', position: 'absolute' }}
                 >
                   <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
-                </AnimatedButton>
+                </button>
 
                 {/* Team Image */}
                 <div className="relative h-96">

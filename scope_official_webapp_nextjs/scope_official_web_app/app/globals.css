@@ -897,3 +897,22 @@ a:hover {
 .circuit-overlay {
   animation: circuit-pulse 8s ease-in-out infinite;
 }
+
+/* --- MODAL STYLES --- */
+/* Hide navbar and footer when modal is open */
+.modal-open header,
+.modal-open nav,
+.modal-open footer,
+.modal-open .navbar,
+.modal-open .navigation,
+.modal-open .footer {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  z-index: -1 !important;
+}
+
+/* Prevent body scroll when modal is open */
+.modal-open {
+  overflow: hidden !important;
+}

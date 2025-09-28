@@ -1,10 +1,9 @@
 import "./globals.css";
 import { Orbitron, Inter, DM_Sans } from "next/font/google";
 import type { Metadata } from "next";
-import Navigation from "./components/Navigation";
 import { ViewModeProvider } from "./components/ViewModeContext";
-import FooterComponent from "./components/FooterComponent";
-import PageTransitionWrapper from "./components/PageTransitionWrapper";
+import { ModalProvider } from "./contexts/ModalContext";
+import ClientLayoutContent from "./components/ClientLayoutContent";
 
 // Load fonts
 const orbitron = Orbitron({ subsets: ["latin"], weight: ["600", "600"], variable: "--font-orbitron" });
@@ -56,16 +55,11 @@ export default function RootLayout({
       </head>
       <body className="min-h-screen flex flex-col bg-[#040A28] text-white font-inter">
         <ViewModeProvider>
-          <Navigation />
-          
-          {/* Page Content with Transition Wrapper */}
-          <main className="flex-grow">
-            <PageTransitionWrapper>
+          <ModalProvider>
+            <ClientLayoutContent>
               {children}
-            </PageTransitionWrapper>
-          </main>
-
-          <FooterComponent />
+            </ClientLayoutContent>
+          </ModalProvider>
         </ViewModeProvider>
       </body>
     </html>
