@@ -12,7 +12,7 @@ export default function FaqPage() {
   const faqs = [
     {
       question: "What is SCOPE and what do you do?",
-      answer: "SCOPE (Student Club of Professional Electronics) is a student-led electronics club that focuses on promoting electronics and circuit design among students. We organize workshops, competitions, and projects to enhance practical learning in electronics."
+      answer: "SCOPE (Society of Core Oriented Projects in Electronics) is a student-led electronics club that focuses on promoting electronics and circuit design among students. We organize workshops, competitions, and projects to enhance practical learning in electronics."
     },
     {
       question: "How can I join SCOPE?",

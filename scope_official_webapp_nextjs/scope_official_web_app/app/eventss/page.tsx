@@ -3,9 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import AnimatedButton from '../components/AnimatedButton';
 
 export default function HomePage() {
+  const router = useRouter();
+  
   const pastEvents = [
     "/images/past-event-1.jpg",
     "/images/past-event-2-matlab.jpg",
@@ -18,6 +21,11 @@ export default function HomePage() {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showExpandedView, setShowExpandedView] = useState(false);
   const swipeThreshold = 50;
+
+  const handleKnowMoreClick = () => {
+    // Navigate to home page and scroll to gallery section
+    router.push('/#gallery');
+  };
 
   const handlePrev = () => {
     if (isTransitioning) return;
@@ -412,7 +420,7 @@ export default function HomePage() {
             variant="secondary"
             size="lg"
             className="mt-12 bg-[rgb(0,76,148)] hover:bg-[#003E7A] border-[rgb(0,76,148)]"
-            onClick={() => setShowExpandedView(true)}
+            onClick={handleKnowMoreClick}
           >
             KNOW MORE
           </AnimatedButton>

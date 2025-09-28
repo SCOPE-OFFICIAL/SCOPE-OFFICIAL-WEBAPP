@@ -71,12 +71,17 @@ export default function AnimatedButton({
 
   const buttonContent = (
     <>
-      {/* Expanding blue dot animation - only for non-primary variants */}
-      {variant !== 'primary' && (
+      {/* Home tab style sliding background animation - for secondary and outline variants */}
+      {(variant === 'secondary' || variant === 'outline') && (
+        <div className="absolute inset-0 bg-gradient-to-r from-[#F24DC2]/25 to-[#2C97FF]/25 rounded-full transform translate-x-full transition-transform duration-400 ease-out group-hover:translate-x-0"></div>
+      )}
+      
+      {/* Expanding blue dot animation - only for nav variant */}
+      {variant === 'nav' && (
         <span className="absolute left-2 top-1/2 transform -translate-y-1/2 w-1.5 h-1.5 bg-[#2C97FF] rounded-full transition-all duration-700 ease-out origin-center group-hover:w-20 group-hover:h-20 group-hover:left-1/2 group-hover:top-1/2 group-hover:-translate-x-1/2 group-hover:-translate-y-1/2 group-hover:scale-[3] group-hover:bg-[#2C97FF] group-hover:rounded-full"></span>
       )}
       
-      {/* Gradient overlay for outline variant */}
+      {/* Enhanced gradient overlay for outline variant */}
       {variant === 'outline' && (
         <span className="absolute inset-0 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></span>
       )}
@@ -94,8 +99,8 @@ export default function AnimatedButton({
           </svg>
         )}
         
-        {/* Invisible spacer for dot positioning - only for non-primary variants */}
-        {variant !== 'primary' && (
+        {/* Invisible spacer for dot positioning - only for nav variant */}
+        {variant === 'nav' && (
           <span className="w-1.5 h-1.5 mr-2 opacity-0"></span>
         )}
         

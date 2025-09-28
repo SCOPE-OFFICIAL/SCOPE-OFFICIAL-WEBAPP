@@ -146,7 +146,7 @@ const Gallery: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen py-20 px-6 relative">
+    <div id="gallery" className="min-h-screen py-20 px-6 relative">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(6)].map((_, i) => {
