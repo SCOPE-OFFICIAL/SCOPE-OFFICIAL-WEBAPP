@@ -50,21 +50,33 @@ export default function HomePage() {
   };
 
   const handlePosterClick = (index: number) => {
-    // Store the gallery folder selection in localStorage
-    if (index === 0) { // Tech Innovation Workshop -> ATLASSIAN
-      localStorage.setItem('galleryFolder', 'ATLASSIAN');
-    } else if (index === 1) { // MATLAB Programming Session -> MATLAB
-      localStorage.setItem('galleryFolder', 'MATLAB');
+    // Map poster index to gallery folder
+    const posterToGalleryMap: { [key: number]: string } = {
+      0: 'ATLASSIAN',    // Atlassian 2025
+      1: 'MATLAB',       // MATLAB Programming Session
+      2: 'MATLAB',       // Advanced Technology Seminar (maps to MATLAB for now)
+      // Add more mappings as new galleries are created
+    };
+
+    const galleryFolder = posterToGalleryMap[index];
+    
+    if (galleryFolder) {
+      // Store the gallery folder selection in localStorage
+      localStorage.setItem('galleryFolder', galleryFolder);
+      
+      // Close the expanded view modal first
+      setShowExpandedView(false);
+      
+      // Small delay to ensure modal closes, then navigate
+      setTimeout(() => {
+        // Navigate to gallery section on main page
+        window.location.href = '/#gallery';
+      }, 100);
+    } else {
+      // If no gallery is mapped, show a message or default behavior
+      console.log(`No gallery available for poster ${index + 1} yet`);
+      // Could show a toast notification here
     }
-    
-    // Close the expanded view modal first
-    setShowExpandedView(false);
-    
-    // Small delay to ensure modal closes, then navigate
-    setTimeout(() => {
-      // Navigate to gallery section on main page
-      window.location.href = '/#Gallery';
-    }, 100);
   };
 
   useEffect(() => {
@@ -503,7 +515,7 @@ export default function HomePage() {
               {pastEvents.map((src, index) => (
                 <motion.div
                   key={index}
-                  className={`relative group ${(index === 0 || index === 1) ? 'cursor-pointer' : 'cursor-default'}`}
+                  className="relative group cursor-pointer"
                   initial={{ opacity: 0, scale: 0.9, y: 30 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ 
@@ -515,7 +527,7 @@ export default function HomePage() {
                     ease: "easeOut"
                   }}
                   whileHover={{ 
-                    scale: (index === 0 || index === 1) ? 1.05 : 1.03, // More scale for clickable posters
+                    scale: 1.05, // All posters now have the same hover scale
                     rotateY: 3,
                     transition: { duration: 0.2, ease: "easeOut" }
                   }}
@@ -551,20 +563,20 @@ export default function HomePage() {
                         {index === 1 && "Comprehensive MATLAB training for engineering students"}
                         {index === 2 && "Deep dive into emerging technologies and their applications"}
                       </p>
-                      {/* Subtle click hint for specific posters */}
-                      {(index === 0 || index === 1) && (
-                        <motion.div
-                          className="mt-3 flex items-center justify-center"
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.1 }}
-                        >
-                          <span className="text-xs text-blue-300 opacity-80">
-                            {index === 0 && "Click to open Atlassian Workshop gallery"}
-                            {index === 1 && "Click to open MATLAB Workshop gallery"}
-                          </span>
-                        </motion.div>
-                      )}
+                      {/* Click hint for all posters */}
+                      <motion.div
+                        className="mt-3 flex items-center justify-center"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 }}
+                      >
+                        <span className="text-xs text-blue-300 opacity-80">
+                          {index === 0 && "Click to open Atlassian Workshop gallery"}
+                          {index === 1 && "Click to open MATLAB Workshop gallery"}
+                          {index === 2 && "Click to open MATLAB Workshop gallery"}
+                          {/* Add more as galleries are created */}
+                        </span>
+                      </motion.div>
                     </div>
                   </motion.div>
                 </motion.div>
