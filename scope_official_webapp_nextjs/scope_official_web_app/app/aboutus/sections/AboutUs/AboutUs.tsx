@@ -1,43 +1,67 @@
 import React from "react";
 import styles from "./AboutUs.module.css";
 import SectionTitle from "../../components/SectionTitle/SectionTitle";
+import { FaLightbulb, FaCog } from "react-icons/fa";
 
+interface InfoBoxProps {
+  title: string;
+  content: string;
+  icon: React.ReactNode;
+  type: "mission" | "value";
+}
 
-const AboutUs: React.FC = () => {
+const InfoBox: React.FC<InfoBoxProps> = ({ title, content, icon, type }) => (
+  <div className={`${styles.infoBox} ${styles[`${type}Box`]}`}>
+    <h3 className={styles.boxTitle}>{title}</h3>
+    <div className={styles.boxContent}>
+      {icon}
+      <p>{content}</p>
+    </div>
+  </div>
+);
+
+export default function AboutUs() {
+  const infoBoxes: InfoBoxProps[] = [
+    {
+      title: "OUR MISSION",
+      content: "Ignite passion for tech, foster innovation, and bridge the gap between theory and real-world application.",
+      icon: <FaLightbulb className={styles.boxIcon} />,
+      type: "mission"
+    },
+    {
+      title: "WHY WE EXIST",
+      content: "We shift the focus toward technology careers by providing hands-on experience often missing in traditional curriculum.",
+      icon: <FaCog className={styles.boxIcon} />,
+      type: "value"
+    }
+  ];
+
   return (
     <section className={styles.aboutUsSection} id="about-us">
       <div className={styles.container}>
-        {/*
-          The HorizontalDivider has been removed as per your code snippet.
-        */}
-        {/* <HorizontalDivider marginBottom="50px" /> */}
         <SectionTitle title="ABOUT US" showLines={true} />
+        <p className={styles.subHeadline}>
+          Empowering the next generation of innovators
+        </p>
+
         <div className={styles.contentWrapper}>
-          <div className={styles.mission}>
-            <h3 className={styles.missionTitle}>OUR MISSION</h3>
-            <p>
-              Our mission is to ignite curiosity and passion for electronics,
-              fostering innovation, and collaboration. Through engaging
-              projects, comprehensive workshops, and insightful technical
-              discussions, we strive to elevate theoretical knowledge and
-              practical application. We aim to create a community where students
-              can learn, develop real-world solutions, and be inspired to tackle
-              complex technological challenges. By fostering creativity and
-              teamwork, we empower our members to transform their ideas into
-              impactful innovations.
-            </p>
-          </div>
-          <div className={styles.illustration}>
-            {/* Correcting the image path to be consistent */}
-            <img
-              src="/images/about-us-illustration.png"
-              alt="SCOPE Mission Illustration"
+          {infoBoxes.map((box, index) => (
+            <InfoBox
+              key={box.title}
+              title={box.title}
+              content={box.content}
+              icon={box.icon}
+              type={box.type}
             />
-          </div>
+          ))}
+        </div>
+        
+        <div className={styles.ctaWrapper}>
+          <a href="#what-we-offer" className={styles.ctaButton}>
+            LEARN MORE ABOUT OUR PROGRAMS
+          </a>
         </div>
       </div>
     </section>
   );
-};
-
-export default AboutUs;
+}
