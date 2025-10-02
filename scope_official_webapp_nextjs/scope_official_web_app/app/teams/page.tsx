@@ -185,38 +185,49 @@ export default function TeamPage() {
           viewport={{ margin: "-150px" }}
         >
           <motion.div 
-            className="team-member-card"
-            whileHover={{ y: -10, transition: { duration: 0.3 } }}
+            className="team-member-wrapper"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
+            transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
+            viewport={{ margin: "-150px" }}
           >
-            <h2 className="member-role">FACULTY COORDINATOR</h2>
-            <p className="member-name">Prof. Dilip Chandra E</p>
-            <div className="member-image-container">
-              <Image
-                src="/images/dilip sir.jpg"
-                alt="Prof. Dilip Chandra E"
-                width={120}
-                height={120}
-                className="member-image object-cover"
-              />
+            <div className="member-text-top">
+              <h2 className="member-role">FACULTY COORDINATOR</h2>
+              <p className="member-name">Prof. Dilip Chandra E</p>
             </div>
-            <div className="member-socials">
-              <a
-                href="https://www.instagram.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="social-icon-link"
-              >
-                {InstagramIcon}
-              </a>
-              <a
-                href="https://www.linkedin.com/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="social-icon-link"
-              >
-                {LinkedInIcon}
-              </a>
-            </div>
+            <motion.div 
+              className="team-member-card"
+              whileHover={{ y: -10, transition: { duration: 0.3 } }}
+            >
+              <div className="member-image-background">
+                <Image
+                  src="/images/dilip sir.jpg"
+                  alt="Prof. Dilip Chandra E"
+                  fill
+                  className="member-background-image"
+                />
+              </div>
+              <div className="member-overlay"></div>
+              <div className="member-socials">
+                <a
+                  href="https://www.instagram.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="social-icon-link"
+                >
+                  {InstagramIcon}
+                </a>
+                <a
+                  href="https://www.linkedin.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="social-icon-link"
+                >
+                  {LinkedInIcon}
+                </a>
+              </div>
+            </motion.div>
           </motion.div>
         </motion.div>
         
@@ -232,7 +243,7 @@ export default function TeamPage() {
         >
           {teamMembers.map((member, index) => (
             <motion.div 
-              className="team-member-card" 
+              className="team-member-wrapper" 
               key={index}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -243,37 +254,43 @@ export default function TeamPage() {
                 delay: 0.3 + (index * 0.05) 
               }}
               viewport={{ margin: "-150px" }}
-              whileHover={{ y: -10, transition: { duration: 0.3 } }}
             >
-              <h2 className="member-role">{member.role}</h2>
-              <p className="member-name">{member.name}</p>
-              <div className="member-image-container">
-                <Image
-                  src={member.image}
-                  alt={member.name}
-                  width={120} // Reduced from 150 to match CSS
-                  height={120} // Reduced from 150 to match CSS
-                  className="member-image object-cover"
-                />
+              <div className="member-text-top">
+                <h2 className="member-role">{member.role}</h2>
+                <p className="member-name">{member.name}</p>
               </div>
-              <div className="member-socials">
-                <a
-                  href={member.instagram}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="social-icon-link"
-                >
-                  {InstagramIcon}
-                </a>
-                <a
-                  href={member.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="social-icon-link"
-                >
-                  {LinkedInIcon}
-                </a>
-              </div>
+              <motion.div 
+                className="team-member-card"
+                whileHover={{ y: -10, transition: { duration: 0.3 } }}
+              >
+                <div className="member-image-background">
+                  <Image
+                    src={member.image}
+                    alt={member.name}
+                    fill
+                    className="member-background-image"
+                  />
+                </div>
+                <div className="member-overlay"></div>
+                <div className="member-socials">
+                  <a
+                    href={member.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-icon-link"
+                  >
+                    {InstagramIcon}
+                  </a>
+                  <a
+                    href={member.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="social-icon-link"
+                  >
+                    {LinkedInIcon}
+                  </a>
+                </div>
+              </motion.div>
             </motion.div>
           ))}
         </motion.div>

@@ -446,7 +446,7 @@ export default function HomePage() {
               &lt;
             </motion.button>
             <motion.div
-              className="flex justify-center items-center relative h-[420px] overflow-hidden cursor-grab active:cursor-grabbing"
+              className="flex justify-center items-center relative h-[650px] overflow-visible cursor-grab active:cursor-grabbing"
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.6 }}
@@ -473,11 +473,11 @@ export default function HomePage() {
                 let styleClass = "absolute transition-all duration-700 ease-in-out rounded-xl shadow-xl object-cover ";
                 
                 if (relativeIndex === 0) {
-                  styleClass += (isHovered || isCenter ? "w-80 h-[420px] z-30 scale-100 opacity-100" : "w-72 h-[400px] z-20 scale-95 opacity-90");
+                  styleClass += (isHovered || isCenter ? "w-96 h-[700px] z-30 scale-100 opacity-100" : "w-80 h-[550px] z-20 scale-95 opacity-90");
                 } else if (relativeIndex === 1) {
-                  styleClass += (isHovered ? "translate-x-[190px] scale-100 z-30 opacity-100 w-80 h-[420px]" : "translate-x-[190px] scale-90 z-10 opacity-60 w-72 h-[400px]");
+                  styleClass += (isHovered ? "translate-x-[230px] scale-100 z-30 opacity-100 w-96 h-[700px]" : "translate-x-[220px] scale-90 z-10 opacity-60 w-80 h-[550px]");
                 } else if (relativeIndex === pastEvents.length - 1) {
-                  styleClass += (isHovered ? "-translate-x-[190px] scale-100 z-30 opacity-100 w-80 h-[420px]" : "-translate-x-[190px] scale-90 z-10 opacity-60 w-72 h-[400px]");
+                  styleClass += (isHovered ? "-translate-x-[230px] scale-100 z-30 opacity-100 w-96 h-[700px]" : "-translate-x-[220px] scale-90 z-10 opacity-60 w-80 h-[550px]");
                 } else {
                   styleClass += "opacity-0 pointer-events-none";
                 }

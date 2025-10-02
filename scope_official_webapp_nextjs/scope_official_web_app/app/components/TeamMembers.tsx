@@ -325,7 +325,7 @@ export default function TeamMembers() {
               <div className="relative">
 
                 {/* Team Image */}
-                <div className="relative h-96">
+                <div className="relative h-[650px]">
                   <Image
                     src={selectedTeam.image}
                     alt={selectedTeam.title}
