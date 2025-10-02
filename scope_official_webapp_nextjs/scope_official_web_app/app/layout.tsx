@@ -3,7 +3,9 @@ import { Orbitron, Inter, DM_Sans } from "next/font/google";
 import type { Metadata } from "next";
 import Navigation from "./components/Navigation";
 import { ViewModeProvider } from "./components/ViewModeContext";
+import FooterComponent from "./components/FooterComponent";
 import PageTransitionWrapper from "./components/PageTransitionWrapper";
+import PixyDust from "./components/PixyDust";
 
 // Load fonts
 const orbitron = Orbitron({ subsets: ["latin"], weight: ["600", "600"], variable: "--font-orbitron" });
@@ -53,17 +55,19 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/images/scope_logo.png" />
         <link rel="shortcut icon" href="/images/scope_logo.png" />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#040A28] text-white font-inter overflow-x-hidden max-w-full">
+      <body className="min-h-screen flex flex-col bg-[#040A28] text-white font-inter">
         <ViewModeProvider>
+          <PixyDust />
           <Navigation />
           
           {/* Page Content with Transition Wrapper */}
-          <main className="flex-grow overflow-x-hidden max-w-full">
+          <main className="flex-grow relative z-10">
             <PageTransitionWrapper>
               {children}
             </PageTransitionWrapper>
           </main>
 
+          <FooterComponent />
         </ViewModeProvider>
       </body>
     </html>

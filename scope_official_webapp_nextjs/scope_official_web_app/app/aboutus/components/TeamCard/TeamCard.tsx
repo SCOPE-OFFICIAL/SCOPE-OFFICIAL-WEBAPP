@@ -37,4 +37,3 @@ const TeamCard: React.FC<TeamCardProps> = ({
 };
 
 export default TeamCard;
-

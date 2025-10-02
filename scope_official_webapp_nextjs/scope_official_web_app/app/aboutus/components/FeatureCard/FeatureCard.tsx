@@ -5,15 +5,26 @@ interface FeatureCardProps {
   iconSrc: string;
   title: string;
   description: string;
+  // New prop to control the border style (must match CSS classes)
+  boxType?: 'blue' | 'pink' | 'default'; 
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({
   iconSrc,
   title,
   description,
+  boxType = 'default', // Default to a neutral border
 }) => {
+
+  // Dynamically select the correct class for the border
+  const borderClass = boxType === 'blue' 
+    ? styles.blueBorder 
+    : boxType === 'pink' 
+    ? styles.pinkBorder 
+    : '';
+
   return (
-    <div className={styles.card}>
+    <div className={`${styles.card} ${borderClass}`}>
       <div className={styles.iconContainer}>
         <img src={iconSrc} alt={`${title} Icon`} className={styles.icon} />
       </div>
