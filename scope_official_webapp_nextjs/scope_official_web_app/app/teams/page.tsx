@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image"; // Import Next.js Image component for optimized images
+import { motion } from "framer-motion";
 
 // --- Data for Team Members ---
 const teamMembers = [
@@ -127,22 +130,64 @@ const LinkedInIcon = (
 
 export default function TeamPage() {
   return (
-    <div className="team-page-container min-h-screen relative">
-      <div className="relative z-10">
+    <div 
+      className="team-page-container min-h-screen relative"
+      style={{ 
+        overflow: 'visible', 
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none'
+      }}
+    >
+      <motion.div 
+        className="relative z-10"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        style={{ 
+          overflow: 'visible', 
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}
+      >
 
       {/* --- Main Our Team Section --- */}
-      <section className="our-team-section">
+      <motion.section 
+        className="our-team-section"
+        initial={{ opacity: 0, y: 100 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -100 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        viewport={{ margin: "-150px" }}
+      >
         {/* Left: Heading and paragraph */}
-        <div className="intro-text">
+        <motion.div 
+          className="intro-text"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -50 }}
+          transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+          viewport={{ margin: "-150px" }}
+        >
           <h1 className="section-title"> OUR TEAM</h1>
           <p className="section-subtitle">
             Introducing the core members of SCOPE and their respectful roles.
           </p>
-        </div>
+        </motion.div>
 
         {/* Faculty Coordinator Card - Same size as other team cards */}
-        <div className="faculty-coordinator-container" style={{ display: 'flex', justifyContent: 'center', marginBottom: '3rem', marginTop: '2rem' }}>
-          <div className="team-member-card">
+        <motion.div 
+          className="faculty-coordinator-container" 
+          style={{ display: 'flex', justifyContent: 'center', marginBottom: '3rem', marginTop: '2rem' }}
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -50 }}
+          transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
+          viewport={{ margin: "-150px" }}
+        >
+          <motion.div 
+            className="team-member-card"
+            whileHover={{ y: -10, transition: { duration: 0.3 } }}
+          >
             <h2 className="member-role">FACULTY COORDINATOR</h2>
             <p className="member-name">Prof. Dilip Chandra E</p>
             <div className="member-image-container">
@@ -172,14 +217,34 @@ export default function TeamPage() {
                 {LinkedInIcon}
               </a>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
         
         {/* Right: Image */}
           
-        <div className="team-grid">
+        <motion.div 
+          className="team-grid"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
+          viewport={{ margin: "-150px" }}
+        >
           {teamMembers.map((member, index) => (
-            <div className="team-member-card" key={index}>
+            <motion.div 
+              className="team-member-card" 
+              key={index}
+              initial={{ opacity: 0, y: 50 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -50 }}
+              transition={{ 
+                duration: 0.4, 
+                ease: "easeOut", 
+                delay: 0.3 + (index * 0.05) 
+              }}
+              viewport={{ margin: "-150px" }}
+              whileHover={{ y: -10, transition: { duration: 0.3 } }}
+            >
               <h2 className="member-role">{member.role}</h2>
               <p className="member-name">{member.name}</p>
               <div className="member-image-container">
@@ -209,12 +274,12 @@ export default function TeamPage() {
                   {LinkedInIcon}
                 </a>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
-      </section>
+        </motion.div>
+      </motion.section>
 
-      </div>
+      </motion.div>
     </div>
   );
 }

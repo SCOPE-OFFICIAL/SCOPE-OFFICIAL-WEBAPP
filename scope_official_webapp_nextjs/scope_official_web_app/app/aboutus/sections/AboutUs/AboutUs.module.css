@@ -1,31 +1,18 @@
-.aboutUsSection {
-  padding: 100px 0;
-  scroll-margin-top: 100px;
-  background-color: transparent;
-  position: relative;
-  overflow: hidden;
-}
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 50px 20px;
   position: relative;
   z-index: 2;
+  background-color: transparent;
+  overflow: visible !important;
+  height: auto !important;
+  min-height: auto !important;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Background effects */
-.aboutUsSection::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 80%;
-  height: 80%;
-  background: radial-gradient(circle at center, rgba(44, 151, 255, 0.1) 0%, transparent 70%);
-  z-index: 1;
-}
+/* Background effects removed to eliminate scrolling issues */
 
 .subHeadline {
   text-align: center;

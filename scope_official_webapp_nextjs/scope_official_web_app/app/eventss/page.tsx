@@ -129,70 +129,55 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#040a28] via-[#0d1b3d] to-[#040a28] text-gray-200 font-sans relative overflow-hidden">
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-72 h-72 rounded-full opacity-5"
-            style={{
-              background: `linear-gradient(45deg, #F24DC2, #2C97FF)`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              x: [0, 100, 0],
-              y: [0, -100, 0],
-              rotate: [0, 180, 360],
-            }}
-            transition={{
-              duration: 20 + Math.random() * 10,
-              repeat: Infinity,
-              ease: "linear",
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Animated Background Particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(12)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -50, 0],
-              opacity: [0.2, 0.8, 0.2],
-              scale: [1, 1.5, 1],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-              ease: "easeInOut",
-            }}
-          />
-        ))}
-      </div>
+      {/* DISABLED: All background animations removed */}
 
       {/* Main Content Area - Use a relative z-index to place content above background */}
       <main className="relative z-10">
-        {/* Upcoming Events Section */}
-        <section className="py-16 px-6 bg-[#040A28] text-white relative">
-          <h2
-            className="text-2xl md:text-3xl font-bold text-center mb-12"
-            style={{ fontFamily: '"Orbitron", sans-serif' }}
+        {/* Upcoming Events Section - WITH SMOOTH ANIMATIONS */}
+        <motion.section 
+          className="py-16 px-6 bg-[#040A28] text-white relative"
+          initial={{ opacity: 0, y: 100 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -100 }}
+          transition={{ 
+            duration: 0.8, 
+            ease: "easeOut",
+            type: "tween"
+          }}
+          viewport={{ margin: "-200px" }}
+        >
+          {/* Smooth Section Divider */}
+          <motion.div
+            className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#F24DC2] to-transparent mb-16"
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            transition={{ duration: 1.2, delay: 0.2 }}
+            viewport={{ once: true }}
+          />
+          
+          {/* Updated Typography to Match Past Events */}
+          <motion.h2
+            className="mb-12 text-center text-4xl md:text-5xl font-bold text-gray-100"
+            style={{
+              textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
+              letterSpacing: '2px',
+              fontFamily: '"Orbitron", sans-serif'
+            }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            viewport={{ once: true }}
           >
             UPCOMING EVENTS
-          </h2>
-          <br></br>
-          <br></br>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-1 items-center justify-center">
-            {/* 🔷 Honeycomb Hexagon Layout */}
+          </motion.h2>
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 gap-1 items-center justify-center"
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            viewport={{ once: true }}
+          >
+            {/* 🔷 Honeycomb Hexagon Layout with Smooth Animations */}
             <div className="flex flex-col items-center gap-6 -mt-10">
                <style jsx>{`
                     .hexagon {
@@ -204,10 +189,31 @@ export default function HomePage() {
                       transform: scale(1.05);
                     }
                   `}</style>
-              {/* First Row (3) */}
-              <div className="flex justify-center gap-1">
+              {/* First Row (3) with Staggered Animation */}
+              <motion.div 
+                className="flex justify-center gap-1"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+                viewport={{ once: true }}
+              >
                 {paddedEvents.slice(0, 3).map((event, index) => (
-                  <div key={index} className="relative">
+                  <motion.div 
+                    key={index} 
+                    className="relative"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ 
+                      duration: 0.6, 
+                      delay: 1.0 + (index * 0.1),
+                      ease: "easeOut"
+                    }}
+                    viewport={{ once: true }}
+                    whileHover={{ 
+                      scale: 1.05,
+                      transition: { duration: 0.2 }
+                    }}
+                  >
                     <div className="hexagon w-25 h-50 bg-pink-500 absolute inset-0 opacity-35" />
                     <div className="hexagon w-40 h-44 flex items-center justify-center text-center text-sm p-4 bg-[#1a1c3a] text-white relative m-[2px]">
                       {(index === 0 || index === 2) && (
@@ -227,14 +233,35 @@ export default function HomePage() {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
 
-              {/* Second Row (2) */}
-              <div className="flex justify-center gap-1 -mt-12">
+              {/* Second Row (2) with Animation */}
+              <motion.div 
+                className="flex justify-center gap-1 -mt-12"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 1.3 }}
+                viewport={{ once: true }}
+              >
                 {paddedEvents.slice(0, 2).map((event, index) => (
-                  <div key={index} className="relative">
+                  <motion.div 
+                    key={index} 
+                    className="relative"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ 
+                      duration: 0.6, 
+                      delay: 1.5 + (index * 0.1),
+                      ease: "easeOut"
+                    }}
+                    viewport={{ once: true }}
+                    whileHover={{ 
+                      scale: 1.05,
+                      transition: { duration: 0.2 }
+                    }}
+                  >
                     <div className="hexagon w-25 h-50 bg-pink-500 absolute inset-0 opacity-35" />
                     <div className="hexagon w-40 h-44 flex items-center justify-center text-center text-sm p-4 bg-[#1a1c3a] text-white relative m-[2px]">
                       <div className="hexagon w-full h-full bg-white absolute inset-0 opacity-10" />
@@ -248,14 +275,35 @@ export default function HomePage() {
                           </>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
 
-              {/* Third Row (3) */}
-              <div className="flex justify-center gap-1 -mt-12">
+              {/* Third Row (3) with Animation */}
+              <motion.div 
+                className="flex justify-center gap-1 -mt-12"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.6, delay: 1.7 }}
+                viewport={{ once: true }}
+              >
                 {paddedEvents.slice(0, 3).map((event, index) => (
-                  <div key={index} className="relative">
+                  <motion.div 
+                    key={index} 
+                    className="relative"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ 
+                      duration: 0.6, 
+                      delay: 1.9 + (index * 0.1),
+                      ease: "easeOut"
+                    }}
+                    viewport={{ once: true }}
+                    whileHover={{ 
+                      scale: 1.05,
+                      transition: { duration: 0.2 }
+                    }}
+                  >
                     <div className="hexagon w-25 h-50 bg-pink-500 absolute inset-0 opacity-35" />
                     <div className="hexagon w-40 h-44 flex items-center justify-center text-center text-sm p-4 bg-[#1a1c3a] text-white relative m-[2px]">
                       {index === 1 && (
@@ -273,14 +321,32 @@ export default function HomePage() {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
 
-            {/* 🔥 Countdown with Neon Circular Glow */}
-            <div className="flex flex-col items-center justify-center mt-10 md:mt-0">
-                <div className="relative w-[350px] h-[350px] md:w-[450px] md:h-[450px] rounded-full flex items-center justify-center border-0 border-[#550231] shadow-[0_0_80px_30px_#560C4B,inset_0_0_50px_15px_#560C4B] opacity-90">
+            {/* 🔥 Countdown with Neon Circular Glow - ANIMATED */}
+            <motion.div 
+              className="flex flex-col items-center justify-center mt-10 md:mt-0"
+              initial={{ opacity: 0, scale: 0.5 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ 
+                duration: 1.0, 
+                delay: 2.2,
+                type: "spring",
+                stiffness: 100
+              }}
+              viewport={{ once: true }}
+            >
+                <motion.div 
+                  className="relative w-[350px] h-[350px] md:w-[450px] md:h-[450px] rounded-full flex items-center justify-center border-0 border-[#550231] shadow-[0_0_80px_30px_#560C4B,inset_0_0_50px_15px_#560C4B] opacity-90"
+                  whileHover={{ 
+                    scale: 1.05,
+                    boxShadow: "0 0 100px 40px #560C4B, inset 0 0 60px 20px #560C4B",
+                    transition: { duration: 0.3 }
+                  }}
+                >
                     <div className="absolute w-[90%] h-[90%] rounded-full flex items-center justify-center border-2 border-[#560C4B]">
                         <div className="absolute w-[80%] h-[80%] rounded-full flex items-center justify-center border-4 border-[#39184D] shadow-[0_0_15px_rgba(57,24,77,0.5)]">
                             <div className="absolute w-[90%] h-[90%] rounded-full flex items-center justify-center border-4 border-[#FB4B8C] ring-4 ring-[#0072FF] shadow-[0_0_20px_rgba(251,75,140,0.8),_0_0_20px_rgba(0,114,255,0.8)]">
@@ -307,28 +373,40 @@ export default function HomePage() {
                             </div>
                         </div>
                     </div>
-                </div>
-                <p className="mt-8 text-lg text-gray-300" style={{ fontFamily: '"Orbitron", sans-serif' }}>
+                </motion.div>
+                <motion.p 
+                  className="mt-8 text-lg text-gray-300" 
+                  style={{ fontFamily: '"Orbitron", sans-serif' }}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 2.8 }}
+                  viewport={{ once: true }}
+                >
                     Next event: Holiday Event
-                </p>
-            </div>
-          </div>
-        </section>
+                </motion.p>
+            </motion.div>
+          </motion.div>
+        </motion.section>
 
 
-        {/* Past Events Section */}
-        <motion.section
+        {/* Past Events Section - WITH SMOOTH ANIMATIONS */}
+        <motion.section 
           className="text-center py-24 px-4 relative"
-          initial={{ opacity: 0, y: 50 }}
+          initial={{ opacity: 0, y: 100 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          viewport={{ once: true, margin: "-100px" }}
+          exit={{ opacity: 0, y: -100 }}
+          transition={{ 
+            duration: 0.8, 
+            ease: "easeOut",
+            type: "tween"
+          }}
+          viewport={{ margin: "-200px" }}
         >
-          <motion.div
-            className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#0072FF] to-transparent my-16"
+          <motion.div 
+            className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#0072FF] to-transparent my-16" 
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
-            transition={{ duration: 1.2, delay: 0.3 }}
+            transition={{ duration: 1.2, delay: 0.2 }}
             viewport={{ once: true }}
           />
           <motion.h2
@@ -338,10 +416,15 @@ export default function HomePage() {
               letterSpacing: '2px',
               fontFamily: '"Orbitron", sans-serif'
             }}
-            initial={{ opacity: 0, y: 40 }}
+            initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.8, delay: 0.4 }}
             viewport={{ once: true }}
+            whileHover={{
+              scale: 1.05,
+              textShadow: "0 0 30px rgba(138, 64, 255, 0.6)",
+              transition: { duration: 0.3 }
+            }}
           >
             PAST EVENTS
           </motion.h2>
@@ -362,8 +445,12 @@ export default function HomePage() {
             >
               &lt;
             </motion.button>
-            <div
+            <motion.div
               className="flex justify-center items-center relative h-[420px] overflow-hidden cursor-grab active:cursor-grabbing"
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+              viewport={{ once: true }}
               onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
               onTouchEnd={(e) => {
                 const touchEndX = e.changedTouches[0].clientX;
@@ -410,7 +497,7 @@ export default function HomePage() {
                   />
                 );
               })}
-            </div>
+            </motion.div>
             <motion.button
               onClick={handleNext}
               className="absolute right-0 translate-x-1/2 top-1/2 transform -translate-y-1/2 z-20 text-5xl text-white hover:text-gray-300 px-4 hidden md:block"
@@ -422,28 +509,33 @@ export default function HomePage() {
             </motion.button>
           </motion.div>
 
-          <AnimatedButton
-            className="mt-12 bg-[#004c94] hover:bg-[#003E7A] border-[#004c94]"
+          <motion.button 
+            className="mt-12 bg-[#004c94] hover:bg-[#003E7A] border-[#004c94] px-6 py-3 rounded-full font-bold text-white"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 1.0 }}
+            viewport={{ once: true }}
+            whileHover={{ 
+              scale: 1.05,
+              backgroundColor: "#003E7A",
+              transition: { duration: 0.2 }
+            }}
+            whileTap={{ scale: 0.95 }}
           >
             KNOW MORE
-          </AnimatedButton>
+          </motion.button>
         </motion.section>
       </main>
 
-      {/* Decorative Bottom-Right Circuit Image */}
-      <motion.div
-        className="absolute bottom-0 right-0 w-64 opacity-60 pointer-events-none z-0"
-        initial={{ opacity: 0, x: 50, y: 50 }}
-        animate={{ opacity: 0.6, x: 0, y: 0 }}
-        transition={{ duration: 1.5, delay: 1 }}
-      >
+      {/* Decorative Bottom-Right Circuit Image - STATIC */}
+      <div className="absolute bottom-0 right-0 w-64 opacity-60 pointer-events-none z-0">
         <img 
           src="/images/circuit-deco.png"
           alt="Circuit Decoration"
           width={256}
           height={256}
         />
-      </motion.div>
+      </div>
     </div>
   );
 } 

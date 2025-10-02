@@ -1,31 +1,19 @@
-.whatWeDoSection {
-  padding: 100px 0;
-  scroll-margin-top: 100px;
-  background-color: transparent;
-  position: relative;
-  overflow: hidden;
-}
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 50px 20px;
   text-align: center;
   position: relative;
   z-index: 2;
+  background-color: transparent;
+  overflow: visible !important;
+  height: auto !important;
+  min-height: auto !important;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Background gradient effects */
-.whatWeDoSection::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, #2C97FF, #F24DC2, transparent);
-  opacity: 0.3;
-}
+/* Background gradient effects removed to eliminate scrolling issues */
 
 /* Sub-Headline: LEARN. NETWORK. INNOVATE. */
 .subHeadline {
@@ -147,15 +135,7 @@
   line-height: 1.6;
 }
 
-/* Floating animation for cards container */
-.cardsContainer {
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-}
+/* Floating animation removed to eliminate scrolling issues */
 
 /* Responsive adjustments */
 @media (max-width: 1024px) {

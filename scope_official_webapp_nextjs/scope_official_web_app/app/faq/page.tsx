@@ -65,7 +65,14 @@ export default function FaqPage() {
   };
 
   return (
-    <div id="faq-section" data-section="faq" className="flex flex-col min-h-screen text-white font-sans relative overflow-hidden">
+    <motion.div 
+      id="faq-section" 
+      data-section="faq" 
+      className="flex flex-col min-h-screen text-white font-sans relative overflow-hidden"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8, ease: "easeOut" }}
+    >
       {/* Static Vibrant Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#040A28] via-[#0d1b3d] to-[#040A28]">
         <div 
@@ -249,8 +256,9 @@ export default function FaqPage() {
             }}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            viewport={{ once: true }}
+            viewport={{ margin: "-150px" }}
           >
             Frequently Asked Questions
           </motion.h1>
@@ -279,9 +287,11 @@ export default function FaqPage() {
               <motion.div
                 key={index}
                 className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.1 * index }}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -50 }}
+                transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 * index }}
+                viewport={{ margin: "-150px" }}
                 whileHover={{ 
                   backgroundColor: "rgba(255, 255, 255, 0.08)",
                   borderColor: "rgba(242, 77, 194, 0.3)"
@@ -576,6 +586,6 @@ export default function FaqPage() {
       
       {/* Footer - Only appears at the end of the website */}
       <FooterComponent />
-    </div>
+    </motion.div>
   );
 }

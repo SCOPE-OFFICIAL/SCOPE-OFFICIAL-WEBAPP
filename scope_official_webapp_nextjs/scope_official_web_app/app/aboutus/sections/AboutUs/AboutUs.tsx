@@ -37,31 +37,38 @@ export default function AboutUs() {
   ];
 
   return (
-    <section className={styles.aboutUsSection} id="about-us">
-      <div className={styles.container}>
-        <SectionTitle title="ABOUT US" showLines={true} />
-        <p className={styles.subHeadline}>
-          Empowering the next generation of innovators
-        </p>
+    <div 
+      className={styles.container} 
+      style={{ 
+        overflow: 'visible', 
+        height: 'auto', 
+        minHeight: 'auto',
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none'
+      }}
+    >
+      <SectionTitle title="ABOUT US" showLines={true} />
+      <p className={styles.subHeadline}>
+        Empowering the next generation of innovators
+      </p>
 
-        <div className={styles.contentWrapper}>
-          {infoBoxes.map((box, index) => (
-            <InfoBox
-              key={box.title}
-              title={box.title}
-              content={box.content}
-              icon={box.icon}
-              type={box.type}
-            />
-          ))}
-        </div>
-        
-        <div className={styles.ctaWrapper}>
-          <a href="#what-we-offer" className={styles.ctaButton}>
-            LEARN MORE ABOUT OUR PROGRAMS
-          </a>
-        </div>
+      <div className={styles.contentWrapper}>
+        {infoBoxes.map((box) => (
+          <InfoBox
+            key={box.title}
+            title={box.title}
+            content={box.content}
+            icon={box.icon}
+            type={box.type}
+          />
+        ))}
       </div>
-    </section>
+      
+      <div className={styles.ctaWrapper}>
+        <a href="#what-we-offer" className={styles.ctaButton}>
+          LEARN MORE ABOUT OUR PROGRAMS
+        </a>
+      </div>
+    </div>
   );
 }

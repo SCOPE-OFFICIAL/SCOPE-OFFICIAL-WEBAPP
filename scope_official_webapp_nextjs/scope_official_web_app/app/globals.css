@@ -674,7 +674,7 @@ a:hover {
   transition: all 0.2s ease;
   z-index: 1;
   position: relative;
-  opacity: 0.8;
+  opacity: 1;
   display: block;
   margin: 0 auto;
 }
@@ -919,4 +919,320 @@ a:hover {
 
 .circuit-overlay {
   animation: circuit-pulse 8s ease-in-out infinite;
+}
+
+/* --- PERFORMANCE OPTIMIZED ANIMATIONS --- */
+/* GPU accelerated floating animations for background elements */
+@keyframes float-0 {
+  0%, 100% { 
+    transform: translate3d(0, 0, 0) rotate(0deg); 
+  }
+  33% { 
+    transform: translate3d(20px, -15px, 0) rotate(120deg); 
+  }
+  66% { 
+    transform: translate3d(-15px, 10px, 0) rotate(240deg); 
+  }
+}
+
+@keyframes float-1 {
+  0%, 100% { 
+    transform: translate3d(0, 0, 0) rotate(0deg); 
+  }
+  50% { 
+    transform: translate3d(-25px, -20px, 0) rotate(180deg); 
+  }
+}
+
+@keyframes float-2 {
+  0%, 100% { 
+    transform: translate3d(0, 0, 0) rotate(0deg); 
+  }
+  25% { 
+    transform: translate3d(15px, -25px, 0) rotate(90deg); 
+  }
+  75% { 
+    transform: translate3d(-20px, 15px, 0) rotate(270deg); 
+  }
+}
+
+/* Optimized twinkle animation for particles */
+@keyframes twinkle {
+  0%, 100% { 
+    opacity: 0.3;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% { 
+    opacity: 0.8;
+    transform: translate3d(0, -20px, 0) scale(1.2);
+  }
+}
+
+/* Smooth pulse animation for reduced opacity changes */
+@keyframes pulse-slow {
+  0%, 100% { 
+    opacity: 0.05;
+  }
+  50% { 
+    opacity: 0.12;
+  }
+}
+
+/* Performance optimization classes */
+.animate-pulse-slow {
+  animation: pulse-slow 6s ease-in-out infinite;
+}
+
+.animate-twinkle {
+  animation: twinkle 4s ease-in-out infinite;
+}
+
+/* Optimized fade in animation */
+@keyframes fadeIn {
+  from { 
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(1.05);
+  }
+  to { 
+    opacity: 0.6;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* OPTIMIZED: Main content animations replacing heavy Framer Motion */
+@keyframes scopeTitleAppear {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 50px, 0) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes slideUpFade {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes scaleUpFade {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+/* Optimized scroll indicator animation */
+@keyframes scrollBounce {
+  0%, 100% { 
+    transform: translate3d(0, 0, 0); 
+  }
+  50% { 
+    transform: translate3d(0, 10px, 0); 
+  }
+}
+
+@keyframes scrollDotMove {
+  0%, 100% { 
+    transform: translate3d(0, 0, 0); 
+  }
+  50% { 
+    transform: translate3d(0, 8px, 0); 
+  }
+}
+
+/* GPU acceleration for all animated elements */
+.gpu-accelerated {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Performance optimized scroll indicator */
+.scroll-indicator-optimized {
+  animation: scrollBounce 2s ease-in-out infinite;
+}
+
+.scroll-dot-optimized {
+  animation: scrollDotMove 2s ease-in-out infinite;
+}
+
+/* --- GLOBAL PERFORMANCE OPTIMIZATIONS --- */
+/* Smooth scrolling with better performance */
+.unified-scroll-container {
+  scroll-behavior: smooth;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100vh;
+  /* Enable hardware acceleration for scrolling */
+  transform: translate3d(0, 0, 0);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Reduce layout thrashing */
+* {
+  box-sizing: border-box;
+}
+
+/* Optimize text rendering */
+body {
+  text-rendering: optimizeSpeed;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Enable hardware acceleration for common elements */
+video, img, canvas {
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+/* Optimize gradient rendering */
+.bg-gradient-to-br {
+  background-attachment: fixed;
+}
+
+/* DISABLE ALL ANIMATIONS GLOBALLY */
+*, *::before, *::after {
+  animation-duration: 0ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0ms !important;
+  animation-delay: 0ms !important;
+  transition-delay: 0ms !important;
+  animation-fill-mode: none !important;
+}
+
+/* Disable specific animation classes */
+.animate-pulse-slow,
+.animate-twinkle,
+.scroll-indicator-optimized,
+.scroll-dot-optimized {
+  animation: none !important;
+}
+
+/* Remove all transform effects */
+.group:hover .group-hover\:-translate-y-3 {
+  transform: none !important;
+}
+
+.group:hover .group-hover\:scale-105 {
+  transform: none !important;
+}
+
+.group:hover .group-hover\:translate-y-2 {
+  transform: none !important;
+}
+
+/* Remove hover transitions */
+.transition-all,
+.transition-transform,
+.transition-opacity {
+  transition: none !important;
+}
+
+/* Reduce paint area for animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Fix About Us sections to integrate with unified scroll */
+[data-section="about-us"],
+[id="about-us"],
+[id="what-we-offer"],
+section[id="about-us"],
+section[id="what-we-offer"] {
+  scroll-snap-align: none !important;
+  height: auto !important;
+  min-height: auto !important;
+  overflow: visible !important;
+  scroll-behavior: inherit !important;
+  scroll-margin-top: 0 !important;
+  position: static !important;
+}
+
+/* Ensure About Us page integrates properly */
+.aboutus-page-container {
+  height: auto !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+/* Remove any section-level scrolling behaviors */
+.aboutus-page-container section,
+.aboutus-page-container div[class*="Section"],
+.aboutus-page-container div[class*="container"],
+*[class*="aboutUs"],
+*[class*="whatWeDo"] {
+  height: auto !important;
+  min-height: auto !important;
+  overflow: visible !important;
+  scroll-snap-align: none !important;
+  scroll-behavior: inherit !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* Hide any scrollbars completely in About Us sections */
+*[class*="aboutUs"]::-webkit-scrollbar,
+*[class*="whatWeDo"]::-webkit-scrollbar,
+.aboutus-page-container::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Force no scrolling in About Us page */
+.aboutus-page-container,
+.aboutus-page-container * {
+  overflow-x: visible !important;
+  overflow-y: visible !important;
+}
+
+/* Eliminate scrollbars in Teams section */
+*[class*="team"],
+*[class*="Team"],
+.team-page-container,
+.team-page-container *,
+.our-team-section,
+.our-team-section * {
+  overflow: visible !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+/* Hide webkit scrollbars in Teams section */
+*[class*="team"]::-webkit-scrollbar,
+*[class*="Team"]::-webkit-scrollbar,
+.team-page-container::-webkit-scrollbar,
+.our-team-section::-webkit-scrollbar,
+.team-grid::-webkit-scrollbar,
+.team-member-card::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+/* Prevent any temporary scrollbars during animations */
+.team-page-container *,
+.our-team-section *,
+.team-grid *,
+.team-member-card * {
+  overflow: visible !important;
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
 }

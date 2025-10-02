@@ -13,22 +13,33 @@ export default function Navigation() {
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-  // Handle scroll to hide/show navbar
+  // OPTIMIZED: Debounced scroll handler for better performance
   useEffect(() => {
+    let ticking = false;
+    
     const handleScroll = () => {
-      // Check for unified scroll container first
-      const scrollContainer = document.querySelector('.unified-scroll-container');
-      const currentScrollY = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
-      
-      if (currentScrollY > lastScrollY && currentScrollY > 100) {
-        // Scrolling down and past 100px - hide navbar (slide up)
-        setIsVisible(false);
-      } else if (currentScrollY < lastScrollY || currentScrollY < 100) {
-        // Scrolling up or near top - show navbar (slide down)
-        setIsVisible(true);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          // Check for unified scroll container first
+          const scrollContainer = document.querySelector('.unified-scroll-container');
+          const currentScrollY = scrollContainer ? scrollContainer.scrollTop : window.scrollY;
+          
+          // Only update if scroll difference is significant (reduces unnecessary renders)
+          if (Math.abs(currentScrollY - lastScrollY) > 10) {
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+              // Scrolling down and past 100px - hide navbar (slide up)
+              setIsVisible(false);
+            } else if (currentScrollY < lastScrollY || currentScrollY < 100) {
+              // Scrolling up or near top - show navbar (slide down)
+              setIsVisible(true);
+            }
+            setLastScrollY(currentScrollY);
+          }
+          
+          ticking = false;
+        });
+        ticking = true;
       }
-      
-      setLastScrollY(currentScrollY);
     };
 
     // Add scroll listener to unified container if it exists, otherwise window

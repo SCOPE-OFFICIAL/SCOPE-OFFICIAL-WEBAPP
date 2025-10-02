@@ -26,42 +26,48 @@ const WhatWeDo: React.FC = () => {
   ];
 
   return (
-    <section className={styles.whatWeDoSection} id="what-we-offer">
-      <div className={styles.container}>
-        {/* Main Title of the section: WHAT WE OFFER */}
-        <SectionTitle title="WHAT WE OFFER" showLines={false} />
-        
-        {/* Sub-Headline: LEARN. NETWORK. INNOVATE. */}
-        <p className={styles.subHeadline}>LEARN. NETWORK. INNOVATE.</p>
+    <div 
+      className={styles.container}
+      style={{ 
+        overflow: 'visible', 
+        height: 'auto', 
+        minHeight: 'auto',
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none'
+      }}
+    >
+      {/* Main Title of the section: WHAT WE OFFER */}
+      <SectionTitle title="WHAT WE OFFER" showLines={false} />
+      
+      {/* Sub-Headline: LEARN. NETWORK. INNOVATE. */}
+      <p className={styles.subHeadline}>LEARN. NETWORK. INNOVATE.</p>
 
-        {/* --- Programs Grid --- */}
-        <h2 className={styles.programsTitle}>OUR PROGRAMS</h2>
-        <div className={styles.cardsContainer}>
-          {programs.map((program, index) => (
-            <FeatureCard
-              key={program.title}
-              iconSrc={program.iconSrc}
-              title={program.title}
-              description={program.description}
-              boxType={program.boxType}
-              delay={index * 100} // Stagger animation
-            />
-          ))}
-        </div>
-
-        {/* --- Enhanced Call to Action --- */}
-        <div className={styles.callToActionContainer}>
-          <h3 className={styles.ctaTitle}>READY TO GET STARTED?</h3>
-          <button className={styles.ctaButton}>
-            JOIN OUR COMMUNITY
-          </button>
-          <p className={styles.ctaTagline}>
-            Become part of a vibrant community of innovators, creators, and tech enthusiasts 
-            shaping the future together.
-          </p>
-        </div>
+      {/* --- Programs Grid --- */}
+      <h2 className={styles.programsTitle}>OUR PROGRAMS</h2>
+      <div className={styles.cardsContainer}>
+        {programs.map((program) => (
+          <FeatureCard
+            key={program.title}
+            iconSrc={program.iconSrc}
+            title={program.title}
+            description={program.description}
+            boxType={program.boxType}
+          />
+        ))}
       </div>
-    </section>
+
+      {/* --- Enhanced Call to Action --- */}
+      <div className={styles.callToActionContainer}>
+        <h3 className={styles.ctaTitle}>READY TO GET STARTED?</h3>
+        <button className={styles.ctaButton}>
+          JOIN OUR COMMUNITY
+        </button>
+        <p className={styles.ctaTagline}>
+          Become part of a vibrant community of innovators, creators, and tech enthusiasts 
+          shaping the future together.
+        </p>
+      </div>
+    </div>
   );
 };
 

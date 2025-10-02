@@ -6,11 +6,16 @@ import WhatWeDo from "./sections/WhatWeDo/WhatWeDo";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen relative">
-      <div className="relative z-10">
-        <AboutUs />
-        <WhatWeDo />
-      </div>
+    <div style={{ 
+      overflow: 'visible', 
+      height: 'auto', 
+      width: '100%',
+      position: 'relative',
+      padding: 0,
+      margin: 0
+    }}>
+      <AboutUs />
+      <WhatWeDo />
     </div>
   );
 }

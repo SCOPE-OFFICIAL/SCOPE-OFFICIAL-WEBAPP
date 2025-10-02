@@ -271,8 +271,9 @@ const Gallery: React.FC = () => {
           className="text-center mb-16"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -50 }}
           transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
+          viewport={{ margin: "-150px" }}
         >
           <motion.h2 
             className="mb-6 text-center relative inline-block"
@@ -287,8 +288,9 @@ const Gallery: React.FC = () => {
             }}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -40 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            viewport={{ once: true }}
+            viewport={{ margin: "-150px" }}
           >
             <span 
               className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-7 rounded"
@@ -302,8 +304,9 @@ const Gallery: React.FC = () => {
             className="text-xl text-gray-300 max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
+            viewport={{ margin: "-150px" }}
           >
             Explore our innovative projects and cutting-edge research across multiple domains
           </motion.p>
@@ -612,8 +615,9 @@ const Gallery: React.FC = () => {
             className="text-center mt-20"
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -50 }}
             transition={{ duration: 0.8 }}
-            viewport={{ once: true }}
+            viewport={{ margin: "-150px" }}
           >
             <AnimatedButton
               variant="primary"

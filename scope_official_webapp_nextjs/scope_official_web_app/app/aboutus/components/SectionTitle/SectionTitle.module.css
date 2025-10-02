@@ -34,7 +34,7 @@
   color: var(--text-light);
   text-align: center;
   text-shadow: 0 0 20px rgba(138, 64, 255, 0.4); /* Softer shadow */
-  white-space: nowrap; /* Prevent title from wrapping */
+  white-space: normal; /* Allow title to wrap properly */
   letter-spacing: 2px; /* Refined letter spacing */
   text-transform: uppercase;
 }
