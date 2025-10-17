@@ -1,0 +1,42 @@
+.socialIconsContainer {
+  display: flex;
+  justify-content: center;
+  gap: 25px; /* Space between icons */
+  margin-top: 20px;
+}
+
+.iconLink {
+  display: inline-flex; /* To ensure padding and hover effects apply correctly */
+  padding: 10px; /* Clickable area */
+  border-radius: 50%; /* Circular background for hover */
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.icon {
+  width: 30px; /* Icon size */
+  height: 30px;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3)); /* Subtle white glow */
+  transition: filter 0.3s ease;
+}
+
+.iconLink:hover {
+  background-color: rgba(138, 64, 255, 0.2); /* Subtle background on hover */
+  box-shadow: 0 0 15px rgba(138, 64, 255, 0.5); /* Glow on hover */
+}
+
+.iconLink:hover .icon {
+  filter: drop-shadow(
+    0 0 10px rgba(138, 64, 255, 0.7)
+  ); /* Stronger glow for icon on hover */
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .socialIconsContainer {
+    gap: 15px;
+  }
+  .icon {
+    width: 25px;
+    height: 25px;
+  }
+}

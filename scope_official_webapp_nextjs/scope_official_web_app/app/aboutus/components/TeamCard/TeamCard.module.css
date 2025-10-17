@@ -1,0 +1,150 @@
+.teamCard {
+  background: linear-gradient(
+    135deg,
+    rgba(29, 30, 78, 0.8),
+    rgba(10, 15, 43, 0.8)
+  );
+  border-radius: 30px;
+  width: 320px;
+  height: 65px;
+  padding: 15px 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+  cursor: pointer;
+  transform: rotate(0.75deg);
+  backdrop-filter: blur(10px);
+}
+
+/* Enhanced gradient border effect */
+.teamCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  padding: 2px;
+  background: var(--card-border-gradient) border-box;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  border-radius: inherit;
+  z-index: -1;
+  opacity: 0.8;
+  transition: all 0.4s ease;
+}
+
+/* Hover shine effect */
+.teamCard::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transform: rotate(45deg);
+  transition: all 0.6s ease;
+  opacity: 0;
+}
+
+.teamCard:hover {
+  transform: translateY(-8px) rotate(0.75deg) scale(1.05);
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(184, 77, 255, 0.3);
+}
+
+.teamCard:hover::before {
+  opacity: 1;
+  background: linear-gradient(135deg, #2C97FF, #F24DC2) border-box;
+}
+
+.teamCard:hover::after {
+  opacity: 1;
+  left: 100%;
+}
+
+.teamName {
+  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 100%;
+  letter-spacing: 0%;
+  color: var(--text-light);
+  margin: 0;
+  text-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+  transition: all 0.3s ease;
+  background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.teamCard:hover .teamName {
+  text-shadow: 
+    0 0 20px rgba(255, 255, 255, 0.9),
+    0 0 30px rgba(184, 77, 255, 0.5);
+  transform: scale(1.05);
+}
+
+/* Specific positioning classes for TeamCard are handled by OurTeams.module.css */
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .teamCard {
+    width: 100%;
+    max-width: 280px;
+    height: 60px;
+    padding: 12px 30px;
+    transform: rotate(0deg);
+  }
+  
+  .teamCard:hover {
+    transform: translateY(-5px) rotate(0deg) scale(1.03);
+  }
+  
+  .teamName {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .teamCard {
+    height: 55px;
+    padding: 10px 25px;
+  }
+  
+  .teamName {
+    font-size: 18px;
+  }
+}
+
+/* Animation for card entrance */
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(30px) rotate(0.75deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0.75deg);
+  }
+}
+
+.teamCard {
+  animation: cardEntrance 0.6s ease-out;
+}

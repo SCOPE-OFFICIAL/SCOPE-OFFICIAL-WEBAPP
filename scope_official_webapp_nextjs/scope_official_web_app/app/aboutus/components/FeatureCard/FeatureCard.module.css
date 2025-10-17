@@ -1,0 +1,112 @@
+.card {
+  background-color: transparent;
+  border-radius: 15px;
+  padding: 30px;
+  text-align: center;
+  transition: transform 0.3s ease;
+  position: relative;
+  flex: 1;
+  min-width: 280px;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  /* Base style - neutral border, which will be overridden */
+  border: 2px solid rgba(138, 64, 255, 0.2); 
+  box-shadow: 0 0 15px rgba(138, 64, 255, 0.1);
+}
+
+/* --- New Styles for Colored Borders --- */
+.blueBorder {
+    border: 2px solid #2C97FF; /* Bright Blue */
+    box-shadow: 0 0 20px rgba(44, 151, 255, 0.3);
+}
+
+.pinkBorder {
+    border: 2px solid #F24DC2; /* Bright Pink */
+    box-shadow: 0 0 20px rgba(242, 77, 194, 0.3);
+}
+
+
+.card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(138, 64, 255, 0.7);
+  box-shadow: 0 0 25px rgba(138, 64, 255, 0.5);
+}
+/* Ensure hover works with specific borders */
+.card.blueBorder:hover {
+    border-color: #2C97FF;
+    box-shadow: 0 0 30px rgba(44, 151, 255, 0.7);
+}
+.card.pinkBorder:hover {
+    border-color: #F24DC2;
+    box-shadow: 0 0 30px rgba(242, 77, 194, 0.7);
+}
+
+
+.iconContainer {
+  margin-bottom: 20px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.icon {
+  width: 70px;
+  height: 70px;
+}
+
+.title {
+  font-family: "DM Sans", sans-serif;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 120%;
+  color: var(--text-light);
+  margin-top: 0;
+  margin-bottom: 10px;
+}
+
+.description {
+  font-family: "DM Sans", sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 140%;
+  letter-spacing: 0%;
+  color: var(--text-light);
+  opacity: 0.8;
+  margin-bottom: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .card {
+    padding: 25px;
+    min-width: 250px;
+    max-width: 45%; 
+  }
+  .icon {
+    width: 60px;
+    height: 60px;
+  }
+  .title {
+    font-size: 24px;
+  }
+  .description {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    min-width: 100%; 
+    max-width: 100%;
+    padding: 20px;
+  }
+  .title {
+    font-size: 22px;
+  }
+  .description {
+    font-size: 15px;
+  }
+}

@@ -1,0 +1,100 @@
+.titleContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 50px; /* Enhanced spacing */
+  position: relative; /* For absolute positioning of subtitle if needed */
+}
+
+.line {
+  height: 1px; /* Thinner, more elegant line */
+  width: 25%; /* Adjust width of lines next to title */
+  background: linear-gradient(
+    to right,
+    rgba(242, 77, 194, 0.6),
+    rgba(44, 151, 255, 0.6)
+  ); /* More subtle gradient */
+  border-radius: 1px;
+  opacity: 0.8;
+  transform-origin: center;
+}
+
+.lineLeft {
+  margin-right: 30px; /* More generous spacing */
+}
+
+.lineRight {
+  margin-left: 30px; /* More generous spacing */
+}
+
+.title {
+  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 3.2rem; /* Slightly larger for more presence */
+  font-weight: 600; /* Slightly lighter for elegance */
+  color: var(--text-light);
+  text-align: center;
+  text-shadow: 0 0 20px rgba(138, 64, 255, 0.4); /* Softer shadow */
+  white-space: normal; /* Allow title to wrap properly */
+  letter-spacing: 2px; /* Refined letter spacing */
+  text-transform: uppercase;
+}
+.subtitle {
+  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 1.1rem;
+  color: var(--text-light);
+  text-align: center;
+  opacity: 0.8;
+  position: absolute; /* Example positioning */
+  top: 100%; /* Below the title */
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 15px;
+  font-weight: 300;
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+  .title {
+    font-size: 2.8rem;
+  }
+  .line {
+    width: 20%;
+  }
+  .lineLeft {
+    margin-right: 20px;
+  }
+  .lineRight {
+    margin-left: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2.4rem;
+  }
+  .lineLeft {
+    margin-right: 15px;
+  }
+  .lineRight {
+    margin-left: 15px;
+  }
+  .titleContainer {
+    margin-bottom: 40px;
+  }
+}
+
+@media (max-width: 576px) {
+  .title {
+    font-size: 2rem;
+    letter-spacing: 1px;
+  }
+  .line {
+    width: 15%;
+  }
+  .lineLeft {
+    margin-right: 10px;
+  }
+  .lineRight {
+    margin-left: 10px;
+  }
+}

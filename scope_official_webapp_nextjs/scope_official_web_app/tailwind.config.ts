@@ -6,8 +6,9 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        orbitron: ["var(--font-orbitron)"],
-        dmSans: ["var(--font-dm-sans)"],
+        sans: ["Mango Grotesque", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+        orbitron: ["Mango Grotesque", "var(--font-orbitron)", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
+        dmSans: ["Mango Grotesque", "Helvetica Neue", "Helvetica", "Arial", "sans-serif"],
       },
       animation: {
         marquee: "marquee 25s linear infinite",
