@@ -1,47 +1,95 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimatedButton from '../components/AnimatedButton';
 import FooterComponent from '../components/FooterComponent';
+import { FAQ, UserQuestion } from '@/lib/types/database';
 
 export default function FaqPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
+  const [adminFaqs, setAdminFaqs] = useState<FAQ[]>([]);
+  const [userFaqs, setUserFaqs] = useState<UserQuestion[]>([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    user_name: '',
+    user_email: '',
+    question: '',
+  });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
-  const faqs = [
-    {
-      question: "What is SCOPE and what do you do?",
-      answer: "SCOPE (Society of Core Oriented Projects in Electronics) is a student-led electronics club that focuses on promoting electronics and circuit design among students. We organize workshops, competitions, and projects to enhance practical learning in electronics."
-    },
-    {
-      question: "How can I join SCOPE?",
-      answer: "You can join SCOPE by attending our recruitment events, filling out the membership form, or contacting any of our team members. We welcome students from all departments who are interested in electronics."
-    },
-    {
-      question: "What kind of events does SCOPE organize?",
-      answer: "We organize various events including technical workshops, circuit designing competitions, PCB designing sessions, robotics workshops, guest lectures from industry experts, and hands-on project development sessions."
-    },
-    {
-      question: "Do I need prior experience in electronics to join?",
-      answer: "No prior experience is required! We welcome beginners and provide foundational training. Our workshops are designed to cater to all skill levels, from basic electronics to advanced circuit design."
-    },
-    {
-      question: "What are the benefits of joining SCOPE?",
-      answer: "Members get access to workshops, hands-on training, industry exposure, networking opportunities, project guidance, access to tools and components, and certification for completed courses and projects."
-    },
-    {
-      question: "Are there any membership fees?",
-      answer: "Membership details including any fees are communicated during recruitment. We strive to keep costs minimal and focus on providing maximum value to our members."
-    },
-    {
-      question: "Can I propose a project or workshop idea?",
-      answer: "Absolutely! We encourage members to propose new ideas for projects, workshops, or events. Innovation and creativity are at the heart of what we do at SCOPE."
-    },
-    {
-      question: "How often do you conduct meetings and events?",
-      answer: "We conduct regular meetings and events throughout the academic year. The frequency varies based on the academic calendar, but we typically have activities every few weeks."
+  useEffect(() => {
+    fetchFAQs();
+  }, []);
+
+  const fetchFAQs = async () => {
+    try {
+      // Fetch admin FAQs
+      const adminRes = await fetch('/api/faq');
+      const adminData = await adminRes.json();
+      const visibleAdminFaqs = (adminData.faqs || []).filter((faq: FAQ) => faq.is_visible);
+      setAdminFaqs(visibleAdminFaqs);
+
+      // Fetch public user questions
+      const userRes = await fetch('/api/user-questions?public=true');
+      const userData = await userRes.json();
+      setUserFaqs(userData.questions || []);
+    } catch (error) {
+      console.error('Error fetching FAQs:', error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.question.trim()) {
+      alert('Please enter your question');
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const res = await fetch('/api/user-questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (res.ok) {
+        setSubmitSuccess(true);
+        setFormData({ user_name: '', user_email: '', question: '' });
+        setTimeout(() => setSubmitSuccess(false), 5000);
+      } else {
+        alert('Failed to submit question. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error submitting question:', error);
+      alert('Error submitting question. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Combine admin FAQs and user FAQs for display
+  const allFaqs = [
+    ...adminFaqs.map(faq => ({
+      question: faq.question,
+      answer: faq.answer,
+      type: 'admin' as const
+    })),
+    ...userFaqs.map(faq => ({
+      question: faq.question,
+      answer: faq.answer || '',
+      type: 'user' as const,
+      askedBy: faq.user_name
+    }))
   ];
 
   const formVariants = {
@@ -281,7 +329,7 @@ export default function FaqPage() {
 
           {/* FAQ Items */}
           <div className="space-y-4">
-            {faqs.map((faq, index) => (
+            {allFaqs.map((faq, index) => (
               <motion.div
                 key={index}
                 className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden"
@@ -299,9 +347,16 @@ export default function FaqPage() {
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
                 >
-                  <h3 className="text-lg font-semibold text-white pr-4">
-                    {faq.question}
-                  </h3>
+                  <div className="flex-1 pr-4">
+                    <h3 className="text-lg font-semibold text-white">
+                      {faq.question}
+                    </h3>
+                    {faq.type === 'user' && faq.askedBy && (
+                      <p className="text-xs text-gray-400 mt-1">
+                        Asked by: {faq.askedBy}
+                      </p>
+                    )}
+                  </div>
                   <motion.div
                     className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] flex items-center justify-center"
                     animate={{ rotate: openFAQ === index ? 45 : 0 }}
@@ -373,7 +428,18 @@ export default function FaqPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 1.1 }}
             >
+              {submitSuccess && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-green-900/30 border border-green-600 rounded-lg p-4 mb-4"
+                >
+                  <p className="text-green-300 font-semibold">✅ Your question has been submitted! We&apos;ll review and answer it soon.</p>
+                </motion.div>
+              )}
+
               <motion.form 
+                onSubmit={handleSubmit}
                 className="space-y-6 bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
                 variants={formVariants}
                 initial="hidden"
@@ -397,6 +463,9 @@ export default function FaqPage() {
                   <motion.input
                     type="text"
                     id="name"
+                    value={formData.user_name}
+                    onChange={(e) => setFormData({ ...formData, user_name: e.target.value })}
+                    placeholder="Your name"
                     className="w-full bg-gray-200 rounded-lg border border-transparent focus:border-blue-400 focus:ring-0 px-4 py-3 text-black placeholder-gray-500 transition-all duration-300"
                     whileFocus={{ 
                       boxShadow: "0 0 20px rgba(44, 151, 255, 0.3)",
@@ -413,33 +482,14 @@ export default function FaqPage() {
                     htmlFor="phone"
                     className="block text-sm font-medium text-gray-300 mb-2"
                   >
-                    Phone Number
-                  </label>
-                  <motion.input
-                    type="tel"
-                    id="phone"
-                    className="w-full bg-gray-200 rounded-lg border border-transparent focus:border-blue-400 focus:ring-0 px-4 py-3 text-black placeholder-gray-500 transition-all duration-300"
-                    whileFocus={{ 
-                      boxShadow: "0 0 20px rgba(44, 151, 255, 0.3)",
-                      scale: 1.02
-                    }}
-                  />
-                </motion.div>
-                
-                <motion.div 
-                  className="md:col-span-1"
-                  variants={fieldVariants}
-                  transition={{ duration: 0.5, delay: 0.1 }}
-                >
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-300 mb-2"
-                  >
                     Email
                   </label>
                   <motion.input
                     type="email"
                     id="email"
+                    value={formData.user_email}
+                    onChange={(e) => setFormData({ ...formData, user_email: e.target.value })}
+                    placeholder="your@email.com"
                     className="w-full bg-gray-200 rounded-lg border border-transparent focus:border-blue-400 focus:ring-0 px-4 py-3 text-black placeholder-gray-500 transition-all duration-300"
                     whileFocus={{ 
                       boxShadow: "0 0 20px rgba(44, 151, 255, 0.3)",
@@ -457,11 +507,15 @@ export default function FaqPage() {
                   htmlFor="query"
                   className="block text-sm font-medium text-gray-300 mb-2"
                 >
-                  Post Your Queries Here
+                  Post Your Question Here *
                 </label>
                 <motion.textarea
                   id="query"
                   rows={5}
+                  value={formData.question}
+                  onChange={(e) => setFormData({ ...formData, question: e.target.value })}
+                  required
+                  placeholder="Ask your question..."
                   className="w-full bg-gray-200 rounded-lg border border-transparent focus:border-blue-400 focus:ring-0 px-4 py-3 text-black placeholder-gray-500 transition-all duration-300"
                   whileFocus={{ 
                     boxShadow: "0 0 20px rgba(44, 151, 255, 0.3)",
@@ -475,8 +529,9 @@ export default function FaqPage() {
                 variant="primary"
                 size="lg"
                 className="w-full sm:w-auto"
+                disabled={submitting}
               >
-                Submit Query
+                {submitting ? 'Submitting...' : 'Submit Question'}
               </AnimatedButton>
             </motion.form>
             </motion.div>

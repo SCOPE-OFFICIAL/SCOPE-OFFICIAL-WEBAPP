@@ -1,9 +1,9 @@
 import "./globals.css";
 import { Orbitron, Inter, DM_Sans } from "next/font/google";
 import type { Metadata } from "next";
-import Navigation from "./components/Navigation";
+import ConditionalNavigation from "./components/ConditionalNavigation";
+import ConditionalFooter from "./components/ConditionalFooter";
 import { ViewModeProvider } from "./components/ViewModeContext";
-import FooterComponent from "./components/FooterComponent";
 import PageTransitionWrapper from "./components/PageTransitionWrapper";
 // import PixyDust from "./components/PixyDust"; // DISABLED: Custom cursor removed
 
@@ -58,7 +58,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col bg-[#040A28] text-white font-inter">
         <ViewModeProvider>
           {/* <PixyDust /> DISABLED: Custom blue ball cursor removed */}
-          <Navigation />
+          <ConditionalNavigation />
           
           {/* Page Content with Transition Wrapper */}
           <main className="flex-grow relative z-10">
@@ -67,7 +67,7 @@ export default function RootLayout({
             </PageTransitionWrapper>
           </main>
 
-          <FooterComponent />
+          <ConditionalFooter />
         </ViewModeProvider>
       </body>
     </html>

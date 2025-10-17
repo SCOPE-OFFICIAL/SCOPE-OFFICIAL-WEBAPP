@@ -1,8 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+
+interface GroupPhoto {
+  id: string;
+  title: string;
+  description?: string;
+  image_url: string;
+  category: string;
+  is_visible: boolean;
+}
+
+interface PhotoTag {
+  id: string;
+  photo_id: string;
+  team_member_id?: string | null;
+  person_name: string;
+  position_x: number;
+  position_y: number;
+}
 
 interface TeamData {
   id: string;
@@ -12,85 +30,58 @@ interface TeamData {
   members?: { name: string; position: { x: number; y: number } }[];
 }
 
-const teamData: TeamData[] = [
-  {
-    id: "tech_team",
-    title: "Technical Team",
-    image: "/images/TEAM_Mem/tech_team.jpeg",
-    description: "Focuses on electronics, embedded systems, IoT, and VLSI through projects, workshops, and mentorship.",
-    members: [
-      { name: "Neha J S", position: { x: 85, y: 65 } },
-      { name: "Sindhuja U", position: { x: 72, y: 65 } },
-      { name: "Mekala Abhirama", position: { x: 58, y: 65 } },
-      { name: "Prasanna Kumaran", position: { x: 45, y: 65 } },
-      { name: "Kunaal Raju M", position: { x: 35,y: 65 } },
-      { name: "Divyashree N", position: { x: 20, y: 65 } },
-      { name: "Kavyanjali", position: { x: 10, y: 65 } }
-    ]
-  },
-  {
-    id: "design_team",
-    title: "Design Team",
-    image: "/images/TEAM_Mem/Design_team.jpeg",
-    description: "Creates visual identities, user interfaces, and creative solutions for all SCOPE initiatives.",
-    members: [
-      { name: "Sruthi Subhash", position: { x: 75, y: 65 } },
-      { name: "Vedhashri M", position: { x: 68, y: 65 } },
-      { name: "Anantha Sai Gudivada", position: { x: 58, y: 65 } },
-      { name: "Rayyan Ahmed", position: { x: 45, y: 65 } },
-      { name: "Nidish MG", position: { x: 35, y: 65 } },
-      { name: "Srijan Srivastava", position: { x: 24, y: 65 } },
-      { name: "Nikhil N", position: { x: 14, y: 65 } }
-    ]
-  },
-  {
-    id: "events_team",
-    title: "Events Team",
-    image: "/images/TEAM_Mem/events_team.jpeg",
-    description: "Organizes workshops, seminars, competitions, and technical events for the community.",
-    members: [
-      { name: "Nikhil Ajay", position: { x: 82, y: 65 } },
-      { name: "Imdad Aqueel", position: { x: 72, y: 65 } },
-      { name: "Joel Jo", position: { x: 64, y: 65 } },
-      { name: "Rohan Baiju", position: { x: 52, y: 65 } },
-      { name: "Nandish Reddy", position: { x: 43, y: 65 } },
-      { name: "Viha Shomikha", position: { x: 31, y: 65 } },
-      { name: "Arfa", position: { x: 23, y: 65 } },
-      { name: "Ananya Y", position: { x: 13, y: 65 } }
-    ]
-  },
-  {
-    id: "pr_team",
-    title: "PR Team",
-    image: "/images/TEAM_Mem/pr_team.jpeg",
-    description: "Manages communications, social media presence, and outreach activities.",
-    members: [
-      { name: "Dhiya Krishna R", position: { x: 64, y: 65 } },
-      { name: "Dhanyashree Karnam", position: { x: 37, y: 65 } }
-    ]
-  },
-  {
-    id: "student_coordinator",
-    title: "Student Coordinator",
-    image: "/images/TEAM_Mem/student_cordinator.jpeg",
-    description: "Bridges communication between students, faculty, and administration for smooth operations.",
-    members: [
-      { name: "Vaibhav S J", position: { x: 86, y: 65 } },
-      { name: "Joyce Aparna", position: { x: 76, y: 65 } },
-      { name: "Gagana K", position: { x: 67, y: 65 } },
-      { name: "Monika S", position: { x: 60, y: 65 } },
-      { name: "Nandana Rajesh", position: { x: 52, y: 65 } },
-      { name: "Brunda R", position: { x: 45, y: 65 } },
-      { name: "Akshaya Kadiri", position: { x: 38, y: 65 } },
-      { name: "Jyothishree V Daroji", position: { x: 28, y: 65 } },
-      { name: "Vaishnavi T", position: { x: 21, y: 65 } },
-      { name: "Ashmitha", position: { x: 13, y: 65 } }
-    ]
-  }
-];
-
 export default function TeamMembers() {
+  const [groupPhotos, setGroupPhotos] = useState<GroupPhoto[]>([]);
+  const [photoTags, setPhotoTags] = useState<{ [key: string]: PhotoTag[] }>({});
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchGroupPhotos();
+  }, []);
+
+  const fetchGroupPhotos = async () => {
+    try {
+      // Fetch group photos from database
+      const photosRes = await fetch('/api/group-photos?withTags=true');
+      const photosData = await photosRes.json();
+      const photos = photosData.photos || [];
+      
+      // Filter visible photos
+      const visiblePhotos = photos.filter((p: GroupPhoto) => p.is_visible);
+      setGroupPhotos(visiblePhotos);
+      
+      // Organize tags by photo ID
+      const tagsByPhoto: { [key: string]: PhotoTag[] } = {};
+      photos.forEach((photo: GroupPhoto & { tags?: PhotoTag[] }) => {
+        if (photo.tags && photo.tags.length > 0) {
+          tagsByPhoto[photo.id] = photo.tags;
+        }
+      });
+      setPhotoTags(tagsByPhoto);
+    } catch (error) {
+      console.error('Error fetching group photos:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePhotoClick = (photo: GroupPhoto) => {
+    const tags = photoTags[photo.id] || [];
+    
+    const members = tags.map(tag => ({
+      name: tag.person_name,
+      position: { x: tag.position_x, y: tag.position_y }
+    }));
+
+    setSelectedTeam({
+      id: photo.id,
+      title: photo.title,
+      image: photo.image_url,
+      description: photo.description || photo.category,
+      members
+    });
+  };
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -229,47 +220,57 @@ export default function TeamMembers() {
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
         >
-          {teamData.map((team) => (
-            <motion.div
-              key={team.id}
-              variants={itemVariants}
-              className="group cursor-pointer"
-              onClick={() => setSelectedTeam(team)}
-              whileHover={{ y: -10, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/10 shadow-2xl transition-all duration-300 group-hover:border-[#F24DC2]/50 group-hover:shadow-[0_0_30px_rgba(242,77,194,0.3)]">
-                {/* Team Image */}
-                <div className="relative h-64 overflow-hidden">
-                  <Image
-                    src={team.image}
-                    alt={team.title}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+          {loading ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-xl text-gray-300">Loading team photos...</p>
+            </div>
+          ) : groupPhotos.length === 0 ? (
+            <div className="col-span-full text-center py-12">
+              <p className="text-xl text-gray-300">No team photos available</p>
+            </div>
+          ) : (
+            groupPhotos.map((photo) => (
+              <motion.div
+                key={photo.id}
+                variants={itemVariants}
+                className="group cursor-pointer"
+                onClick={() => handlePhotoClick(photo)}
+                whileHover={{ y: -10, scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <div className="relative bg-white/5 backdrop-blur-xl rounded-2xl overflow-hidden border border-white/10 shadow-2xl transition-all duration-300 group-hover:border-[#F24DC2]/50 group-hover:shadow-[0_0_30px_rgba(242,77,194,0.3)]">
+                  {/* Team Image */}
+                  <div className="relative h-64 overflow-hidden">
+                    <Image
+                      src={photo.image_url}
+                      alt={photo.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                    
+                    {/* Team Title Overlay */}
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="text-2xl font-bold text-white mb-2">
+                        {photo.title}
+                      </h3>
+                    </div>
+                  </div>
+
+                  {/* Hover Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#F24DC2]/20 to-[#2C97FF]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   
-                  {/* Team Title Overlay */}
-                  <div className="absolute bottom-4 left-4 right-4">
-                    <h3 className="text-2xl font-bold text-white mb-2">
-                      {team.title}
-                    </h3>
+                  {/* Click to view more indicator */}
+                  <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
                   </div>
                 </div>
-
-                {/* Hover Effect */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#F24DC2]/20 to-[#2C97FF]/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                
-                {/* Click to view more indicator */}
-                <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm rounded-full p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))
+          )}
         </motion.div>
       </div>
 
@@ -334,36 +335,38 @@ export default function TeamMembers() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
                   
-                  {/* Name Tags for Team Members (only for Technical Team) */}
-                  {selectedTeam.members && selectedTeam.members.map((member, index) => (
-                    <div
-                      key={index}
-                      className="absolute group/member"
-                      style={{
-                        left: `${member.position.x}%`,
-                        top: `${member.position.y}%`,
-                        transform: 'translate(-50%, -50%)'
-                      }}
-                    >
-                      {/* Hover Area */}
-                      <div className="w-32 h-32 cursor-pointer relative">
-                        {/* Invisible hover trigger */}
-                        <div className="absolute inset-0 bg-transparent hover:bg-white/5 rounded-full transition-all duration-200"></div>
-                        
-                        {/* Name Tag */}
-                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 opacity-0 group-hover/member:opacity-100 transition-all duration-300 pointer-events-none">
-                          <div className="bg-black/90 backdrop-blur-sm text-white px-4 py-3 rounded-xl text-base font-medium whitespace-nowrap border border-white/30 shadow-2xl">
-                            {member.name}
-                            {/* Arrow pointing down */}
-                            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-6 border-r-6 border-t-6 border-transparent border-t-black/90"></div>
+                  {/* Name Tags for Team Members */}
+                  {selectedTeam.members && selectedTeam.members.length > 0 && (
+                    selectedTeam.members.map((member, index) => (
+                      <div
+                        key={index}
+                        className="absolute group/member z-20"
+                        style={{
+                          left: `${member.position.x}%`,
+                          top: `${member.position.y}%`,
+                          transform: 'translate(-50%, -50%)'
+                        }}
+                      >
+                        {/* Hover Area */}
+                        <div className="w-20 h-20 cursor-pointer relative">
+                          {/* Visible dot indicator - subtle by default, prominent on hover */}
+                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full opacity-40 group-hover/member:opacity-100 transition-all duration-300 shadow-lg border border-white/30 group-hover/member:scale-[2] group-hover/member:border-2"></div>
+                          
+                          {/* Hover trigger area - invisible unless hovered */}
+                          <div className="absolute inset-0 bg-transparent group-hover/member:bg-white/10 rounded-full transition-all duration-200"></div>
+                          
+                          {/* Name Tag - appears BELOW the marker */}
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 opacity-0 group-hover/member:opacity-100 transition-all duration-300 pointer-events-none z-30">
+                            <div className="bg-black/95 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-sm font-semibold whitespace-nowrap border-2 border-[#F24DC2] shadow-2xl">
+                              {member.name}
+                              {/* Arrow pointing UP to the marker */}
+                              <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-6 border-r-6 border-b-6 border-transparent border-b-[#F24DC2]"></div>
+                            </div>
                           </div>
                         </div>
-                        
-                        {/* Dot indicator - invisible but larger hover area */}
-                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-6 h-6 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full opacity-0 group-hover/member:opacity-30 transition-all duration-300 shadow-lg border border-white/30"></div>
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
 
                 {/* Team Details */}

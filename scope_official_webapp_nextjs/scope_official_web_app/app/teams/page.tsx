@@ -1,111 +1,11 @@
 "use client";
 
-import Image from "next/image"; // Import Next.js Image component for optimized images
+import Image from "next/image";
 import { motion } from "framer-motion";
-
-// --- Data for Team Members ---
-const teamMembers = [
-  {
-    role: "PRESIDENT",
-    name: "Marisetty Nehasree",
-    image: "/images/neha pick.jpg", // Replace with your image path
-    instagram: "https://www.instagram.com/", // Replace with actual link
-    linkedin: "http://www.linkedin.com/in/marisettynehasree", // Replace with actual link
-  },
-  {
-    role: "VICE PRESIDENT",
-    name: "Brunda R",
-    image: "/images/brundha pick.png", // Replace with your image path
-    instagram: "https://www.instagram.com/brunda._.17?igsh=dGFkb2dmZWF6OGVj",
-    linkedin: "https://www.linkedin.com/in/brunda-reddy-r-02a149295",
-  },
-  {
-    role: "STUDENT MENTOR",
-    name: "Guraman Singh",
-    image: "/images/guraman singh pick.jpg", // Replace with your image path
-    instagram: "https://www.instagram.com/sokhig1?igsh=bGdzeDBzODBpeHFl",
-    linkedin: "https://www.linkedin.com/in/guraman-singh-sokhi-33884121b?",
-  },
-  {
-    role: "STUDENT COORDINATOR HEAD",
-    name: "Nandana Rajesh",
-    image: "/images/nandana pick.jpg", // Replace with your image path
-    instagram:
-      "https://www.instagram.com/nandana2628?igsh=MXQzMHBtNTY0ejZmYw==",
-    linkedin: "https://www.linkedin.com/in/nandana-rajesh-583827294",
-  },
-  {
-    role: "SECRETARY",
-    name: "Monika S",
-    image: "/images/monika pick.jpg", // Replace with your image path
-    instagram:
-      "https://www.instagram.com/_m.o.n.i.k.a_16?igsh=MXNiaHd4cDl2ZWM4Zg==",
-    linkedin: "http://linkedin.com/in/monika-s-85b275341",
-  },
-  {
-    role: "TREASURER",
-    name: "Pratham Gupta",
-    image: "/images/pratham pick.png", // Replace with your image path
-    instagram: "https://www.instagram.com/__pratham__01?igsh=aTFnb2k1YzBkeWJh",
-    linkedin: "https://linkedin.com/in/pratham21gupta",
-  },
-  {
-    role: "PROJECT MANAGER",
-    name: "Kishore",
-    image: "/images/kishor pick.jpg", // Replace with your image path
-    instagram:
-      "https://www.instagram.com/mhskreddy_04?igsh=MWxtbWo5MDFvZTlhdA==",
-    linkedin:
-      "https://www.linkedin.com/in/m-hema-siva-kishore-reddy-26407734b/",
-  },
-  {
-    role: "PR HEAD",
-    name: "Dhanya Karnam",
-    image: "/images/dhanya pick.jpg", // Replace with your image path
-    instagram:
-      " https://www.instagram.com/dhanyaaayyy?igsh=MXVnZGtmcWE4cWtuMg== ",
-    linkedin: "https://www.linkedin.com/in/dhanya-karnam-3921a01bb?",
-  },
-  {
-    role: "MARKETING HEAD",
-    name: "Kadiri Akshaya",
-    image: "/images/akshaya pick.jpg", // Replace with your image path
-    instagram: "https://www.instagram.com/borahae_hearts?igsh=eGs2bzEzcmV3NGJq",
-    linkedin: "http://www.linkedin.com/in/kadiriakshaya",
-  },
-  {
-    role: "EVENT MANAGEMENT HEAD",
-    name: "Rohan Baiju",
-    image: "/images/rohan biju pick.jpg", // Replace with your image path
-    instagram: "https://www.instagram.com/",
-    linkedin: "http://www.linkedin.com/in/rohanbaiju",
-  },
-  {
-    role: "CONTENT HEAD",
-    name: "Rayyan Ahamed",
-    image: "/images/rayan .jpg", // Replace with your image path
-    instagram: "https://www.instagram.com/",
-    linkedin: "https://www.linkedin.com/",
-  },
-  {
-    role: "DESIGN HEAD",
-    name: "Ananta Sai Gudivada",
-    image: "/images/ananth pick.jpg", // Replace with your image path
-    instagram:
-      "https://www.instagram.com/ananthasaigudivada?igsh=ZHlweXAxZXRxa2Qx",
-    linkedin: "https://www.linkedin.com/in/ananthasaigudivada",
-  },
-  {
-    role: "TECHNICAL HEAD",
-    name: "Prasanna Kumaran",
-    image: "/images/prasanna pick.jpg", // Replace with your image path
-    instagram: "https://www.instagram.com/prasi2004/",
-    linkedin: "https://www.linkedin.com/in/prasi2004",
-  },
-];
+import { useEffect, useState } from "react";
+import { TeamMember } from '@/lib/types/database';
 
 // --- SVG Icons (Simplified) ---
-// You can replace these with icons from a library like react-icons if preferred.
 const InstagramIcon = (
   <svg
     className="icon"
@@ -129,6 +29,35 @@ const LinkedInIcon = (
 );
 
 export default function TeamPage() {
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [facultyCoordinator, setFacultyCoordinator] = useState<TeamMember | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTeamData();
+  }, []);
+
+  const fetchTeamData = async () => {
+    try {
+      // Fetch individual team members
+      const membersRes = await fetch('/api/team?active=true');
+      const membersData = await membersRes.json();
+      const members = membersData.members || [];
+      
+      // Separate faculty coordinator from other members
+      const faculty = members.find((m: TeamMember) => m.role.toUpperCase().includes('FACULTY'));
+      const otherMembers = members.filter((m: TeamMember) => !m.role.toUpperCase().includes('FACULTY'));
+      
+      setFacultyCoordinator(faculty || null);
+      setTeamMembers(otherMembers);
+      
+    } catch (error) {
+      console.error('Error fetching team data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div 
       className="team-page-container min-h-screen relative"
@@ -186,95 +115,154 @@ export default function TeamPage() {
         </motion.div>
 
         {/* Faculty Coordinator Card - Same size as other team cards */}
-        <div 
-          className="faculty-coordinator-container" 
-          style={{ display: 'flex', justifyContent: 'center', marginBottom: '3rem', marginTop: '2rem' }}
-        >
+        {facultyCoordinator && (
           <div 
-            className="team-member-wrapper"
+            className="faculty-coordinator-container" 
+            style={{ display: 'flex', justifyContent: 'center', marginBottom: '3rem', marginTop: '2rem' }}
           >
-            <div className="member-text-top">
-              <h2 className="member-role">FACULTY COORDINATOR</h2>
-              <p className="member-name">Prof. Dilip Chandra E</p>
-            </div>
-            <motion.div 
-              className="team-member-card"
-              whileHover={{ y: -10, transition: { duration: 0.3 } }}
+            <div 
+              className="team-member-wrapper"
             >
-              <div className="member-image-background">
-                <Image
-                  src="/images/dilip sir.jpg"
-                  alt="Prof. Dilip Chandra E"
-                  fill
-                  className="member-background-image"
-                />
-              </div>
-              <div className="member-overlay"></div>
-              <div className="member-socials">
-                <a
-                  href="https://www.instagram.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="social-icon-link"
-                >
-                  {InstagramIcon}
-                </a>
-                <a
-                  href="https://www.linkedin.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="social-icon-link"
-                >
-                  {LinkedInIcon}
-                </a>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-        
-        {/* Right: Image */}
-          
-        <div className="team-grid">
-          {teamMembers.map((member, index) => (
-            <div className="team-member-wrapper" key={index}>
               <div className="member-text-top">
-                <h2 className="member-role">{member.role}</h2>
-                <p className="member-name">{member.name}</p>
+                <h2 className="member-role">{facultyCoordinator.role}</h2>
+                <p className="member-name">{facultyCoordinator.name}</p>
               </div>
               <motion.div 
                 className="team-member-card"
                 whileHover={{ y: -10, transition: { duration: 0.3 } }}
               >
                 <div className="member-image-background">
-                  <Image
-                    src={member.image}
-                    alt={member.name}
-                    fill
-                    className="member-background-image"
-                  />
+                  {facultyCoordinator.photo_url ? (
+                    <Image
+                      src={facultyCoordinator.photo_url}
+                      alt={facultyCoordinator.name}
+                      fill
+                      className="member-background-image"
+                    />
+                  ) : (
+                    <div style={{ 
+                      width: '100%', 
+                      height: '100%', 
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '3rem',
+                      color: 'white',
+                      fontWeight: 'bold'
+                    }}>
+                      {facultyCoordinator.name.charAt(0)}
+                    </div>
+                  )}
                 </div>
                 <div className="member-overlay"></div>
                 <div className="member-socials">
-                  <a
-                    href={member.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-icon-link"
-                  >
-                    {InstagramIcon}
-                  </a>
-                  <a
-                    href={member.linkedin}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="social-icon-link"
-                  >
-                    {LinkedInIcon}
-                  </a>
+                  {facultyCoordinator.instagram_url && (
+                    <a
+                      href={facultyCoordinator.instagram_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="social-icon-link"
+                    >
+                      {InstagramIcon}
+                    </a>
+                  )}
+                  {facultyCoordinator.linkedin_url && (
+                    <a
+                      href={facultyCoordinator.linkedin_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="social-icon-link"
+                    >
+                      {LinkedInIcon}
+                    </a>
+                  )}
                 </div>
               </motion.div>
             </div>
-          ))}
+          </div>
+        )}
+        
+        {/* Right: Image */}
+          
+        <div className="team-grid">
+          {loading ? (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem' }}>
+              <p style={{ color: 'white', fontSize: '1.2rem' }}>Loading team members...</p>
+            </div>
+          ) : teamMembers.length === 0 ? (
+            <div style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '3rem' }}>
+              <p style={{ color: 'white', fontSize: '1.2rem' }}>No team members found. Add members from the admin panel!</p>
+            </div>
+          ) : (
+            <>
+              {/* Individual Team Members */}
+              {teamMembers.map((member, index) => (
+              <div className="team-member-wrapper" key={member.id}>
+                <div className="member-text-top">
+                  <h2 className="member-role">{member.role}</h2>
+                  <p className="member-name">{member.name}</p>
+                </div>
+                <motion.div 
+                  className="team-member-card"
+                  whileHover={{ y: -10, transition: { duration: 0.3 } }}
+                  initial={{ opacity: 0, y: 50 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.05 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                >
+                  <div className="member-image-background">
+                    {member.photo_url ? (
+                      <Image
+                        src={member.photo_url}
+                        alt={member.name}
+                        fill
+                        className="member-background-image"
+                      />
+                    ) : (
+                      <div style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '3rem',
+                        color: 'white',
+                        fontWeight: 'bold'
+                      }}>
+                        {member.name.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <div className="member-overlay"></div>
+                  <div className="member-socials">
+                    {member.instagram_url && (
+                      <a
+                        href={member.instagram_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="social-icon-link"
+                      >
+                        {InstagramIcon}
+                      </a>
+                    )}
+                    {member.linkedin_url && (
+                      <a
+                        href={member.linkedin_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="social-icon-link"
+                      >
+                        {LinkedInIcon}
+                      </a>
+                    )}
+                  </div>
+                </motion.div>
+              </div>
+              ))}
+            </>
+          )}
         </div>
       </motion.section>
 

@@ -4,6 +4,20 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 
+// Type for Event from database
+interface Event {
+  id: string
+  title: string
+  description: string
+  short_description: string
+  event_date: string
+  event_time: string | null
+  location: string | null
+  image_url: string | null
+  event_type: string
+  status: string
+}
+
 // This would typically be in a separate components file
 const AnimatedButton = ({ children, className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: string, size?: string }) => (
   <motion.button
@@ -23,24 +37,69 @@ export default function HomePage() {
     "/images/past-event-3-tech.jpg",
   ];
   
-  // Data for upcoming events honeycomb layout
-  const events = [
-    { title: "Orientation on Matlab", date: "15th Aug 25" },
-    { title: "Hackathon", date: "28th Aug 25" },
-    { title: "ARM architecture workshop", date: "10th Sept 25" },
-    { title: "Empower talk", date: "5th Sept 25" },
-    { title: "Current Basics", date: "12th Sept 25" },
-  ];
+  // State for fetched events
+  const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Fill up to 8 slots for 3–2–3 honeycomb
-  const totalHexagons = 8;
-  const paddedEvents = [
-    ...events,
-    ...Array(totalHexagons - events.length).fill({
-      title: "Coming Soon",
-      date: "",
-    }),
-  ];
+  // Fetch upcoming events from API
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        setLoading(true)
+        const response = await fetch('/api/events?upcoming=true&status=published')
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch events')
+        }
+        
+        const data = await response.json()
+        setUpcomingEvents(data.events || [])
+        setError(null)
+      } catch (err) {
+        console.error('Error fetching events:', err)
+        setError('Failed to load events')
+        // Fallback to empty array
+        setUpcomingEvents([])
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchEvents()
+  }, [])
+
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString)
+    const day = date.getDate()
+    const month = date.toLocaleString('default', { month: 'short' })
+    const year = date.getFullYear().toString().slice(-2)
+    
+    const suffix = day === 1 || day === 21 || day === 31 ? 'st' 
+                 : day === 2 || day === 22 ? 'nd'
+                 : day === 3 || day === 23 ? 'rd'
+                 : 'th'
+    
+    return `${day}${suffix} ${month} ${year}`
+  }
+
+  // Transform events for honeycomb display
+  const totalHexagons = 8
+  const paddedEvents = loading 
+    ? Array(totalHexagons).fill({ title: "Loading...", date: "" })
+    : [
+        ...upcomingEvents.slice(0, totalHexagons).map(event => ({
+          title: event.title,
+          date: formatDate(event.event_date),
+          image: event.image_url,
+          description: event.short_description || event.description
+        })),
+        ...Array(Math.max(0, totalHexagons - upcomingEvents.length)).fill({
+          title: "Coming Soon",
+          date: "",
+        }),
+      ]
 
   // State for Past Events Carousel
   const [currentIndex, setCurrentIndex] = useState(0);
