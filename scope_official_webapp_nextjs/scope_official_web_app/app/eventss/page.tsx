@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
 
 // Type for Event from database
 interface Event {
@@ -16,31 +15,35 @@ interface Event {
   image_url: string | null
   event_type: string
   status: string
+  registration_link?: string | null
+  speaker?: string | null
+  registration_fee?: string | null
+  banner_image_url?: string | null
+  poster_image_url?: string | null
+  what_to_expect?: string | null
+  what_you_get?: string | null
 }
 
-// This would typically be in a separate components file
-const AnimatedButton = ({ children, className, ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { variant?: string, size?: string }) => (
-  <motion.button
-    className={`px-6 py-3 rounded-full font-bold text-white transition-all duration-300 transform hover:scale-105 ${className}`}
-    whileHover={{ scale: 1.05 }}
-    whileTap={{ scale: 0.95 }}
-    {...props}
-  >
-    {children}
-  </motion.button>
-);
+// Type for Past Event from database
+interface PastEvent {
+  id: string
+  event_name: string
+  poster_image_url: string
+  display_order: number
+  is_visible: boolean
+}
 
 export default function HomePage() {
-  const pastEvents = [
-    "/images/past-event-1.jpg",
-    "/images/past-event-2-matlab.jpg",
-    "/images/past-event-3-tech.jpg",
-  ];
-  
   // State for fetched events
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
+  const [pastEvents, setPastEvents] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  
+  // Event Card Carousel State
+  const [currentEventIndex, setCurrentEventIndex] = useState(0)
+  const [eventCountdown, setEventCountdown] = useState({ days: 0, hours: 0, mins: 0, secs: 0 })
+  const [currentSlide, setCurrentSlide] = useState(0) // 0 = Event Details, 1 = Poster
+  const [selectedHexagonIndex, setSelectedHexagonIndex] = useState<number | null>(null)
 
   // Fetch upcoming events from API
   useEffect(() => {
@@ -55,10 +58,15 @@ export default function HomePage() {
         
         const data = await response.json()
         setUpcomingEvents(data.events || [])
-        setError(null)
+        
+        // Select a random event on initial load
+        if (data.events && data.events.length > 0) {
+          const randomIndex = Math.floor(Math.random() * data.events.length)
+          setCurrentEventIndex(randomIndex)
+          setSelectedHexagonIndex(randomIndex)
+        }
       } catch (err) {
         console.error('Error fetching events:', err)
-        setError('Failed to load events')
         // Fallback to empty array
         setUpcomingEvents([])
       } finally {
@@ -68,6 +76,81 @@ export default function HomePage() {
 
     fetchEvents()
   }, [])
+
+  // Fetch past events from API
+  useEffect(() => {
+    async function fetchPastEvents() {
+      try {
+        const response = await fetch('/api/past-events?visible=true')
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch past events')
+        }
+        
+        const data = await response.json()
+        // Extract poster URLs from past events
+        const posterUrls = (data.pastEvents || []).map((event: PastEvent) => event.poster_image_url)
+        setPastEvents(posterUrls.length > 0 ? posterUrls : [
+          "/images/past-event-1.jpg",
+          "/images/past-event-2-matlab.jpg",
+          "/images/past-event-3-tech.jpg"
+        ])
+      } catch (err) {
+        console.error('Error fetching past events:', err)
+        // Fallback to default images
+        setPastEvents([
+          "/images/past-event-1.jpg",
+          "/images/past-event-2-matlab.jpg",
+          "/images/past-event-3-tech.jpg"
+        ])
+      }
+    }
+
+    fetchPastEvents()
+  }, [])
+
+  // Smart Countdown Timer Effect - Calculates time to current event
+  useEffect(() => {
+    if (upcomingEvents.length === 0 || !upcomingEvents[currentEventIndex]) return
+
+    const updateCountdown = () => {
+      const currentEvent = upcomingEvents[currentEventIndex]
+      if (!currentEvent || !currentEvent.event_date) return
+
+      const eventDateTime = new Date(`${currentEvent.event_date}T${currentEvent.event_time || '00:00:00'}`).getTime()
+      const now = new Date().getTime()
+      const distance = eventDateTime - now
+
+      if (distance > 0) {
+        setEventCountdown({
+          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          mins: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
+          secs: Math.floor((distance % (1000 * 60)) / 1000)
+        })
+      } else {
+        setEventCountdown({ days: 0, hours: 0, mins: 0, secs: 0 })
+      }
+    }
+
+    updateCountdown()
+    const interval = setInterval(updateCountdown, 1000)
+    return () => clearInterval(interval)
+  }, [upcomingEvents, currentEventIndex])
+
+  // Auto-carousel effect - Slides between Event Details (0) and Poster (1) every 6 seconds
+  useEffect(() => {
+    if (upcomingEvents.length === 0) return
+
+    // Switch slide after 6 seconds
+    const slideInterval = setInterval(() => {
+      setCurrentSlide((prev) => prev === 0 ? 1 : 0)
+    }, 6000) // 6 seconds
+
+    return () => {
+      clearInterval(slideInterval)
+    }
+  }, [upcomingEvents])
 
   // Format date for display
   const formatDate = (dateString: string) => {
@@ -107,38 +190,6 @@ export default function HomePage() {
   const [touchStartX, setTouchStartX] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const swipeThreshold = 50;
-  
-  // State for Countdown Timer
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, mins: 0, secs: 0 });
-
-  // Effect for countdown timer - Updated target date to December 25th, 2025
-  useEffect(() => {
-    const targetDate = new Date("2025-12-25T00:00:00").getTime();
-    
-    const updateCountdown = () => {
-      const now = new Date().getTime();
-      const distance = targetDate - now;
-
-      if (distance > 0) {
-        setTimeLeft({
-          days: Math.floor(distance / (1000 * 60 * 60 * 24)),
-          hours: Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-          mins: Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)),
-          secs: Math.floor((distance % (1000 * 60)) / 1000)
-        });
-      } else {
-         setTimeLeft({ days: 0, hours: 0, mins: 0, secs: 0 });
-      }
-    };
-
-    // Update immediately on mount
-    updateCountdown();
-    
-    // Then update every second
-    const interval = setInterval(updateCountdown, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   // Effect for loading fonts
   useEffect(() => {
@@ -194,7 +245,7 @@ export default function HomePage() {
       <main className="relative z-10">
         {/* Upcoming Events Section - WITH SMOOTH ANIMATIONS */}
         <motion.section 
-          className="py-16 px-6 bg-[#040A28] text-white relative"
+          className="py-[200px] px-[30px] bg-[#040A28] text-white relative"
           initial={{ opacity: 0, y: 100 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ 
@@ -225,14 +276,16 @@ export default function HomePage() {
           >
             UPCOMING EVENTS
           </motion.h2>
+          
+          {/* Main Container: Hexagon + Event Card Side by Side */}
           <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 gap-1 items-center justify-center"
+            className="flex flex-col lg:flex-row gap-[200px] items-start justify-center w-full px-8"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            {/* 🔷 Honeycomb Hexagon Layout with Smooth Animations */}
-            <div className="flex flex-col items-center gap-6 -mt-10">
+            {/* LEFT: 🔷 Honeycomb Hexagon Layout with Smooth Animations */}
+            <div className="flex flex-col items-center gap-6 mt-10 lg:mt-0 flex-shrink-0">
                <style jsx>{`
                     .hexagon {
                       clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
@@ -250,10 +303,15 @@ export default function HomePage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.8 }}
               >
-                {paddedEvents.slice(0, 3).map((event, index) => (
+                {paddedEvents.slice(0, 3).map((event, index) => {
+                  const eventIndex = index
+                  const hasEvent = index < upcomingEvents.length
+                  const isSelected = selectedHexagonIndex === eventIndex
+                  
+                  return (
                   <motion.div 
                     key={index} 
-                    className="relative"
+                    className={`relative ${hasEvent ? 'cursor-pointer' : 'cursor-not-allowed'}`}
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ 
@@ -261,32 +319,39 @@ export default function HomePage() {
                       delay: 1.0 + (index * 0.1),
                       ease: "easeOut"
                     }}
-                    whileHover={{ 
+                    whileHover={hasEvent ? { 
                       scale: 1.05,
                       transition: { duration: 0.2 }
+                    } : {}}
+                    onClick={() => {
+                      if (hasEvent) {
+                        setCurrentEventIndex(eventIndex)
+                        setSelectedHexagonIndex(eventIndex)
+                      }
                     }}
                   >
-                    <div className="hexagon w-25 h-50 bg-pink-500 absolute inset-0 opacity-35" />
+                    {/* Pink selection border */}
+                    <div className={`hexagon w-25 h-50 absolute inset-0 transition-opacity duration-300 ${
+                      isSelected ? 'bg-pink-500 opacity-100' : 'bg-pink-500 opacity-35'
+                    }`} />
                     <div className="hexagon w-40 h-44 flex items-center justify-center text-center text-sm p-4 bg-[#1a1c3a] text-white relative m-[2px]">
-                      {(index === 0 || index === 2) && (
+                      {hasEvent && (
                         <div className="hexagon w-full h-full bg-white absolute inset-0 opacity-10" />
                       )}
                       <div className="flex flex-col items-center relative z-10">
-                        {index !== 1 && (
+                        {hasEvent && (
                           <>
                             <p className="font-semibold">{event.title}</p>
                             {event.date && (
                               <p className="text-gray-300 text-xs mt-1">{event.date}</p>
                             )}
-                            <a href="https://www.google.com/">
-                              <ArrowRight className="mx-auto mt-2 w-4 h-4" />
-                            </a>
                           </>
                         )}
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                  )
+                })}
               </motion.div>
 
               {/* Second Row (2) with Animation */}
@@ -296,10 +361,15 @@ export default function HomePage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 1.3 }}
               >
-                {paddedEvents.slice(0, 2).map((event, index) => (
+                {paddedEvents.slice(3, 5).map((event, index) => {
+                  const eventIndex = index + 3
+                  const hasEvent = eventIndex < upcomingEvents.length
+                  const isSelected = selectedHexagonIndex === eventIndex
+                  
+                  return (
                   <motion.div 
                     key={index} 
-                    className="relative"
+                    className={`relative ${hasEvent ? 'cursor-pointer' : 'cursor-not-allowed'}`}
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ 
@@ -307,26 +377,35 @@ export default function HomePage() {
                       delay: 1.5 + (index * 0.1),
                       ease: "easeOut"
                     }}
-                    whileHover={{ 
+                    whileHover={hasEvent ? { 
                       scale: 1.05,
                       transition: { duration: 0.2 }
+                    } : {}}
+                    onClick={() => {
+                      if (hasEvent) {
+                        setCurrentEventIndex(eventIndex)
+                        setSelectedHexagonIndex(eventIndex)
+                      }
                     }}
                   >
-                    <div className="hexagon w-25 h-50 bg-pink-500 absolute inset-0 opacity-35" />
+                    {/* Pink selection border */}
+                    <div className={`hexagon w-25 h-50 absolute inset-0 transition-opacity duration-300 ${
+                      isSelected ? 'bg-pink-500 opacity-100' : 'bg-pink-500 opacity-35'
+                    }`} />
                     <div className="hexagon w-40 h-44 flex items-center justify-center text-center text-sm p-4 bg-[#1a1c3a] text-white relative m-[2px]">
-                      <div className="hexagon w-full h-full bg-white absolute inset-0 opacity-10" />
+                      {hasEvent && <div className="hexagon w-full h-full bg-white absolute inset-0 opacity-10" />}
                       <div className="flex flex-col items-center relative z-10">
+                        {hasEvent && (
                           <>
                             <p className="font-semibold">{event.title}</p>
-                            <p className="text-gray-300 text-xs mt-1">{event.date}</p>
-                            <a href="https://www.google.com/">
-                              <ArrowRight className="mx-auto mt-2 w-4 h-4" />
-                            </a>
+                            {event.date && <p className="text-gray-300 text-xs mt-1">{event.date}</p>}
                           </>
+                        )}
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                  )
+                })}
               </motion.div>
 
               {/* Third Row (3) with Animation */}
@@ -336,10 +415,15 @@ export default function HomePage() {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 1.7 }}
               >
-                {paddedEvents.slice(0, 3).map((event, index) => (
+                {paddedEvents.slice(5, 8).map((event, index) => {
+                  const eventIndex = index + 5
+                  const hasEvent = eventIndex < upcomingEvents.length
+                  const isSelected = selectedHexagonIndex === eventIndex
+                  
+                  return (
                   <motion.div 
                     key={index} 
-                    className="relative"
+                    className={`relative ${hasEvent ? 'cursor-pointer' : 'cursor-not-allowed'}`}
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ 
@@ -347,90 +431,273 @@ export default function HomePage() {
                       delay: 1.9 + (index * 0.1),
                       ease: "easeOut"
                     }}
-                    whileHover={{ 
+                    whileHover={hasEvent ? { 
                       scale: 1.05,
                       transition: { duration: 0.2 }
+                    } : {}}
+                    onClick={() => {
+                      if (hasEvent) {
+                        setCurrentEventIndex(eventIndex)
+                        setSelectedHexagonIndex(eventIndex)
+                      }
                     }}
                   >
-                    <div className="hexagon w-25 h-50 bg-pink-500 absolute inset-0 opacity-35" />
+                    {/* Pink selection border */}
+                    <div className={`hexagon w-25 h-50 absolute inset-0 transition-opacity duration-300 ${
+                      isSelected ? 'bg-pink-500 opacity-100' : 'bg-pink-500 opacity-35'
+                    }`} />
                     <div className="hexagon w-40 h-44 flex items-center justify-center text-center text-sm p-4 bg-[#1a1c3a] text-white relative m-[2px]">
-                      {index === 1 && (
+                      {hasEvent && (
                         <div className="hexagon w-full h-full bg-white absolute inset-0 opacity-10" />
                       )}
                       <div className="flex flex-col items-center relative z-10">
-                        {index === 1 && ( 
+                        {hasEvent && ( 
                           <>
                             <p className="font-semibold">{event.title}</p>
-                            <p className="text-gray-300 text-xs mt-1">{event.date}</p>
-                            <a href="https://www.google.com/">
-                              <ArrowRight className="mx-auto mt-2 w-4 h-4" />
-                            </a>
+                            {event.date && <p className="text-gray-300 text-xs mt-1">{event.date}</p>}
                           </>
                         )}
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                  )
+                })}
               </motion.div>
             </div>
 
-            {/* 🔥 Countdown with Neon Circular Glow - ANIMATED */}
-            <motion.div 
-              className="flex flex-col items-center justify-center mt-10 md:mt-0"
-              initial={{ opacity: 0, scale: 0.5 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ 
-                duration: 1.0, 
-                delay: 2.2,
-                type: "spring",
-                stiffness: 100
-              }}
-            >
-                <motion.div 
-                  className="relative w-[350px] h-[350px] md:w-[450px] md:h-[450px] rounded-full flex items-center justify-center border-0 border-[#550231] shadow-[0_0_80px_30px_#560C4B,inset_0_0_50px_15px_#560C4B] opacity-90"
-                  whileHover={{ 
-                    scale: 1.05,
-                    boxShadow: "0 0 100px 40px #560C4B, inset 0 0 60px 20px #560C4B",
-                    transition: { duration: 0.3 }
-                  }}
-                >
-                    <div className="absolute w-[90%] h-[90%] rounded-full flex items-center justify-center border-2 border-[#560C4B]">
-                        <div className="absolute w-[80%] h-[80%] rounded-full flex items-center justify-center border-4 border-[#39184D] shadow-[0_0_15px_rgba(57,24,77,0.5)]">
-                            <div className="absolute w-[90%] h-[90%] rounded-full flex items-center justify-center border-4 border-[#FB4B8C] ring-4 ring-[#0072FF] shadow-[0_0_20px_rgba(251,75,140,0.8),_0_0_20px_rgba(0,114,255,0.8)]">
-                                <div className="relative w-[90%] h-[90%] rounded-full flex items-center justify-center bg-transparent">
-                                    <div className="text-center">
-                                        <p className="text-[#FB4B8C] text-4xl font-bold">
-                                            {timeLeft.days.toString().padStart(2, "0")}
-                                        </p>
-                                        <p className="text-white text-lg">DAYS</p>
-                                        <p className="text-[#FB4B8C] text-4xl font-bold mt-2">
-                                            {timeLeft.hours.toString().padStart(2, "0")}
-                                        </p>
-                                        <p className="text-white text-lg">HRS</p>
-                                        <p className="text-[#FB4B8C] text-2xl font-bold mt-2">
-                                            {timeLeft.mins.toString().padStart(2, "0")}
-                                        </p>
-                                        <p className="text-white text-lg">MINS</p>
-                                        <p className="text-[#FB4B8C] text-sm font-bold mt-2">
-                                            {timeLeft.secs.toString().padStart(2, "0")}
-                                        </p>
-                                        <p className="text-white text-xs">SECS</p>
-                                    </div>
-                                </div>
+            {/* RIGHT: Event Details Card */}
+            {upcomingEvents.length > 0 && upcomingEvents[currentEventIndex] && (
+              <div className="flex-1 max-w-4xl flex flex-col items-center justify-center gap-4">
+                {/* Event Card Container with Horizontal Sliding */}
+                <div className="relative w-full overflow-hidden">
+                  
+                  {/* Main Event Card - Horizontal Carousel */}
+                  <motion.div
+                    className="relative w-full bg-gradient-to-br from-[#1a1c3a] via-[#0d1b3d] to-[#1a1c3a] rounded-2xl shadow-2xl border border-white/10"
+                    initial={{ x: -100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 0.2 }}
+                  >
+                    {/* Carousel Container - Slides Horizontally */}
+                    <div className="relative overflow-hidden rounded-2xl min-h-[680px]">
+                      {/* Event Details Slide */}
+                      <motion.div
+                        className="w-full absolute inset-0"
+                        initial={false}
+                        animate={{ x: currentSlide === 0 ? 0 : '-100%' }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      >
+                        {/* Event Banner Image */}
+                        <div className="relative h-56 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] overflow-hidden">
+                          {upcomingEvents[currentEventIndex].image_url ? (
+                            <img
+                              src={upcomingEvents[currentEventIndex].image_url}
+                              alt="Event Banner"
+                              className="w-full h-full object-cover opacity-90"
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center h-full">
+                              <span className="text-5xl font-bold text-white/20">EVENTS</span>
                             </div>
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-[#1a1c3a] via-transparent to-transparent"></div>
                         </div>
+
+                        {/* Content Grid - 2 Columns */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+                      
+                          {/* LEFT COLUMN - Event Details */}
+                          <div className="space-y-3">
+                        {/* Event Name */}
+                        <div>
+                          <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Event Name:</p>
+                          <h3 className="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F24DC2] to-[#2C97FF]">
+                            {upcomingEvents[currentEventIndex].title}
+                          </h3>
+                        </div>
+
+                        {/* Date & Time */}
+                        <div>
+                          <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Date & Time:</p>
+                          <p className="text-white font-semibold">
+                            {formatDate(upcomingEvents[currentEventIndex].event_date)}
+                            {upcomingEvents[currentEventIndex].event_time && 
+                              ` at ${upcomingEvents[currentEventIndex].event_time}`
+                            }
+                          </p>
+                        </div>
+
+                        {/* Speaker */}
+                        <div>
+                          <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Speaker:</p>
+                          <p className="text-white font-semibold">
+                            {upcomingEvents[currentEventIndex].speaker || 'To be announced'}
+                          </p>
+                        </div>
+
+                        {/* Venue */}
+                        <div>
+                          <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Venue:</p>
+                          <p className="text-white font-semibold">
+                            {upcomingEvents[currentEventIndex].location || 'To be announced'}
+                          </p>
+                        </div>
+
+                        {/* Registration Fee */}
+                        <div>
+                          <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Registration Fee:</p>
+                          <p className="text-2xl font-bold text-green-400">
+                            {upcomingEvents[currentEventIndex].registration_fee || 'FREE'}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* RIGHT COLUMN - Countdown & What to Expect */}
+                      <div className="space-y-4">
+                        
+                        {/* What to Expect */}
+                        <div>
+                          <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">What to Expect:</p>
+                          <p className="text-gray-300 text-sm leading-relaxed">
+                            {upcomingEvents[currentEventIndex].short_description || 
+                             upcomingEvents[currentEventIndex].description?.substring(0, 150) + '...' ||
+                             'An exciting event with valuable insights.'}
+                          </p>
+                        </div>
+
+                        {/* Countdown Timer */}
+                        <div>
+                          <motion.div 
+                            className="relative bg-gradient-to-r from-blue-900/30 to-indigo-900/30 border-2 border-blue-500/50 rounded-lg p-4 shadow-[0_0_20px_rgba(59,130,246,0.3)]"
+                            whileHover={{ 
+                              boxShadow: "0 0 30px rgba(59,130,246,0.5)",
+                              scale: 1.01 
+                            }}
+                            transition={{ duration: 0.3 }}
+                          >
+                            <p className="text-center text-xs text-gray-400 uppercase tracking-wider mb-2">Event Starts In:</p>
+                            <div className="flex justify-center items-center gap-2">
+                              {/* Days */}
+                              <div className="text-center">
+                                <div className="bg-black/50 rounded p-2 min-w-[50px] border border-red-500/50">
+                                  <p className="text-2xl font-bold text-red-500 font-mono leading-none" style={{ 
+                                    textShadow: '0 0 15px rgba(239, 68, 68, 0.8)',
+                                    fontFamily: 'monospace'
+                                  }}>
+                                    {eventCountdown.days.toString().padStart(2, '0')}
+                                  </p>
+                                </div>
+                                <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wide">Days</p>
+                              </div>
+                              <span className="text-xl text-red-500 font-bold">:</span>
+                              {/* Hours */}
+                              <div className="text-center">
+                                <div className="bg-black/50 rounded p-2 min-w-[50px] border border-red-500/50">
+                                  <p className="text-2xl font-bold text-red-500 font-mono leading-none" style={{ 
+                                    textShadow: '0 0 15px rgba(239, 68, 68, 0.8)',
+                                    fontFamily: 'monospace'
+                                  }}>
+                                    {eventCountdown.hours.toString().padStart(2, '0')}
+                                  </p>
+                                </div>
+                                <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wide">Hrs</p>
+                              </div>
+                              <span className="text-xl text-red-500 font-bold">:</span>
+                              {/* Minutes */}
+                              <div className="text-center">
+                                <div className="bg-black/50 rounded p-2 min-w-[50px] border border-red-500/50">
+                                  <p className="text-2xl font-bold text-red-500 font-mono leading-none" style={{ 
+                                    textShadow: '0 0 15px rgba(239, 68, 68, 0.8)',
+                                    fontFamily: 'monospace'
+                                  }}>
+                                    {eventCountdown.mins.toString().padStart(2, '0')}
+                                  </p>
+                                </div>
+                                <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wide">Min</p>
+                              </div>
+                              <span className="text-xl text-red-500 font-bold">:</span>
+                              {/* Seconds */}
+                              <div className="text-center">
+                                <div className="bg-black/50 rounded p-2 min-w-[50px] border border-red-500/50">
+                                  <p className="text-2xl font-bold text-red-500 font-mono leading-none" style={{ 
+                                    textShadow: '0 0 15px rgba(239, 68, 68, 0.8)',
+                                    fontFamily: 'monospace'
+                                  }}>
+                                    {eventCountdown.secs.toString().padStart(2, '0')}
+                                  </p>
+                                </div>
+                                <p className="text-[10px] text-gray-400 mt-1 uppercase tracking-wide">Sec</p>
+                              </div>
+                            </div>
+                          </motion.div>
+                        </div>
+
+                        {/* Register Button */}
+                        <motion.a
+                          href={upcomingEvents[currentEventIndex].registration_link || '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-full"
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <div className="bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-lg p-4 text-center cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300 group">
+                            <div className="flex items-center justify-center gap-2">
+                              <span className="text-base font-bold text-white">CLICK HERE TO REGISTER</span>
+                              <motion.span
+                                className="text-xl"
+                                animate={{ x: [0, 3, 0] }}
+                                transition={{ duration: 1.5, repeat: Infinity }}
+                              >
+                                👆
+                              </motion.span>
+                            </div>
+                          </div>
+                        </motion.a>
+                      </div>
                     </div>
-                </motion.div>
-                <motion.p 
-                  className="mt-8 text-lg text-gray-300" 
-                  style={{ fontFamily: '"Orbitron", sans-serif' }}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 2.8 }}
-                >
-                    Next event: Holiday Event
-                </motion.p>
-            </motion.div>
+                      </motion.div>
+
+                      {/* Poster Slide */}
+                      <motion.div
+                        className="absolute inset-0 bg-[#1a1c3a]"
+                        style={{ width: '100%', height: '600px' }}
+                        initial={false}
+                        animate={{ x: currentSlide === 1 ? 0 : '100%' }}
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      >
+                        {/* Poster Content - Full Container */}
+                        <div className="overflow-hidden rounded-2xl" style={{ width: '100%', height: '1000px' }}>
+                          {upcomingEvents[currentEventIndex].poster_image_url ? (
+                            <img
+                              src={upcomingEvents[currentEventIndex].poster_image_url}
+                              alt="Event Poster"
+                              className="object-cover"
+                              style={{ width: '100%', height: '1000px' }}
+                            />
+                          ) : upcomingEvents[currentEventIndex].image_url ? (
+                            <img
+                              src={upcomingEvents[currentEventIndex].image_url}
+                              alt="Event Poster"
+                              className="object-cover"
+                              style={{ width: '100%', height: '1000px' }}
+                            />
+                          ) : (
+                            <div className="flex items-center justify-center bg-gradient-to-br from-[#1a1c3a] to-[#0d1b3d]" style={{ width: '100%', height: '600px' }}>
+                              <div className="text-center">
+                                <div className="text-8xl mb-4">🎪</div>
+                                <p className="text-white text-3xl font-bold">POSTER</p>
+                                <p className="text-white/70 mt-2 text-lg">Event poster will appear here</p>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+              </div>
+            </div>
+            )}
           </motion.div>
         </motion.section>
 

@@ -13,7 +13,11 @@ export default function NewEventPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [uploadingBanner, setUploadingBanner] = useState(false)
+  const [uploadingPoster, setUploadingPoster] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null)
+  const [posterPreview, setPosterPreview] = useState<string | null>(null)
   
   const [formData, setFormData] = useState({
     title: '',
@@ -23,7 +27,13 @@ export default function NewEventPage() {
     event_time: '',
     location: '',
     image_url: '',
+    banner_image_url: '',
+    poster_image_url: '',
     registration_link: '',
+    speaker: '',
+    registration_fee: 'FREE',
+    what_to_expect: '',
+    what_you_get: '',
     event_type: 'workshop',
     status: 'published',
     is_featured: false
@@ -73,6 +83,84 @@ export default function NewEventPage() {
       alert('Error uploading image')
     } finally {
       setUploading(false)
+    }
+  }
+
+  const handleBannerUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Show preview
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setBannerPreview(reader.result as string)
+    }
+    reader.readAsDataURL(file)
+
+    // Upload to server
+    try {
+      setUploadingBanner(true)
+      const formDataUpload = new FormData()
+      formDataUpload.append('file', file)
+      formDataUpload.append('bucket', 'event-images')
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formDataUpload
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setFormData(prev => ({ ...prev, banner_image_url: data.url }))
+        alert('Banner image uploaded successfully!')
+      } else {
+        alert('Failed to upload banner image: ' + data.error)
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert('Error uploading banner image')
+    } finally {
+      setUploadingBanner(false)
+    }
+  }
+
+  const handlePosterUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    // Show preview
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      setPosterPreview(reader.result as string)
+    }
+    reader.readAsDataURL(file)
+
+    // Upload to server
+    try {
+      setUploadingPoster(true)
+      const formDataUpload = new FormData()
+      formDataUpload.append('file', file)
+      formDataUpload.append('bucket', 'event-images')
+
+      const response = await fetch('/api/upload', {
+        method: 'POST',
+        body: formDataUpload
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setFormData(prev => ({ ...prev, poster_image_url: data.url }))
+        alert('Poster image uploaded successfully!')
+      } else {
+        alert('Failed to upload poster image: ' + data.error)
+      }
+    } catch (error) {
+      console.error('Upload error:', error)
+      alert('Error uploading poster image')
+    } finally {
+      setUploadingPoster(false)
     }
   }
 
@@ -238,6 +326,66 @@ export default function NewEventPage() {
             />
           </div>
 
+          {/* Speaker */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Speaker / Host
+            </label>
+            <input
+              type="text"
+              name="speaker"
+              value={formData.speaker}
+              onChange={handleChange}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2C97FF]"
+              placeholder="e.g., Dr. Jane Smith"
+            />
+          </div>
+
+          {/* Registration Fee */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Registration Fee
+            </label>
+            <input
+              type="text"
+              name="registration_fee"
+              value={formData.registration_fee}
+              onChange={handleChange}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2C97FF]"
+              placeholder="e.g., FREE or $50 or ₹500"
+            />
+          </div>
+
+          {/* What to Expect */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              What to Expect
+            </label>
+            <textarea
+              name="what_to_expect"
+              value={formData.what_to_expect}
+              onChange={handleChange}
+              rows={3}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2C97FF]"
+              placeholder="Describe what attendees can expect from this event..."
+            />
+          </div>
+
+          {/* What You Get */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              What You&apos;ll Get
+            </label>
+            <textarea
+              name="what_you_get"
+              value={formData.what_you_get}
+              onChange={handleChange}
+              rows={3}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2C97FF]"
+              placeholder="List benefits (e.g., certificate, swag, networking...)..."
+            />
+          </div>
+
           {/* Event Type */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -294,7 +442,7 @@ export default function NewEventPage() {
           {/* Image Upload */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-2">
-              Event Image
+              Event Image (Main)
             </label>
             <input
               type="file"
@@ -307,6 +455,46 @@ export default function NewEventPage() {
             {imagePreview && (
               <div className="mt-4 rounded-lg overflow-hidden border border-white/10">
                 <img src={imagePreview} alt="Preview" className="w-full h-64 object-cover" />
+              </div>
+            )}
+          </div>
+
+          {/* Banner Image Upload */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Banner Image (for event card header)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleBannerUpload}
+              disabled={uploadingBanner}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#F24DC2] file:text-white file:cursor-pointer hover:file:bg-[#d83da7]"
+            />
+            {uploadingBanner && <p className="text-yellow-400 text-sm mt-2">Uploading banner...</p>}
+            {bannerPreview && (
+              <div className="mt-4 rounded-lg overflow-hidden border border-white/10">
+                <img src={bannerPreview} alt="Banner Preview" className="w-full h-32 object-cover" />
+              </div>
+            )}
+          </div>
+
+          {/* Poster Image Upload */}
+          <div className="md:col-span-2">
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Poster Image (slides in event card)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handlePosterUpload}
+              disabled={uploadingPoster}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gradient-to-r file:from-[#F24DC2] file:to-[#2C97FF] file:text-white file:cursor-pointer hover:file:opacity-90"
+            />
+            {uploadingPoster && <p className="text-yellow-400 text-sm mt-2">Uploading poster...</p>}
+            {posterPreview && (
+              <div className="mt-4 rounded-lg overflow-hidden border border-white/10">
+                <img src={posterPreview} alt="Poster Preview" className="w-full h-64 object-cover" />
               </div>
             )}
           </div>
@@ -323,7 +511,7 @@ export default function NewEventPage() {
           </button>
           <button
             type="submit"
-            disabled={loading || uploading}
+            disabled={loading || uploading || uploadingBanner || uploadingPoster}
             className="px-8 py-3 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] text-white rounded-lg hover:opacity-90 transition-all font-bold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Creating...' : '✨ Create Event'}
