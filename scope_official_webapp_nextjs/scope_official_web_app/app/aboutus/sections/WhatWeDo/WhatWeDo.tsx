@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import styles from "./WhatWeDo.module.css";
 import SectionTitle from "../../components/SectionTitle/SectionTitle";
 import FeatureCard from "../../components/FeatureCard/FeatureCard";
@@ -59,9 +60,11 @@ const WhatWeDo: React.FC = () => {
       {/* --- Enhanced Call to Action --- */}
       <div className={styles.callToActionContainer}>
         <h3 className={styles.ctaTitle}>READY TO GET STARTED?</h3>
-        <button className={styles.ctaButton}>
-          JOIN OUR COMMUNITY
-        </button>
+        <Link href="/#faq">
+          <button className={styles.ctaButton}>
+            JOIN OUR COMMUNITY
+          </button>
+        </Link>
         <p className={styles.ctaTagline}>
           Become part of a vibrant community of innovators, creators, and tech enthusiasts 
           shaping the future together.

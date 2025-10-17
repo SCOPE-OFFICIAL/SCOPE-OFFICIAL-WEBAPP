@@ -56,7 +56,7 @@ export default function AdminFAQPage() {
     }
   }
 
-  const handleDeleteQuestion = async (id: number) => {
+  const handleDeleteQuestion = async (id: string) => {
     if (!confirm('Delete this question?')) return
 
     try {
@@ -75,7 +75,15 @@ export default function AdminFAQPage() {
       return
     }
 
+    if (!question.user_email) {
+      const confirmed = confirm(
+        'This user did not provide an email address. The answer will be published but no email notification will be sent. Continue?'
+      )
+      if (!confirmed) return
+    }
+
     try {
+      // Update question status
       const res = await fetch('/api/user-questions', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -84,15 +92,48 @@ export default function AdminFAQPage() {
           answer,
           status: 'answered',
           is_public: true,
-          answered_by: 'Admin'
+          answered_by: 'SCOPE Admin'
         }),
       })
 
       if (res.ok) {
+        // Send email notification if user provided email
+        if (question.user_email) {
+          try {
+            const emailRes = await fetch('/api/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                to: question.user_email,
+                userName: question.user_name || 'User',
+                question: question.question,
+                answer: answer,
+                answeredBy: 'SCOPE Admin'
+              }),
+            })
+
+            if (emailRes.ok) {
+              alert('✅ Answer published and email notification sent successfully!')
+            } else {
+              const errorData = await emailRes.json()
+              console.error('Email error:', errorData)
+              alert('✅ Answer published, but email notification failed. Please check SMTP configuration.')
+            }
+          } catch (emailError) {
+            console.error('Email sending error:', emailError)
+            alert('✅ Answer published, but email notification failed to send.')
+          }
+        } else {
+          alert('✅ Answer published successfully!')
+        }
+        
         fetchData()
+      } else {
+        alert('Failed to publish answer. Please try again.')
       }
     } catch (error) {
       console.error('Error publishing question:', error)
+      alert('An error occurred. Please try again.')
     }
   }
 
@@ -291,7 +332,7 @@ function UserQuestionCard({
   question: UserQuestion
   index: number
   onPublish: (question: UserQuestion, answer: string) => void
-  onDelete: (id: number) => void
+  onDelete: (id: string) => void
 }) {
   const [isAnswering, setIsAnswering] = useState(false)
   const [answer, setAnswer] = useState(question.answer || '')

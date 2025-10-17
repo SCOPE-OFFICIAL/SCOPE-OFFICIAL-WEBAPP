@@ -63,12 +63,6 @@ export default function AboutUs() {
           />
         ))}
       </div>
-      
-      <div className={styles.ctaWrapper}>
-        <a href="#what-we-offer" className={styles.ctaButton}>
-          LEARN MORE ABOUT OUR PROGRAMS
-        </a>
-      </div>
     </div>
   );
 }

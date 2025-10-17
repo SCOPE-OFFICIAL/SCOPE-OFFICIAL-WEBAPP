@@ -901,24 +901,6 @@ const Gallery: React.FC = () => {
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Bottom CTA Section - Only show when viewing folders */}
-        {!selectedFolder && (
-          <motion.div 
-            className="text-center mt-16"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <AnimatedButton
-              variant="primary"
-              size="lg"
-              className="px-10 py-4 text-lg"
-            >
-              View All Projects
-            </AnimatedButton>
-          </motion.div>
-        )}
       </div>
       </div>
 

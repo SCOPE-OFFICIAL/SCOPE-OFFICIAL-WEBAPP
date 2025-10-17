@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 // Type for Event from database
@@ -821,21 +822,23 @@ export default function HomePage() {
             </motion.button>
           </motion.div>
 
-          <motion.button 
-            className="mt-12 bg-[#004c94] hover:bg-[#003E7A] border-[#004c94] px-6 py-3 rounded-full font-bold text-white"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, delay: 0.5 }}
-            viewport={{ once: true }}
-            whileHover={{ 
-              scale: 1.05,
-              backgroundColor: "#003E7A",
-              transition: { duration: 0.2 }
-            }}
-            whileTap={{ scale: 0.95 }}
-          >
-            KNOW MORE
-          </motion.button>
+          <Link href="/#gallery">
+            <motion.button 
+              className="mt-12 bg-[#004c94] hover:bg-[#003E7A] border-[#004c94] px-6 py-3 rounded-full font-bold text-white"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.5 }}
+              viewport={{ once: true }}
+              whileHover={{ 
+                scale: 1.05,
+                backgroundColor: "#003E7A",
+                transition: { duration: 0.2 }
+              }}
+              whileTap={{ scale: 0.95 }}
+            >
+              KNOW MORE
+            </motion.button>
+          </Link>
         </motion.section>
       </main>
 
