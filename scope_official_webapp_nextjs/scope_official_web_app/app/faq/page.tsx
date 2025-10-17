@@ -330,6 +330,7 @@ export default function FaqPage() {
                   className="bg-green-900/30 border border-green-600 rounded-lg p-4 mb-4"
                 >
                   <p className="text-green-300 font-semibold">✅ Your question has been submitted! We&apos;ll review and answer it soon.</p>
+                  <p className="text-green-200 text-sm mt-2">📧 If you provided an email, check your inbox (and spam folder) for our response!</p>
                 </motion.div>
               )}
 
@@ -389,6 +390,10 @@ export default function FaqPage() {
                   placeholder="Ask your question..."
                   className="w-full bg-gray-200 rounded-lg border border-transparent focus:border-blue-400 focus:ring-0 px-4 py-3 text-black placeholder-gray-500 transition-all duration-300"
                 />
+                <p className="text-gray-400 text-xs mt-2">
+                  💡 Tip: If you provide your email, we&apos;ll send you a notification when your question is answered. 
+                  <span className="text-yellow-400"> Remember to check your spam folder</span> and mark our email as &quot;Not Spam&quot;!
+                </p>
               </div>
 
               <AnimatedButton

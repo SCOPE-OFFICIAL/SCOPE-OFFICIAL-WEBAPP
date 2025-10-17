@@ -12,7 +12,7 @@ const createTransporter = () => {
   // For Gmail (you'll need to enable "Less secure app access" or use App Password)
   // For production, use a service like SendGrid, Postmark, or Resend
   
-  return nodemailer.createTransporter({
+  return nodemailer.createTransport({
     host: process.env.SMTP_HOST || 'smtp.gmail.com',
     port: parseInt(process.env.SMTP_PORT || '587'),
     secure: false, // true for 465, false for other ports
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if SMTP credentials are configured
-    if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASS || !process.env.SMTP_FROM_EMAIL) {
       console.error('SMTP credentials not configured')
       return NextResponse.json(
         { error: 'Email service not configured. Please contact administrator.' },
@@ -199,8 +199,8 @@ export async function POST(request: NextRequest) {
 
     const mailOptions = {
       from: {
-        name: 'SCOPE - Society of Core Oriented Projects',
-        address: process.env.SMTP_USER!
+        name: process.env.SMTP_FROM_NAME || 'SCOPE - Society of Core Oriented Projects',
+        address: process.env.SMTP_FROM_EMAIL
       },
       to: to,
       subject: '✅ Your Question Has Been Answered - SCOPE',
