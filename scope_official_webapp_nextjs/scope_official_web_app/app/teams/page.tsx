@@ -154,43 +154,44 @@ export default function TeamPage() {
       <motion.section 
         className="our-team-section"
         initial={{ opacity: 0, y: 100 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -100 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
-        viewport={{ margin: "-150px" }}
       >
         {/* Left: Heading and paragraph */}
         <motion.div 
           className="intro-text"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -50 }}
-          transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
-          viewport={{ margin: "-150px" }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-100px" }}
         >
-          <h1 className="section-title"> OUR TEAM</h1>
-          <p className="section-subtitle">
+          <motion.h1 
+            className="section-title"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            OUR TEAM
+          </motion.h1>
+          <motion.p 
+            className="section-subtitle"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.4 }}
+            viewport={{ once: true, margin: "-100px" }}
+          >
             Introducing the core members of SCOPE and their respectful roles.
-          </p>
+          </motion.p>
         </motion.div>
 
         {/* Faculty Coordinator Card - Same size as other team cards */}
-        <motion.div 
+        <div 
           className="faculty-coordinator-container" 
           style={{ display: 'flex', justifyContent: 'center', marginBottom: '3rem', marginTop: '2rem' }}
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -50 }}
-          transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
-          viewport={{ margin: "-150px" }}
         >
-          <motion.div 
+          <div 
             className="team-member-wrapper"
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
-            viewport={{ margin: "-150px" }}
           >
             <div className="member-text-top">
               <h2 className="member-role">FACULTY COORDINATOR</h2>
@@ -228,33 +229,14 @@ export default function TeamPage() {
                 </a>
               </div>
             </motion.div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
         
         {/* Right: Image */}
           
-        <motion.div 
-          className="team-grid"
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
-          viewport={{ margin: "-150px" }}
-        >
+        <div className="team-grid">
           {teamMembers.map((member, index) => (
-            <motion.div 
-              className="team-member-wrapper" 
-              key={index}
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              transition={{ 
-                duration: 0.4, 
-                ease: "easeOut", 
-                delay: 0.3 + (index * 0.05) 
-              }}
-              viewport={{ margin: "-150px" }}
-            >
+            <div className="team-member-wrapper" key={index}>
               <div className="member-text-top">
                 <h2 className="member-role">{member.role}</h2>
                 <p className="member-name">{member.name}</p>
@@ -291,9 +273,9 @@ export default function TeamPage() {
                   </a>
                 </div>
               </motion.div>
-            </motion.div>
+            </div>
           ))}
-        </motion.div>
+        </div>
       </motion.section>
 
       </motion.div>

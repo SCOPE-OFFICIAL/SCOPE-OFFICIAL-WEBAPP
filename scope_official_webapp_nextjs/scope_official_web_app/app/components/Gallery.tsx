@@ -270,10 +270,8 @@ const Gallery: React.FC = () => {
         <motion.div 
           className="text-center mb-16"
           initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          viewport={{ margin: "-150px" }}
         >
           <motion.h2 
             className="mb-6 text-center relative inline-block"
@@ -287,10 +285,8 @@ const Gallery: React.FC = () => {
               paddingLeft: '40px'
             }}
             initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            viewport={{ margin: "-150px" }}
           >
             <span 
               className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-7 rounded"
@@ -303,10 +299,8 @@ const Gallery: React.FC = () => {
           <motion.p 
             className="text-xl text-gray-300 max-w-3xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ margin: "-150px" }}
           >
             Explore our innovative projects and cutting-edge research across multiple domains
           </motion.p>
@@ -612,12 +606,10 @@ const Gallery: React.FC = () => {
         {/* Bottom CTA Section - Only show when viewing folders */}
         {!selectedFolder && (
           <motion.div 
-            className="text-center mt-20"
+            className="text-center mt-16"
             initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            viewport={{ margin: "-150px" }}
           >
             <AnimatedButton
               variant="primary"

@@ -255,10 +255,8 @@ export default function FaqPage() {
               letterSpacing: '2px'
             }}
             initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -40 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            viewport={{ margin: "-150px" }}
           >
             Frequently Asked Questions
           </motion.h1>
@@ -288,10 +286,8 @@ export default function FaqPage() {
                 key={index}
                 className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 overflow-hidden"
                 initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -50 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 * index }}
-                viewport={{ margin: "-150px" }}
                 whileHover={{ 
                   backgroundColor: "rgba(255, 255, 255, 0.08)",
                   borderColor: "rgba(242, 77, 194, 0.3)"

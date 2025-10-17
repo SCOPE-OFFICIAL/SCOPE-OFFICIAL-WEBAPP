@@ -137,22 +137,19 @@ export default function HomePage() {
         <motion.section 
           className="py-16 px-6 bg-[#040A28] text-white relative"
           initial={{ opacity: 0, y: 100 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -100 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ 
             duration: 0.8, 
             ease: "easeOut",
             type: "tween"
           }}
-          viewport={{ margin: "-200px" }}
         >
           {/* Smooth Section Divider */}
           <motion.div
             className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#F24DC2] to-transparent mb-16"
             initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
+            animate={{ scaleX: 1 }}
             transition={{ duration: 1.2, delay: 0.2 }}
-            viewport={{ once: true }}
           />
           
           {/* Updated Typography to Match Past Events */}
@@ -164,18 +161,16 @@ export default function HomePage() {
               fontFamily: '"Orbitron", sans-serif'
             }}
             initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
-            viewport={{ once: true }}
           >
             UPCOMING EVENTS
           </motion.h2>
           <motion.div 
             className="grid grid-cols-1 md:grid-cols-2 gap-1 items-center justify-center"
             initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            viewport={{ once: true }}
           >
             {/* 🔷 Honeycomb Hexagon Layout with Smooth Animations */}
             <div className="flex flex-col items-center gap-6 -mt-10">
@@ -193,22 +188,20 @@ export default function HomePage() {
               <motion.div 
                 className="flex justify-center gap-1"
                 initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 0.8 }}
-                viewport={{ once: true }}
               >
                 {paddedEvents.slice(0, 3).map((event, index) => (
                   <motion.div 
                     key={index} 
                     className="relative"
                     initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ 
                       duration: 0.6, 
                       delay: 1.0 + (index * 0.1),
                       ease: "easeOut"
                     }}
-                    viewport={{ once: true }}
                     whileHover={{ 
                       scale: 1.05,
                       transition: { duration: 0.2 }
@@ -241,22 +234,20 @@ export default function HomePage() {
               <motion.div 
                 className="flex justify-center gap-1 -mt-12"
                 initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 1.3 }}
-                viewport={{ once: true }}
               >
                 {paddedEvents.slice(0, 2).map((event, index) => (
                   <motion.div 
                     key={index} 
                     className="relative"
                     initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ 
                       duration: 0.6, 
                       delay: 1.5 + (index * 0.1),
                       ease: "easeOut"
                     }}
-                    viewport={{ once: true }}
                     whileHover={{ 
                       scale: 1.05,
                       transition: { duration: 0.2 }
@@ -283,22 +274,20 @@ export default function HomePage() {
               <motion.div 
                 className="flex justify-center gap-1 -mt-12"
                 initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.6, delay: 1.7 }}
-                viewport={{ once: true }}
               >
                 {paddedEvents.slice(0, 3).map((event, index) => (
                   <motion.div 
                     key={index} 
                     className="relative"
                     initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    animate={{ opacity: 1, y: 0 }}
                     transition={{ 
                       duration: 0.6, 
                       delay: 1.9 + (index * 0.1),
                       ease: "easeOut"
                     }}
-                    viewport={{ once: true }}
                     whileHover={{ 
                       scale: 1.05,
                       transition: { duration: 0.2 }
@@ -330,14 +319,13 @@ export default function HomePage() {
             <motion.div 
               className="flex flex-col items-center justify-center mt-10 md:mt-0"
               initial={{ opacity: 0, scale: 0.5 }}
-              whileInView={{ opacity: 1, scale: 1 }}
+              animate={{ opacity: 1, scale: 1 }}
               transition={{ 
                 duration: 1.0, 
                 delay: 2.2,
                 type: "spring",
                 stiffness: 100
               }}
-              viewport={{ once: true }}
             >
                 <motion.div 
                   className="relative w-[350px] h-[350px] md:w-[450px] md:h-[450px] rounded-full flex items-center justify-center border-0 border-[#550231] shadow-[0_0_80px_30px_#560C4B,inset_0_0_50px_15px_#560C4B] opacity-90"
@@ -378,9 +366,8 @@ export default function HomePage() {
                   className="mt-8 text-lg text-gray-300" 
                   style={{ fontFamily: '"Orbitron", sans-serif' }}
                   initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 2.8 }}
-                  viewport={{ once: true }}
                 >
                     Next event: Holiday Event
                 </motion.p>
@@ -392,21 +379,20 @@ export default function HomePage() {
         {/* Past Events Section - WITH SMOOTH ANIMATIONS */}
         <motion.section 
           className="text-center py-24 px-4 relative"
-          initial={{ opacity: 0, y: 100 }}
+          initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -100 }}
           transition={{ 
-            duration: 0.8, 
+            duration: 0.5, 
             ease: "easeOut",
             type: "tween"
           }}
-          viewport={{ margin: "-200px" }}
+          viewport={{ once: true, margin: "-150px" }}
         >
           <motion.div 
             className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#0072FF] to-transparent my-16" 
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
-            transition={{ duration: 1.2, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
             viewport={{ once: true }}
           />
           <motion.h2
@@ -416,9 +402,9 @@ export default function HomePage() {
               letterSpacing: '2px',
               fontFamily: '"Orbitron", sans-serif'
             }}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
             viewport={{ once: true }}
             whileHover={{
               scale: 1.05,
@@ -431,9 +417,9 @@ export default function HomePage() {
 
           <motion.div
             className="relative w-full max-w-6xl mx-auto"
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.5 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
             viewport={{ once: true }}
           >
             <motion.button
@@ -447,9 +433,9 @@ export default function HomePage() {
             </motion.button>
             <motion.div
               className="flex justify-center items-center relative h-[650px] overflow-visible cursor-grab active:cursor-grabbing"
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
               viewport={{ once: true }}
               onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
               onTouchEnd={(e) => {
@@ -513,7 +499,7 @@ export default function HomePage() {
             className="mt-12 bg-[#004c94] hover:bg-[#003E7A] border-[#004c94] px-6 py-3 rounded-full font-bold text-white"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.0 }}
+            transition={{ duration: 0.4, delay: 0.5 }}
             viewport={{ once: true }}
             whileHover={{ 
               scale: 1.05,

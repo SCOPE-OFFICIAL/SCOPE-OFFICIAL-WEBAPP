@@ -85,17 +85,17 @@ export default function Navigation() {
       // For scroll mode, scroll to section if we're on home page
       if (pathname === '/') {
         const sectionMap: { [key: string]: string } = {
-          '/': 'Home',
-          '/aboutus': 'About Us',
-          '/teams': 'Teams',
-          '/eventss': 'Events',
-          '/gallery': 'Gallery',
-          '/faq': 'FAQ'
+          '/': 'home',
+          '/aboutus': 'about-us',
+          '/teams': 'team',
+          '/eventss': 'events',
+          '/gallery': 'gallery',
+          '/faq': 'faq'
         };
         
-        const sectionName = sectionMap[item.href];
-        if (sectionName) {
-          scrollToSection(sectionName);
+        const sectionId = sectionMap[item.href];
+        if (sectionId) {
+          scrollToSection(sectionId);
         }
       } else {
         // If not on home page, navigate to home first

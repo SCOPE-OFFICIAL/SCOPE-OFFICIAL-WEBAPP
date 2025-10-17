@@ -71,7 +71,114 @@
   align-items: center;
   text-align: center;
   margin-top: 100px;
+  margin-bottom: 80px; /* Reduced to accommodate separator */
   position: relative;
+}
+
+/* --- Section Separator Styles --- */
+.sectionSeparator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 80px auto 80px;
+  max-width: 600px;
+  gap: 20px;
+  opacity: 0.7;
+}
+
+.separatorLine {
+  flex: 1;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    transparent 0%,
+    rgba(242, 77, 194, 0.5) 20%,
+    rgba(138, 64, 255, 0.8) 50%,
+    rgba(44, 151, 255, 0.5) 80%,
+    transparent 100%
+  );
+  position: relative;
+}
+
+.separatorLine::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent 0%,
+    rgba(242, 77, 194, 0.3) 50%,
+    transparent 100%
+  );
+  filter: blur(8px);
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+.separatorDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #F24DC2 0%, #8a40ff 50%, #2C97FF 100%);
+  box-shadow: 
+    0 0 20px rgba(242, 77, 194, 0.6),
+    0 0 40px rgba(138, 64, 255, 0.4),
+    0 0 60px rgba(44, 151, 255, 0.3);
+  animation: dotPulse 2s ease-in-out infinite;
+  position: relative;
+}
+
+.separatorDot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(242, 77, 194, 0.3) 0%, transparent 70%);
+  animation: dotRipple 2s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 
+      0 0 20px rgba(242, 77, 194, 0.6),
+      0 0 40px rgba(138, 64, 255, 0.4),
+      0 0 60px rgba(44, 151, 255, 0.3);
+  }
+  50% {
+    transform: scale(1.2);
+    box-shadow: 
+      0 0 30px rgba(242, 77, 194, 0.8),
+      0 0 50px rgba(138, 64, 255, 0.6),
+      0 0 70px rgba(44, 151, 255, 0.5);
+  }
+}
+
+@keyframes dotRipple {
+  0% {
+    width: 24px;
+    height: 24px;
+    opacity: 0.6;
+  }
+  100% {
+    width: 48px;
+    height: 48px;
+    opacity: 0;
+  }
 }
 
 .ctaTitle {
@@ -182,6 +289,16 @@
   .ctaTagline {
     font-size: 16px;
   }
+
+  .sectionSeparator {
+    max-width: 400px;
+    margin: 60px auto 60px;
+  }
+
+  .separatorDot {
+    width: 10px;
+    height: 10px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -201,5 +318,16 @@
   .ctaButton {
     font-size: 16px;
     padding: 12px 30px;
+  }
+
+  .sectionSeparator {
+    max-width: 300px;
+    margin: 50px auto 50px;
+    gap: 15px;
+  }
+
+  .separatorDot {
+    width: 8px;
+    height: 8px;
   }
 }

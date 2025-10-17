@@ -157,48 +157,44 @@ function UnifiedScroll() {
         <div className="relative z-10">
           {/* Section 1: Home */}
           <motion.div 
+            id="home"
             className="min-h-screen"
             initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            viewport={{ margin: "-200px" }}
           >
             <OriginalHomePage />
           </motion.div>
 
           {/* Section 2: Events */}
           <motion.div 
+            id="events"
             className="min-h-screen"
             initial={{ opacity: 0, y: 100 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -100 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-            viewport={{ margin: "-200px" }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
           >
             <EventsPage />
           </motion.div>
 
           {/* Section 3: About Us */}
           <motion.div 
+            id="about-us"
             className="min-h-screen"
             initial={{ opacity: 0, y: 100 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -100 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-            viewport={{ margin: "-200px" }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
           >
             <AboutUsPage />
           </motion.div>
 
           {/* Section 4: Teams */}
           <motion.div 
+            id="team"
             className="min-h-screen"
             initial={{ opacity: 0, y: 100 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -100 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-            viewport={{ margin: "-200px" }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.6 }}
           >
             <TeamsPage />
           </motion.div>
@@ -207,22 +203,19 @@ function UnifiedScroll() {
           <motion.div 
             className="min-h-screen"
             initial={{ opacity: 0, y: 100 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -100 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-            viewport={{ margin: "-200px" }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.8 }}
           >
             <TeamMembers />
           </motion.div>
 
           {/* Section 6: Gallery */}
           <motion.div 
+            id="gallery"
             className="min-h-screen"
             initial={{ opacity: 0, y: 100 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -100 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-            viewport={{ margin: "-200px" }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 1.0 }}
           >
             <Gallery />
           </motion.div>
@@ -231,11 +224,11 @@ function UnifiedScroll() {
 
       {/* Section 7: FAQ - Smooth Animation */}
       <motion.div 
+        id="faq"
         className="min-h-screen"
         initial={{ opacity: 0, y: 100 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 0.1 }}
-        viewport={{ once: true, margin: "-100px" }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut", delay: 1.2 }}
       >
         <FaqPage />
       </motion.div>

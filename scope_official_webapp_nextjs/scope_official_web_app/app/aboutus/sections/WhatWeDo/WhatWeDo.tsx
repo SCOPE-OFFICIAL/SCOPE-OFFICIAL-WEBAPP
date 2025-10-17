@@ -67,6 +67,13 @@ const WhatWeDo: React.FC = () => {
           shaping the future together.
         </p>
       </div>
+
+      {/* Decorative Separator Line */}
+      <div className={styles.sectionSeparator}>
+        <div className={styles.separatorLine}></div>
+        <div className={styles.separatorDot}></div>
+        <div className={styles.separatorLine}></div>
+      </div>
     </div>
   );
 };
