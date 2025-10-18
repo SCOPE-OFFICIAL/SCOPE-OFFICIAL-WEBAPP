@@ -46,8 +46,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (upcoming === 'true') {
-      const today = new Date().toISOString().split('T')[0]
-      query = query.gte('event_date', today).eq('status', 'published')
+      // When requesting upcoming events, we'll fetch published events and
+      // perform a full datetime filter server-side using event_date + event_time.
+      // This is more accurate than date-only comparisons and handles events
+      // with specific times (and timezone differences).
+      query = query.eq('status', 'published')
     }
 
     const { data, error } = await query
@@ -57,7 +60,39 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ events: data }, { status: 200 })
+    // If the client requested upcoming events, filter them by full datetime
+    // (event_date + event_time). This ensures that events on previous dates
+    // (e.g., yesterday) are excluded even if their date string comparison
+    // might be ambiguous due to timezone differences.
+    type ApiEvent = {
+      event_date?: string | null
+      event_time?: string | null
+      [key: string]: unknown
+    }
+
+    let events: ApiEvent[] = (data || []) as ApiEvent[]
+    if (upcoming === 'true') {
+      const now = Date.now()
+      events = events.filter((ev) => {
+        try {
+          const datePart = (ev.event_date as string) || ''
+          const timePart = (ev.event_time as string) || '00:00:00'
+          const dt = new Date(`${datePart}T${timePart}`)
+          return dt.getTime() >= now
+        } catch {
+          return false
+        }
+      })
+
+      // Sort by ascending datetime just in case
+      events = events.sort((a, b) => {
+        const aTime = new Date(`${(a.event_date as string) || ''}T${(a.event_time as string) || '00:00:00'}`).getTime()
+        const bTime = new Date(`${(b.event_date as string) || ''}T${(b.event_time as string) || '00:00:00'}`).getTime()
+        return aTime - bTime
+      })
+    }
+
+    return NextResponse.json({ events }, { status: 200 })
   } catch (error) {
     console.error('API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
