@@ -82,22 +82,22 @@ export default function TeamPage() {
       {/* --- Main Our Team Section --- */}
       <motion.section 
         className="our-team-section"
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         {/* Left: Heading and paragraph */}
         <motion.div 
           className="intro-text"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true, margin: "-100px" }}
         >
           <motion.h1 
             className="section-title"
-            initial={{ opacity: 0, scale: 0.8 }}
-            whileInView={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
             viewport={{ once: true, margin: "-100px" }}
           >
@@ -105,8 +105,8 @@ export default function TeamPage() {
           </motion.h1>
           <motion.p 
             className="section-subtitle"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.4 }}
             viewport={{ once: true, margin: "-100px" }}
           >
@@ -130,6 +130,10 @@ export default function TeamPage() {
               <motion.div 
                 className="team-member-card"
                 whileHover={{ y: -10, transition: { duration: 0.3 } }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                viewport={{ once: true, margin: "-100px" }}
               >
                 <div className="member-image-background">
                   {facultyCoordinator.photo_url ? (
@@ -206,8 +210,8 @@ export default function TeamPage() {
                 <motion.div 
                   className="team-member-card"
                   whileHover={{ y: -10, transition: { duration: 0.3 } }}
-                  initial={{ opacity: 0, y: 50 }}
-                  whileInView={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
                   transition={{ duration: 0.5, delay: index * 0.05 }}
                   viewport={{ once: true, margin: "-50px" }}
                 >
