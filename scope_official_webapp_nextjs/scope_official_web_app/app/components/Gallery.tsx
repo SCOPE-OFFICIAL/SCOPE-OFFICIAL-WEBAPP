@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 import AnimatedButton from './AnimatedButton';
 
@@ -38,52 +38,53 @@ const Gallery: React.FC = () => {
   const [folderCards, setFolderCards] = useState<FolderData[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const reduceMotion = useReducedMotion();
 
   // Folder metadata (static descriptions)
-  const folderMetadata: { [key: string]: any } = {
-    'MATLAB': {
-      title: 'MATLAB WORKSHOP',
-      subtitle: 'Learn, Analyze, Innovate with MATLAB workshops and training sessions',
-      description: 'Our MATLAB workshop series is designed to empower students and professionals with comprehensive knowledge of MATLAB programming and its applications. These intensive sessions cover everything from basic programming concepts to advanced data analysis, signal processing, and simulation techniques.',
-      eventDetails: {
-        date: 'March 15-16, 2024',
-        duration: '2 Days',
-        participants: '50+ Students',
-        topics: ['MATLAB Fundamentals', 'Data Visualization', 'Signal Processing', 'Simulink Basics', 'Real-world Applications']
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const folderMetadata: { [key: string]: any } = useMemo(() => ({
+      MATLAB: {
+        title: 'MATLAB WORKSHOP',
+        subtitle: 'Learn, Analyze, Innovate with MATLAB workshops and training sessions',
+        description:
+          'Our MATLAB workshop series is designed to empower students and professionals with comprehensive knowledge of MATLAB programming and its applications. These intensive sessions cover everything from basic programming concepts to advanced data analysis, signal processing, and simulation techniques.',
+        eventDetails: {
+          date: 'March 15-16, 2024',
+          duration: '2 Days',
+          participants: '50+ Students',
+          topics: [
+            'MATLAB Fundamentals',
+            'Data Visualization',
+            'Signal Processing',
+            'Simulink Basics',
+            'Real-world Applications'
+          ]
+        },
+        gradient: 'from-blue-600 via-indigo-600 to-purple-600'
       },
-      gradient: 'from-blue-600 via-indigo-600 to-purple-600',
-    },
-    'ATLASSIAN': {
-      title: 'ATLASSIAN WORKSHOP',
-      subtitle: 'Master project management and collaboration with Atlassian tools',
-      description: 'The Atlassian workshop series introduces students to industry-standard project management and collaboration tools used by leading technology companies worldwide. Through comprehensive training sessions, participants learn to effectively use Jira for project tracking, Confluence for documentation and knowledge sharing, and Bitbucket for version control.',
-      eventDetails: {
-        date: 'April 20-21, 2024',
-        duration: '2 Days',
-        participants: '40+ Students',
-        topics: ['Jira Project Management', 'Confluence Documentation', 'Bitbucket Version Control', 'Agile Workflows', 'Team Collaboration']
-      },
-      gradient: 'from-blue-700 via-indigo-700 to-cyan-700',
-    }
-  };
+      ATLASSIAN: {
+        title: 'ATLASSIAN WORKSHOP',
+        subtitle: 'Master project management and collaboration with Atlassian tools',
+        description:
+          'The Atlassian workshop series introduces students to industry-standard project management and collaboration tools used by leading technology companies worldwide. Through comprehensive training sessions, participants learn to effectively use Jira for project tracking, Confluence for documentation and knowledge sharing, and Bitbucket for version control.',
+        eventDetails: {
+          date: 'April 20-21, 2024',
+          duration: '2 Days',
+          participants: '40+ Students',
+          topics: [
+            'Jira Project Management',
+            'Confluence Documentation',
+            'Bitbucket Version Control',
+            'Agile Workflows',
+            'Team Collaboration'
+          ]
+        },
+        gradient: 'from-blue-700 via-indigo-700 to-cyan-700'
+      }
+    }), []);
 
   // Fetch gallery images from database
-  useEffect(() => {
-    fetchGalleryData();
-  }, []);
-
-  // Auto-slide carousel when there are more than 2 folders
-  useEffect(() => {
-    if (folderCards.length > 2 && !selectedFolder) {
-      const interval = setInterval(() => {
-        setCurrentSlide((prev) => (prev + 1) % folderCards.length);
-      }, 5000); // Change slide every 5 seconds
-
-      return () => clearInterval(interval);
-    }
-  }, [folderCards.length, selectedFolder]);
-
-  const fetchGalleryData = async () => {
+  const fetchGalleryData = useCallback(async () => {
     try {
       const res = await fetch('/api/gallery');
       const data = await res.json();
@@ -154,7 +155,24 @@ const Gallery: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [folderMetadata]);
+
+  useEffect(() => {
+    fetchGalleryData();
+  }, [fetchGalleryData]);
+
+  // Auto-slide carousel when there are more than 2 folders
+  useEffect(() => {
+    if (folderCards.length > 2 && !selectedFolder) {
+      const interval = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % folderCards.length);
+      }, 5000); // Change slide every 5 seconds
+
+      return () => clearInterval(interval);
+    }
+  }, [folderCards.length, selectedFolder]);
+
+  // (fetchGalleryData is implemented above as a stable useCallback)
 
   // Check for localStorage to auto-select gallery folder
   useEffect(() => {
@@ -168,41 +186,44 @@ const Gallery: React.FC = () => {
     }
   }, []);
 
+  const getCurrentGallery = useCallback((): GalleryImage[] => {
+    const folder = folderCards.find((f) => f.id === selectedFolder);
+    return folder?.gallery || [];
+  }, [folderCards, selectedFolder]);
+
+  const getCurrentFolderData = useCallback((): FolderData | undefined => {
+    return folderCards.find((folder) => folder.id === selectedFolder);
+  }, [folderCards, selectedFolder]);
+
   // Handle keyboard events for image modal
   useEffect(() => {
-    const navigateImage = (direction: 'prev' | 'next') => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (!selectedImage) return;
-      
+
+      if (e.key === 'Escape') {
+        setSelectedImage(null);
+        return;
+      }
+
       const currentGallery = getCurrentGallery();
       const currentIndex = currentGallery.findIndex(img => img.image_url === selectedImage.image);
-      
       if (currentIndex === -1) return;
-      
-      let newIndex;
-      if (direction === 'prev') {
+
+      let newIndex: number | null = null;
+      if (e.key === 'ArrowLeft') {
         newIndex = currentIndex > 0 ? currentIndex - 1 : currentGallery.length - 1;
-      } else {
+      } else if (e.key === 'ArrowRight') {
         newIndex = currentIndex < currentGallery.length - 1 ? currentIndex + 1 : 0;
       }
-      
+
+      if (newIndex === null) return;
+
       const newImage = currentGallery[newIndex];
       const folderData = getCurrentFolderData();
       setSelectedImage({
         image: newImage.image_url,
         alt: newImage.caption || `${folderData?.title} - Photo ${newIndex + 1}`
       });
-    };
-
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!selectedImage) return;
-      
-      if (e.key === 'Escape') {
-        setSelectedImage(null);
-      } else if (e.key === 'ArrowLeft') {
-        navigateImage('prev');
-      } else if (e.key === 'ArrowRight') {
-        navigateImage('next');
-      }
     };
 
     if (selectedImage) {
@@ -216,16 +237,7 @@ const Gallery: React.FC = () => {
       document.removeEventListener('keydown', handleKeyDown);
       document.body.style.overflow = 'unset';
     };
-  }, [selectedImage, selectedFolder]);
-
-  const getCurrentGallery = (): GalleryImage[] => {
-    const folder = folderCards.find(f => f.id === selectedFolder);
-    return folder?.gallery || [];
-  };
-
-  const getCurrentFolderData = (): FolderData | undefined => {
-    return folderCards.find(folder => folder.id === selectedFolder);
-  };
+  }, [selectedImage, getCurrentGallery, getCurrentFolderData]);
 
   const navigateImage = (direction: 'prev' | 'next') => {
     if (!selectedImage) return;
@@ -288,7 +300,7 @@ const Gallery: React.FC = () => {
     <div id="gallery" className="min-h-screen py-20 px-6 relative overflow-x-hidden">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(6)].map((_, i) => {
+          {[...Array(6)].map((_, i) => {
           // Static positions that don't change on re-render - adjusted to prevent overflow
           const positions = [
             { left: '15%', top: '10%' },
@@ -310,16 +322,24 @@ const Gallery: React.FC = () => {
                 top: positions[i].top,
                 willChange: 'transform'
               }}
-              animate={{
-                x: [0, 50, 0],
-                y: [0, -50, 0],
-                rotate: [0, 180, 360],
-              }}
-              transition={{
-                duration: durations[i],
-                repeat: Infinity,
-                ease: "linear",
-              }}
+              // keep background floats very lightweight: only translate, no rotate or filter
+              animate={
+                reduceMotion
+                  ? {}
+                  : {
+                      x: [0, 40, 0],
+                      y: [0, -30, 0]
+                    }
+              }
+              transition={
+                reduceMotion
+                  ? { duration: 1 }
+                  : {
+                      duration: durations[i],
+                      repeat: Infinity,
+                      ease: "linear"
+                    }
+              }
             />
           );
         })}
@@ -486,13 +506,15 @@ const Gallery: React.FC = () => {
                               <div className="relative h-[350px] overflow-hidden">
                                 <motion.div
                                   className="absolute inset-0"
-                                  whileHover={isCenter ? { scale: 1.1 } : {}}
+                                  whileHover={isCenter ? { scale: 1.05 } : {}}
                                   transition={{ duration: 0.5 }}
                                 >
-                                  <img
+                                  <Image
                                     src={folder.image}
                                     alt={folder.title}
-                                    className="w-full h-full object-cover"
+                                    fill
+                                    className="object-cover"
+                                    sizes="(max-width: 768px) 100vw, 50vw"
                                   />
                                 </motion.div>
                                 
