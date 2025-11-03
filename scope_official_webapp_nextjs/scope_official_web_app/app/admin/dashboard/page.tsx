@@ -129,6 +129,7 @@ export default function AdminDashboard() {
     { title: 'Add New Event', href: '/admin/events/new', icon: '➕', color: 'bg-gradient-to-r from-[#F24DC2] to-[#2C97FF]' },
     { title: 'Manage Events', href: '/admin/events', icon: '📋', color: 'bg-gradient-to-r from-blue-500 to-cyan-500' },
     { title: 'Gallery', href: '/admin/gallery', icon: '🎨', color: 'bg-gradient-to-r from-green-500 to-teal-500' },
+    { title: 'Partners', href: '/admin/partners', icon: '🤝', color: 'bg-gradient-to-r from-pink-500 to-purple-500' },
     { title: 'Team', href: '/admin/team', icon: '👥', color: 'bg-gradient-to-r from-purple-500 to-pink-500' },
     { title: 'Group Photos', href: '/admin/team/group-photos', icon: '📸', color: 'bg-gradient-to-r from-teal-500 to-green-500' },
     { title: 'FAQ', href: '/admin/faq', icon: '❓', color: 'bg-gradient-to-r from-orange-500 to-red-500' }

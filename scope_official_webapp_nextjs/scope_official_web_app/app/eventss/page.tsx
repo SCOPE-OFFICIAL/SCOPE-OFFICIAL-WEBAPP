@@ -49,15 +49,25 @@ export default function HomePage() {
   // Fetch upcoming events from API
   useEffect(() => {
     async function fetchEvents() {
+      const start = Date.now()
       try {
         setLoading(true)
-        const response = await fetch('/api/events?upcoming=true&status=published')
+  // Allow a quick dev/admin preview mode if ?preview=true is present in the URL
+  const params = (typeof window !== 'undefined') ? new URLSearchParams(window.location.search) : new URLSearchParams('')
+  const preview = params.get('preview') === 'true'
+  // If preview mode is enabled, request the API with preview=true so the server
+  // returns events regardless of status/upcoming filters (admin/dev only)
+  const url = preview ? '/api/events?preview=true' : '/api/events?upcoming=true&status=published'
+  const response = await fetch(url)
         
         if (!response.ok) {
           throw new Error('Failed to fetch events')
         }
         
-        const data = await response.json()
+  const data = await response.json()
+  // Debug: log the raw API response to help diagnose why no events are shown
+  console.debug('Events API response:', data)
+  if (preview) console.info('Events preview mode: showing events regardless of status (preview=true)')
         setUpcomingEvents(data.events || [])
         
         // Select a random event on initial load
@@ -71,7 +81,11 @@ export default function HomePage() {
         // Fallback to empty array
         setUpcomingEvents([])
       } finally {
-        setLoading(false)
+        // Ensure the loading spinner is visible for at least 800ms so users notice it
+        const elapsed = Date.now() - start
+        const minDelay = 800
+        const remaining = Math.max(0, minDelay - elapsed)
+        setTimeout(() => setLoading(false), remaining)
       }
     }
 
@@ -216,27 +230,44 @@ export default function HomePage() {
     };
   }, []);
 
-  const handlePrev = () => {
+  const handlePrev = React.useCallback(() => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setCurrentIndex((prevIndex) =>
       prevIndex === 0 ? pastEvents.length - 1 : prevIndex - 1
     );
     setTimeout(() => setIsTransitioning(false), 600);
-  };
+  }, [isTransitioning, pastEvents.length]);
 
-  const handleNext = () => {
+  const handleNext = React.useCallback(() => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setCurrentIndex((prevIndex) =>
       prevIndex === pastEvents.length - 1 ? 0 : prevIndex + 1
     );
     setTimeout(() => setIsTransitioning(false), 600);
-  };
+  }, [isTransitioning, pastEvents.length]);
 
   const handleImageClick = (index: number) => {
     setCurrentIndex(index);
   };
+
+  // Auto-advance Past Events every 5 seconds.
+  // Pause while the user is hovering or while a transition is in progress.
+  useEffect(() => {
+    if (!pastEvents || pastEvents.length <= 1) return;
+
+    const AUTO_MS = 5000;
+    const id = setInterval(() => {
+      // Respect user interactions
+      if (isTransitioning) return;
+      if (hoverIndex !== null) return;
+
+      handleNext();
+    }, AUTO_MS);
+
+    return () => clearInterval(id);
+  }, [pastEvents, pastEvents.length, isTransitioning, hoverIndex, handleNext]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#040a28] via-[#0d1b3d] to-[#040a28] text-gray-200 font-sans relative overflow-hidden">
@@ -277,6 +308,10 @@ export default function HomePage() {
           >
             UPCOMING EVENTS
           </motion.h2>
+          {/* Helpful debug notice when there are no upcoming events */}
+          {!loading && upcomingEvents.length === 0 && (
+            <p className="text-center text-sm text-white-300 mb-6">No upcoming events found</p>
+          )}
           
           {/* Main Container: Hexagon + Event Card Side by Side */}
           <motion.div 
@@ -336,8 +371,16 @@ export default function HomePage() {
                       isSelected ? 'bg-pink-500 opacity-100' : 'bg-pink-500 opacity-35'
                     }`} />
                     <div className="hexagon w-40 h-44 flex items-center justify-center text-center text-sm p-4 bg-[#1a1c3a] text-white relative m-[2px]">
+                      {/* subtle overlay when there's an event */}
                       {hasEvent && (
                         <div className="hexagon w-full h-full bg-white absolute inset-0 opacity-10" />
+                      )}
+
+                      {/* Loading spinner shown while fetching data */}
+                      {loading && (
+                        <div className="absolute inset-0 flex items-center justify-center z-20">
+                          <div className="w-10 h-10 border-4 border-white/30 border-t-transparent rounded-full animate-spin" />
+                        </div>
                       )}
                       <div className="flex flex-col items-center relative z-10">
                         {hasEvent && (
@@ -347,6 +390,13 @@ export default function HomePage() {
                               <p className="text-gray-300 text-xs mt-1">{event.date}</p>
                             )}
                           </>
+                        )}
+
+                        {/* Fallback for empty hexagon when not loading */}
+                        {!hasEvent && !loading && (
+                          <div className="absolute inset-0 flex items-center justify-center z-10 text-gray-400 text-xs opacity-90 animate-pulse">
+                            Coming Soon
+                          </div>
                         )}
                       </div>
                     </div>
@@ -395,12 +445,26 @@ export default function HomePage() {
                     }`} />
                     <div className="hexagon w-40 h-44 flex items-center justify-center text-center text-sm p-4 bg-[#1a1c3a] text-white relative m-[2px]">
                       {hasEvent && <div className="hexagon w-full h-full bg-white absolute inset-0 opacity-10" />}
+
+                      {/* Loading spinner shown while fetching data */}
+                      {loading && (
+                        <div className="absolute inset-0 flex items-center justify-center z-20">
+                          <div className="w-10 h-10 border-4 border-white/30 border-t-transparent rounded-full animate-spin" />
+                        </div>
+                      )}
                       <div className="flex flex-col items-center relative z-10">
                         {hasEvent && (
                           <>
                             <p className="font-semibold">{event.title}</p>
                             {event.date && <p className="text-gray-300 text-xs mt-1">{event.date}</p>}
                           </>
+                        )}
+
+                        {/* Fallback for empty hexagon when not loading */}
+                        {!hasEvent && !loading && (
+                          <div className="absolute inset-0 flex items-center justify-center z-10 text-gray-400 text-xs opacity-90 animate-pulse">
+                            Coming Soon
+                          </div>
                         )}
                       </div>
                     </div>
@@ -451,12 +515,26 @@ export default function HomePage() {
                       {hasEvent && (
                         <div className="hexagon w-full h-full bg-white absolute inset-0 opacity-10" />
                       )}
+
+                      {/* Loading spinner shown while fetching data */}
+                      {loading && (
+                        <div className="absolute inset-0 flex items-center justify-center z-20">
+                          <div className="w-10 h-10 border-4 border-white/30 border-t-transparent rounded-full animate-spin" />
+                        </div>
+                      )}
                       <div className="flex flex-col items-center relative z-10">
                         {hasEvent && ( 
                           <>
                             <p className="font-semibold">{event.title}</p>
                             {event.date && <p className="text-gray-300 text-xs mt-1">{event.date}</p>}
                           </>
+                        )}
+
+                        {/* Fallback for empty hexagon when not loading */}
+                        {!hasEvent && !loading && (
+                          <div className="absolute inset-0 flex items-center justify-center z-10 text-gray-400 text-xs opacity-90 animate-pulse">
+                            Coming Soon
+                          </div>
                         )}
                       </div>
                     </div>
@@ -466,8 +544,17 @@ export default function HomePage() {
               </motion.div>
             </div>
 
-            {/* RIGHT: Event Details Card */}
-            {upcomingEvents.length > 0 && upcomingEvents[currentEventIndex] && (
+            {/* RIGHT: Event Details Card or Loading Placeholder */}
+            {loading ? (
+              <div className="flex-1 max-w-4xl flex items-center justify-center">
+                <div className="w-full max-w-2xl bg-gradient-to-br from-[#1a1c3a] via-[#0d1b3d] to-[#1a1c3a] rounded-2xl shadow-2xl border border-white/10 p-12 flex flex-col items-center gap-6">
+                  <div className="w-20 h-20 border-4 border-white/30 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-3/4 h-6 bg-white/10 rounded animate-pulse" />
+                  <div className="w-5/6 h-4 bg-white/8 rounded animate-pulse" />
+                  <div className="w-2/3 h-4 bg-white/8 rounded animate-pulse" />
+                </div>
+              </div>
+            ) : upcomingEvents.length > 0 && upcomingEvents[currentEventIndex] && (
               <div className="flex-1 max-w-4xl flex flex-col items-center justify-center gap-4">
                 {/* Event Card Container with Horizontal Sliding */}
                 <div className="relative w-full overflow-hidden">
@@ -749,15 +836,26 @@ export default function HomePage() {
             transition={{ duration: 0.5, delay: 0.3 }}
             viewport={{ once: true }}
           >
-            <motion.button
+            {/* Stable arrow buttons: CSS handles hover transform while preserving initial translate to avoid layout jumps */}
+            <style jsx>{`
+              .arrow-btn { position: absolute; top: 50%; z-index: 20; color: white; font-size: 2.2rem; padding: 0.5rem; display: none; }
+              @media (min-width: 768px) { .arrow-btn { display: block; } }
+              .arrow-btn:focus { outline: none; }
+              /* Keep the centering translate in the same rule that also applies scale on hover so transforms don't get overwritten */
+              .arrow-btn.left { left: 0; transform: translate(-50%, -50%); }
+              .arrow-btn.right { right: 0; transform: translate(50%, -50%); }
+              .arrow-btn:hover { color: #d1d5db; }
+              .arrow-btn.left:hover { transform: translate(-60%, -50%) scale(1.08); }
+              .arrow-btn.right:hover { transform: translate(60%, -50%) scale(1.08); }
+            `}</style>
+
+            <button
               onClick={handlePrev}
-              className="absolute left-0 -translate-x-1/2 top-1/2 transform -translate-y-1/2 z-20 text-5xl text-white hover:text-gray-300 px-4 hidden md:block"
-              whileHover={{ scale: 1.2, x: -10 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              className="arrow-btn left"
+              aria-label="Previous"
             >
               &lt;
-            </motion.button>
+            </button>
             <motion.div
               className="flex justify-center items-center relative h-[650px] overflow-visible cursor-grab active:cursor-grabbing"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -811,15 +909,13 @@ export default function HomePage() {
                 );
               })}
             </motion.div>
-            <motion.button
+            <button
               onClick={handleNext}
-              className="absolute right-0 translate-x-1/2 top-1/2 transform -translate-y-1/2 z-20 text-5xl text-white hover:text-gray-300 px-4 hidden md:block"
-              whileHover={{ scale: 1.2, x: 10 }}
-              whileTap={{ scale: 0.9 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              className="arrow-btn right"
+              aria-label="Next"
             >
               &gt;
-            </motion.button>
+            </button>
           </motion.div>
 
           <Link href="/#gallery">
@@ -842,7 +938,7 @@ export default function HomePage() {
         </motion.section>
       </main>
 
-      {/* Decorative Bottom-Right Circuit Image - STATIC */}
+  {/* Decorative Bottom-Right Circuit Image - STATIC */}
       <div className="absolute bottom-0 right-0 w-64 opacity-60 pointer-events-none z-0">
         <img 
           src="/images/circuit-deco.png"

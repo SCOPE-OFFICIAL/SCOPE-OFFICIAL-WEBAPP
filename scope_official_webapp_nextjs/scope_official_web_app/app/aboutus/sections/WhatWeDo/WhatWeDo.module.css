@@ -1,5 +1,5 @@
 .container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 50px 20px;
   text-align: center;
@@ -270,6 +270,7 @@
   .programsTitle {
     font-size: 28px;
     margin-bottom: 20px;
+    padding-left: 0;
   }
   
   .cardsContainer {
@@ -309,6 +310,7 @@
   
   .programsTitle {
     font-size: 24px;
+    padding-left: 0;
   }
   
   .ctaTitle {

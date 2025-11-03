@@ -26,6 +26,7 @@ export async function GET(request: NextRequest) {
     const type = searchParams.get('type') // workshop, hackathon, etc.
     const featured = searchParams.get('featured') // true/false
     const upcoming = searchParams.get('upcoming') // true for upcoming events only
+  const preview = searchParams.get('preview') // preview mode (bypass upcoming/status filters)
 
     let query = supabase
       .from('events')
@@ -45,12 +46,19 @@ export async function GET(request: NextRequest) {
       query = query.eq('is_featured', true)
     }
 
-    if (upcoming === 'true') {
-      // When requesting upcoming events, we'll fetch published events and
-      // perform a full datetime filter server-side using event_date + event_time.
-      // This is more accurate than date-only comparisons and handles events
-      // with specific times (and timezone differences).
-      query = query.eq('status', 'published')
+    // If preview mode is enabled, we allow returning events regardless of status/upcoming
+    // (useful for admin preview/testing on localhost). WARNING: exposing drafts publicly
+    // is insecure—use only for development or behind admin auth.
+    if (preview !== 'true') {
+      if (upcoming === 'true') {
+        // When requesting upcoming events, we'll fetch published events and
+        // perform a full datetime filter server-side using event_date + event_time.
+        // This is more accurate than date-only comparisons and handles events
+        // with specific times (and timezone differences).
+        query = query.eq('status', 'published')
+      }
+    } else {
+      console.warn('Events API: preview=true used — returning events without upcoming/status filtering')
     }
 
     const { data, error } = await query
@@ -71,7 +79,7 @@ export async function GET(request: NextRequest) {
     }
 
     let events: ApiEvent[] = (data || []) as ApiEvent[]
-    if (upcoming === 'true') {
+    if (upcoming === 'true' && preview !== 'true') {
       const now = Date.now()
       events = events.filter((ev) => {
         try {

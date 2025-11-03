@@ -5,12 +5,11 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import AnimatedButton from '../components/AnimatedButton';
 import FooterComponent from '../components/FooterComponent';
-import { FAQ, UserQuestion } from '@/lib/types/database';
+import { FAQ } from '@/lib/types/database';
 
 export default function FaqPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const [adminFaqs, setAdminFaqs] = useState<FAQ[]>([]);
-  const [userFaqs, setUserFaqs] = useState<UserQuestion[]>([]);
   
   // Form state
   const [formData, setFormData] = useState({
@@ -33,10 +32,7 @@ export default function FaqPage() {
       const visibleAdminFaqs = (adminData.faqs || []).filter((faq: FAQ) => faq.is_visible);
       setAdminFaqs(visibleAdminFaqs);
 
-      // Fetch public user questions
-      const userRes = await fetch('/api/user-questions?public=true');
-      const userData = await userRes.json();
-      setUserFaqs(userData.questions || []);
+  // (Intentionally do not fetch public user questions here — public FAQ displays only admin FAQs)
     } catch (error) {
       console.error('Error fetching FAQs:', error);
     }
@@ -74,20 +70,13 @@ export default function FaqPage() {
     }
   };
 
-  // Combine admin FAQs and user FAQs for display
-  const allFaqs = [
-    ...adminFaqs.map(faq => ({
-      question: faq.question,
-      answer: faq.answer,
-      type: 'admin' as const
-    })),
-    ...userFaqs.map(faq => ({
-      question: faq.question,
-      answer: faq.answer || '',
-      type: 'user' as const,
-      askedBy: faq.user_name
-    }))
-  ];
+  // Public FAQ should only display curated admin FAQs.
+  // User-submitted questions are stored separately and moderated from the admin panel.
+  const allFaqs = adminFaqs.map(faq => ({
+    question: faq.question,
+    answer: faq.answer,
+    type: 'admin' as const
+  }));
 
   const toggleFAQ = (index: number) => {
     setOpenFAQ(openFAQ === index ? null : index);
@@ -251,11 +240,6 @@ export default function FaqPage() {
                     <h3 className="text-lg font-semibold text-white">
                       {faq.question}
                     </h3>
-                    {faq.type === 'user' && faq.askedBy && (
-                      <p className="text-xs text-gray-400 mt-1">
-                        Asked by: {faq.askedBy}
-                      </p>
-                    )}
                   </div>
                   <motion.div
                     className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] flex items-center justify-center"

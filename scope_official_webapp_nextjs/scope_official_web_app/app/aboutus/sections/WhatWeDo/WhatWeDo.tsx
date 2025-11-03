@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import styles from "./WhatWeDo.module.css";
 import SectionTitle from "../../components/SectionTitle/SectionTitle";
+import Partners from '../../../components/partners';
 import FeatureCard from "../../components/FeatureCard/FeatureCard";
 
 const WhatWeDo: React.FC = () => {
@@ -57,7 +58,10 @@ const WhatWeDo: React.FC = () => {
         ))}
       </div>
 
-      {/* --- Enhanced Call to Action --- */}
+  {/* Partners slider inserted below WHAT WE OFFER */}
+  <Partners />
+
+  {/* --- Enhanced Call to Action --- */}
       <div className={styles.callToActionContainer}>
         <h3 className={styles.ctaTitle}>READY TO GET STARTED?</h3>
         <Link href="/#faq">

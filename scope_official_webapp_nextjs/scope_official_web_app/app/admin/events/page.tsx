@@ -175,7 +175,18 @@ export default function AdminEventsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {events.map((event, index) => (
+              {events.map((event, index) => {
+                // Determine if event datetime has already passed
+                const expired = (() => {
+                  try {
+                    const dt = new Date(`${event.event_date}T${event.event_time || '00:00:00'}`)
+                    return dt.getTime() < Date.now()
+                  } catch {
+                    return false
+                  }
+                })()
+
+                return (
                 <motion.div
                   key={event.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -237,6 +248,25 @@ export default function AdminEventsPage() {
                         <span className="px-2 py-1 rounded text-xs bg-blue-500/20 text-blue-400">
                           {event.event_type}
                         </span>
+                        {/* Expired tag + quick delete action for passed events */}
+                        {expired && (
+                          <div className="flex items-center gap-2 ml-2">
+                            <span
+                              title="This event's date/time has passed and it will not appear in the public upcoming events. Consider deleting it."
+                              className="px-2 py-1 rounded text-xs bg-red-500/20 text-red-400"
+                            >
+                              Expired
+                            </span>
+                            <button
+                              onClick={() => {
+                                if (confirm('This event has passed. Delete it now?')) handleDelete(event.id)
+                              }}
+                              className="text-xs underline text-red-300 hover:text-red-200"
+                            >
+                              Delete expired
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -257,7 +287,8 @@ export default function AdminEventsPage() {
                     </div>
                   </div>
                 </motion.div>
-              ))}
+              );
+              })}
             </div>
           )}
         </>
