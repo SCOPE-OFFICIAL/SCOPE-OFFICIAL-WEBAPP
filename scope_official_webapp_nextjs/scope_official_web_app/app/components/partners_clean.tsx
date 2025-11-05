@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import whatStyles from '../aboutus/sections/WhatWeDo/WhatWeDo.module.css';
-import useContinuousScroll from '../lib/useContinuousScroll.client';
+import useContinuousScroll from '../lib/useContinuousScroll';
 
 interface Partner {
   id: string;
@@ -62,7 +62,7 @@ export default function Partners() {
         <h3 className={whatStyles.programsTitle}>OUR PARTNERS</h3>
         <div className="relative overflow-hidden">
           <div ref={containerRef} id="partners-carousel" className="w-full overflow-x-hidden overflow-y-hidden" style={{ scrollBehavior: 'auto' }}>
-            <div ref={trackRef} data-repeat={repeatCount} className="flex items-center gap-6 px-6 py-4">
+            <div ref={trackRef} className="flex items-center gap-6 px-6 py-4">
               {Array.from({ length: repeatCount }).flatMap((_, r) =>
                 partners.map((p, i) => (
                   <a key={`${p.id}-${r}-${i}`} href={p.link || '#'} target="_blank" rel="noreferrer" className="flex-shrink-0 w-48 h-28 flex items-center justify-center bg-white/5 rounded-lg border border-white/10">

@@ -33,6 +33,11 @@ const SectionTitle: React.FC<SectionTitleProps> = ({
       )}
       <motion.h2 
         className={styles.title}
+        style={{
+          textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
+          letterSpacing: '2px',
+          fontFamily: '"Orbitron", sans-serif'
+        }}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}

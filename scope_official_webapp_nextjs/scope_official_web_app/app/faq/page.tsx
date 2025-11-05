@@ -190,11 +190,11 @@ export default function FaqPage() {
           <motion.h1
             className="tracking-tight"
             style={{
-              fontFamily: '"Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif',
+              fontFamily: '"Orbitron", sans-serif',
               fontSize: '3.2rem',
               fontWeight: 600,
               color: 'var(--text-light)',
-              textShadow: '0 0 20px rgba(138, 64, 255, 0.4)',
+              textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
               letterSpacing: '2px'
             }}
             initial={{ opacity: 0, y: 40 }}

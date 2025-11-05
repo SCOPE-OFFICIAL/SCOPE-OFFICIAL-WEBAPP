@@ -5,6 +5,7 @@ import ConditionalNavigation from "./components/ConditionalNavigation";
 import ConditionalFooter from "./components/ConditionalFooter";
 import { ViewModeProvider } from "./components/ViewModeContext";
 import PageTransitionWrapper from "./components/PageTransitionWrapper";
+import AnalyticsTracker from "./components/AnalyticsTracker";
 // import PixyDust from "./components/PixyDust"; // DISABLED: Custom cursor removed
 
 // Load fonts
@@ -58,6 +59,7 @@ export default function RootLayout({
       <body className="min-h-screen flex flex-col bg-[#040A28] text-white font-inter">
         <ViewModeProvider>
           {/* <PixyDust /> DISABLED: Custom blue ball cursor removed */}
+          <AnalyticsTracker />
           <ConditionalNavigation />
           
           {/* Page Content with Transition Wrapper */}

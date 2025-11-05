@@ -1,31 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { jwtVerify } from 'jose'
 
 // Server-side upload route for partner logos.
 // Expects JSON: { filename, contentType, base64 }
-// Requires header: x-admin-api-key
+// Requires JWT token from admin login
 
 const SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE_KEY
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
-const ADMIN_API_KEY = process.env.ADMIN_API_KEY || SERVICE_ROLE
+const SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'fallback-secret-key')
 
 function unauthorized() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 }
 
-export async function POST(req: NextRequest) {
-  const key = req.headers.get('x-admin-api-key')
-  // debug logging: show received admin header and env presence
+async function verifyToken(req: NextRequest): Promise<boolean> {
   try {
-    console.log('[admin/upload] incoming x-admin-api-key:', key)
-    console.log('[admin/upload] ADMIN_API_KEY configured?', !!ADMIN_API_KEY)
-    console.log('[admin/upload] SUPABASE_URL present?', !!SUPABASE_URL)
-    console.log('[admin/upload] SUPABASE_SERVICE_ROLE present?', !!SERVICE_ROLE)
-  } catch {
-    // ignore logging issues
+    const authHeader = req.headers.get('authorization')
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.warn('[admin/upload] Missing or invalid authorization header')
+      return false
+    }
+    
+    const token = authHeader.substring(7)
+    const { payload } = await jwtVerify(token, SECRET)
+    
+    if (payload.role === 'admin') {
+      return true
+    }
+    console.warn('[admin/upload] Token does not have admin role')
+    return false
+  } catch (error) {
+    console.warn('[admin/upload] Token verification failed:', error)
+    return false
   }
+}
 
-  if (!ADMIN_API_KEY || key !== ADMIN_API_KEY) {
-    console.warn('[admin/upload] unauthorized - missing or incorrect x-admin-api-key header')
+export async function POST(req: NextRequest) {
+  const isAuthorized = await verifyToken(req)
+  if (!isAuthorized) {
     return unauthorized()
   }
 

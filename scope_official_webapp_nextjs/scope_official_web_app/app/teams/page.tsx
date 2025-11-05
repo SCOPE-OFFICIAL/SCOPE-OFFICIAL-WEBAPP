@@ -96,6 +96,11 @@ export default function TeamPage() {
         >
           <motion.h1 
             className="section-title"
+            style={{
+              textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
+              letterSpacing: '2px',
+              fontFamily: '"Orbitron", sans-serif'
+            }}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Image from "next/image";
+import useContinuousScroll from "../lib/useContinuousScroll.client";
 import AnimatedButton from './AnimatedButton';
 
 interface GalleryImage {
@@ -32,6 +33,11 @@ interface FolderData {
 }
 
 const Gallery: React.FC = () => {
+  // Render repeated items so we have monotonically increasing sequence numbers
+  // Using sufficient repeats for smooth infinite scrolling
+  // The continuous scroll hook automatically wraps at 1/REPEAT of total width
+  const REPEAT = 20; // Balanced value: enough for smooth infinite scrolling, not too heavy on DOM
+
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [cameFromEvents, setCameFromEvents] = useState(false);
   const [selectedImage, setSelectedImage] = useState<{ image: string; alt: string } | null>(null);
@@ -41,9 +47,12 @@ const Gallery: React.FC = () => {
   const reduceMotion = useReducedMotion();
   const carouselRef = useRef<HTMLDivElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
-  const rafRef = useRef<number | null>(null);
+  const carouselWrapperRef = useRef<HTMLDivElement | null>(null);
+  // RAF handled by shared transform-based hook
   // RAF status badge removed from UI per request; keep logs instead
-  const manualPauseUntilRef = useRef<number>(0);
+
+  // Determine if continuous scroll should be active
+  const shouldScroll = !selectedFolder && !reduceMotion && folderCards.length > 2;
 
   // Scroll to a specific slide (center it in the viewport)
   const scrollToSlide = useCallback((index: number) => {
@@ -56,6 +65,152 @@ const Gallery: React.FC = () => {
     container.scrollTo({ left: offset, behavior: 'smooth' });
   }, []);
 
+  // Handle hover: DON'T pause auto-scroll on hover - let it keep scrolling
+  // Users can still click on cards while they're scrolling
+  // This provides a better infinite scroll experience
+  useEffect(() => {
+    const carousel = carouselRef.current;
+    const track = trackRef.current;
+    
+    if (!shouldScroll) {
+      console.log('[Gallery] Continuous scroll disabled:', { selectedFolder, reduceMotion, folderCount: folderCards.length });
+      return;
+    }
+    
+    if (!carousel || !track) {
+      console.log('[Gallery] Waiting for carousel/track refs...');
+      return;
+    }
+
+    // Ensure the carousel is not paused when it mounts
+    if (track.dataset) {
+      track.dataset.paused = "0";
+    }
+
+    console.log('[Gallery] ✅ Continuous scroll ENABLED - slider should be moving automatically');
+    console.log('[Gallery] Track element:', track, 'REPEAT:', REPEAT, 'Items:', folderCards.length);
+  }, [folderCards.length, shouldScroll, selectedFolder, reduceMotion]);
+
+  // Manual scroll controls
+  const scrollCarousel = useCallback((direction: 'left' | 'right') => {
+    if (typeof window === 'undefined') return;
+    
+    const globalKey = '__scope_continuous_scroller__' as const;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const globalState = (window as any)[globalKey];
+    
+    if (globalState && globalState.scrollers) {
+      const scrollerState = globalState.scrollers.get('gallery');
+      if (scrollerState) {
+        // Move by approximately one card width
+        const scrollAmount = 500; // Adjust based on your card width
+        scrollerState.offset += direction === 'right' ? scrollAmount : -scrollAmount;
+        console.log('[Gallery Scroll] Manual scroll:', direction, 'new offset:', scrollerState.offset);
+      }
+    }
+  }, []);
+
+  // Add horizontal scroll support using trackpad/mouse wheel
+  useEffect(() => {
+    const wrapper = carouselWrapperRef.current;
+    const track = trackRef.current;
+    if (!wrapper || !track) {
+      console.log('[Gallery Scroll] Wrapper or track ref not ready, will retry when refs are available');
+      return;
+    }
+
+    console.log('[Gallery Scroll] Setting up wheel event listener on wrapper:', wrapper);
+
+    let scrollTimeout: number | null = null;
+
+    const handleWheel = (e: WheelEvent) => {
+      console.log('[Gallery Scroll] Wheel event detected:', { deltaX: e.deltaX, deltaY: e.deltaY });
+      
+      // Prevent default vertical scroll
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Pause auto-scroll while user is manually scrolling
+      if (track.dataset) {
+        track.dataset.paused = "1";
+      }
+
+      // Get the global continuous scroll state
+      if (typeof window !== 'undefined') {
+        const globalKey = '__scope_continuous_scroller__' as const;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const globalState = (window as any)[globalKey];
+        
+        console.log('[Gallery Scroll] Global state:', globalState);
+        
+        if (globalState && globalState.scrollers) {
+          const scrollerState = globalState.scrollers.get('gallery');
+          
+          console.log('[Gallery Scroll] Scroller state:', scrollerState);
+          
+          if (scrollerState) {
+            // Support both vertical and horizontal scroll
+            // - deltaY: vertical scroll (up/down) - convert to horizontal
+            // - deltaX: horizontal scroll (left/right) - use directly
+            // Priority: if deltaX exists (horizontal touchpad swipe), use it
+            // Otherwise, convert deltaY (vertical scroll) to horizontal movement
+            
+            let scrollSpeed = 0;
+            
+            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+              // Horizontal swipe detected (touchpad two-finger swipe left/right)
+              scrollSpeed = e.deltaX * 0.8; // Higher sensitivity for direct horizontal
+              console.log('[Gallery Scroll] Using horizontal deltaX:', scrollSpeed);
+            } else {
+              // Vertical scroll (mouse wheel or touchpad up/down)
+              // Convert to horizontal: down = right, up = left
+              scrollSpeed = e.deltaY * 0.5;
+              console.log('[Gallery Scroll] Using vertical deltaY converted:', scrollSpeed);
+            }
+            
+            const oldOffset = scrollerState.offset;
+            
+            // Directly update the offset
+            scrollerState.offset += scrollSpeed;
+            
+            console.log('[Gallery Scroll] Offset updated:', oldOffset, '→', scrollerState.offset);
+            
+            // The RAF loop will handle wrapping automatically
+          } else {
+            console.warn('[Gallery Scroll] Scroller state not found for gallery');
+          }
+        } else {
+          console.warn('[Gallery Scroll] Global state or scrollers not available');
+        }
+      }
+
+      // Clear existing timeout
+      if (scrollTimeout) {
+        window.clearTimeout(scrollTimeout);
+      }
+
+      // Resume auto-scroll after user stops scrolling for 2 seconds
+      scrollTimeout = window.setTimeout(() => {
+        if (track.dataset) {
+          track.dataset.paused = "0";
+        }
+        console.log('[Gallery Scroll] Auto-scroll resumed');
+      }, 2000) as unknown as number;
+    };
+
+    // Add wheel event listener with passive: false to allow preventDefault
+    wrapper.addEventListener('wheel', handleWheel, { passive: false });
+    console.log('[Gallery Scroll] ✅ Wheel event listener added to wrapper');
+
+    return () => {
+      wrapper.removeEventListener('wheel', handleWheel);
+      if (scrollTimeout) {
+        window.clearTimeout(scrollTimeout);
+      }
+      console.log('[Gallery Scroll] Wheel event listener removed');
+    };
+  }, [folderCards.length]);
+
   // Keep currentSlide in sync with programmatic navigation
   useEffect(() => {
     // Only perform snap-to-slide when continuous loop is NOT active.
@@ -66,53 +221,39 @@ const Gallery: React.FC = () => {
     }
   }, [currentSlide, scrollToSlide, reduceMotion, selectedFolder, folderCards.length]);
 
-  const handleSlideNav = (dir: 'prev' | 'next') => {
-    const container = carouselRef.current;
-    const track = trackRef.current;
-    if (!container || !track || folderCards.length === 0) return;
+  // initial data fetch will be started after fetchGalleryData is declared
 
-    console.log('[Gallery] manual slide nav triggered, direction:', dir);
+  
 
-    // Get all item elements (we duplicate folderCards, so there are 2*N items)
-    const items = Array.from(track.querySelectorAll('[data-index]')) as HTMLElement[];
-    if (items.length === 0) return;
-
-    // Calculate center of container viewport
-    const containerCenter = container.scrollLeft + container.clientWidth / 2;
-
-    // Find the item whose center is closest to the container center
-    const centers = items.map((el) => el.offsetLeft + el.offsetWidth / 2);
-    let closest = 0;
-    let minDiff = Infinity;
-    for (let i = 0; i < centers.length; i++) {
-      const diff = Math.abs(centers[i] - containerCenter);
-      if (diff < minDiff) {
-        minDiff = diff;
-        closest = i;
+  // Create repeated items for infinite scrolling
+  const repeatedItems = useMemo(() => {
+    const N = folderCards.length;
+    if (!N) return [] as { folder: FolderData; seq: number; logicalIdx: number }[];
+    const out: { folder: FolderData; seq: number; logicalIdx: number }[] = [];
+    for (let r = 0; r < REPEAT; r++) {
+      for (let i = 0; i < N; i++) {
+        out.push({ folder: folderCards[i], seq: r * N + i, logicalIdx: i });
       }
     }
-
-    // Determine target index (next/prev). Wrap within the duplicated list to avoid out-of-bounds
-    let targetIndex = dir === 'next' ? closest + 1 : closest - 1;
-    if (targetIndex < 0) targetIndex = items.length - 1;
-    if (targetIndex >= items.length) targetIndex = 0;
-
-    const targetEl = items[targetIndex];
-    if (!targetEl) return;
-
-    // Center the target element in the container viewport
-    const targetOffset = targetEl.offsetLeft - (container.clientWidth - targetEl.clientWidth) / 2;
-    container.scrollTo({ left: targetOffset, behavior: 'smooth' });
-
-  // Pause RAF updates briefly so the smooth scroll is visible
-  const PAUSE_MS = 200;
-  manualPauseUntilRef.current = performance.now() + PAUSE_MS;
-  console.log('[Gallery] manual slide nav - scrolled to index', targetIndex, 'paused raf for ms', PAUSE_MS);
-  };
+    return out;
+  }, [folderCards]);
 
   // Folder metadata (static descriptions)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const folderMetadata: { [key: string]: any } = useMemo(() => ({
+  type FolderMeta = {
+    title: string;
+    subtitle: string;
+    description: string;
+    eventDetails: {
+      date: string;
+      duration: string;
+      participants: string;
+      topics: string[];
+    };
+    gradient: string;
+    displayImage?: string;
+  };
+
+  const folderMetadata: Record<string, FolderMeta> = useMemo(() => ({
       MATLAB: {
         title: 'MATLAB WORKSHOP',
         subtitle: 'Learn, Analyze, Innovate with MATLAB workshops and training sessions',
@@ -175,11 +316,11 @@ const Gallery: React.FC = () => {
       // Create folder cards
       const cards: FolderData[] = Object.keys(folders).map(folderName => {
         const folderImages = folders[folderName].sort((a, b) => a.display_order - b.display_order);
-        
+
         // Get saved metadata from localStorage (set by admin panel)
         const savedMetadata = localStorage.getItem(`event_meta_${folderName}`)
         const adminMetadata = savedMetadata ? JSON.parse(savedMetadata) : null
-        
+
         // Merge with default metadata
         const defaultMetadata = folderMetadata[folderName] || {
           title: folderName.toUpperCase(),
@@ -222,6 +363,16 @@ const Gallery: React.FC = () => {
 
   console.log('[Gallery] fetched folders:', cards.map(c => ({ id: c.id, photoCount: c.photoCount })));
   setFolderCards(cards);
+      // force a resize event shortly after content is set so any scroller observers recompute
+      try {
+        if (typeof window !== 'undefined') {
+          window.setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+            // also try a micro rAF to nudge measurement
+            requestAnimationFrame(() => { /* no-op */ });
+          }, 80);
+        }
+      } catch {}
     } catch (error) {
       console.error('Error fetching gallery data:', error);
     } finally {
@@ -229,119 +380,15 @@ const Gallery: React.FC = () => {
     }
   }, [folderMetadata]);
 
+  // Kick off initial data fetch
   useEffect(() => {
     fetchGalleryData();
   }, [fetchGalleryData]);
 
-  // Continuous left-scrolling using RAF and scrollLeft
-  useEffect(() => {
-    // Don't abort early if refs are not set; instead use a retry/start loop that
-    // waits for the DOM (carousel & track) to be measurable. This handles
-    // AnimatePresence remounts and image loading timing.
-    console.log('[Gallery RAF] effect run - attempting to start RAF', {
-      folderCardsLen: folderCards.length,
-      carouselRef: !!carouselRef.current,
-      trackRef: !!trackRef.current
-    });
-
-    let previousScrollBehavior = '';
-    let lastTime = performance.now();
-    const speed = 50; // pixels per second
-
-    // Local references captured when we actually start the RAF so the animate
-    // loop operates on stable elements even if the outer refs change.
-    let containerLocal: HTMLDivElement | null = null;
-    let trackLocal: HTMLDivElement | null = null;
-
-    const animate = (time: number) => {
-      if (!containerLocal || !trackLocal) {
-        // If refs went away unexpectedly, schedule next frame and try again.
-        rafRef.current = requestAnimationFrame(animate);
-        return;
-      }
-
-      // If a manual navigation recently occurred, allow the browser's smooth
-      // scroll to complete by skipping RAF-driven scroll advances temporarily.
-      if (performance.now() < manualPauseUntilRef.current) {
-        rafRef.current = requestAnimationFrame(animate);
-        return;
-      }
-
-      const deltaTime = (time - lastTime) / 1000;
-      lastTime = time;
-
-      // advance scroll position (don't pause for manual nav)
-      const before = containerLocal.scrollLeft;
-      containerLocal.scrollLeft += speed * deltaTime;
-
-      // compute half of the duplicated track (we duplicate folderCards in the markup)
-      const halfWidth = trackLocal.scrollWidth / 2;
-
-      // when we've scrolled past the first copy, wrap back by subtracting halfWidth
-      if (halfWidth > 0 && containerLocal.scrollLeft >= halfWidth) {
-        const after = containerLocal.scrollLeft - halfWidth;
-        console.log('[Gallery RAF] wrapped scroll', { before, halfWidth, after });
-        containerLocal.scrollLeft = after;
-      }
-
-      rafRef.current = requestAnimationFrame(animate);
-    };
-
-    let startTimer: number | null = null;
-    let attempts = 0;
-    const maxAttempts = 50; // give a bit longer to allow images/layout to settle
-
-    const tryStart = () => {
-      attempts += 1;
-      console.log('[Gallery RAF] tryStart attempt', { attempts, carouselRef: !!carouselRef.current, trackRef: !!trackRef.current });
-      if (rafRef.current) return; // already running
-
-      containerLocal = carouselRef.current;
-      trackLocal = trackRef.current;
-
-      // If layout isn't ready yet, retry until maxAttempts
-      if (!containerLocal || !trackLocal || trackLocal.scrollWidth <= 0 || containerLocal.clientWidth <= 0) {
-        if (attempts < maxAttempts) {
-          startTimer = window.setTimeout(tryStart, 150);
-        } else {
-          console.log('[Gallery RAF] tryStart max attempts reached - giving up');
-          console.log('[Gallery RAF] status=stopped');
-        }
-        return;
-      }
-
-      // We have measurable elements — lock scroll behavior and begin
-      previousScrollBehavior = containerLocal.style.scrollBehavior;
-      containerLocal.style.scrollBehavior = 'auto';
-
-      try {
-        containerLocal.scrollLeft = 0;
-      } catch {
-        // ignore potential cross-origin or invalid state errors
-      }
-
-      lastTime = performance.now();
-      rafRef.current = requestAnimationFrame(animate);
-      console.log('[Gallery RAF] status=running');
-      console.log('[Gallery RAF] started RAF', { lastTime, speed });
-    };
-
-    // kick off the first try
-    startTimer = window.setTimeout(tryStart, 120);
-
-    return () => {
-      console.log('[Gallery RAF] cleanup - stopping RAF');
-      if (startTimer) clearTimeout(startTimer);
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-      console.log('[Gallery RAF] status=stopped');
-  // restore previous scroll behavior if we have a container
-  const c = containerLocal;
-  if (c) c.style.scrollBehavior = previousScrollBehavior || '';
-    };
-  }, [folderCards, reduceMotion, selectedFolder]);
+  // Register this track with the shared transform-based scroller
+  // Only enable continuous scroll when showing folder carousel (not individual gallery)
+  // and when reduceMotion is not enabled
+  useContinuousScroll(trackRef, { speed: shouldScroll ? 50 : 0, id: 'gallery' });
 
   // (fetchGalleryData is implemented above as a stable useCallback)
 
@@ -532,11 +579,11 @@ const Gallery: React.FC = () => {
           <motion.h2 
             className="mb-6 text-center relative inline-block"
             style={{
-              fontFamily: '"Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif',
+              fontFamily: '"Orbitron", sans-serif',
               fontSize: '3.2rem',
               fontWeight: 600,
               color: 'var(--text-light)',
-              textShadow: '0 0 20px rgba(138, 64, 255, 0.4)',
+              textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
               letterSpacing: '2px',
               paddingLeft: '40px'
             }}
@@ -569,6 +616,7 @@ const Gallery: React.FC = () => {
               /* Carousel for 3+ folders */
               <motion.div
                 key="carousel"
+                ref={carouselWrapperRef}
                 className="relative mb-16 h-[70vh] min-h-[600px] -mx-6 md:-mx-8 lg:-mx-12 w-screen"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -590,27 +638,28 @@ const Gallery: React.FC = () => {
                     <div 
                       id="gallery-carousel" 
                       ref={carouselRef} 
-                      className="relative h-full w-full overflow-x-auto overflow-y-hidden"
+                      className="relative h-full w-full overflow-x-hidden overflow-y-hidden"
                       style={{ scrollBehavior: 'auto' }}
                     >
-                      <div ref={trackRef} className="flex items-center gap-6 px-6 h-full">
-                        {[...folderCards, ...folderCards].map((folder, index) => (
+                      <div ref={trackRef} data-repeat={REPEAT} data-paused="0" className="flex items-center gap-6 px-6 h-full">
+                        {repeatedItems.map((item) => (
                           <div
-                            key={`${folder.id}-${index}`}
-                            data-index={index}
+                            key={`${item.folder.id}-${item.seq}`}
+                            data-index={item.logicalIdx}
+                            data-seq={item.seq}
                             className="snap-start flex-shrink-0 w-[48%] max-w-[900px] min-w-[280px]"
                           >
                             <div
-                              onClick={() => setSelectedFolder(folder.id)}
+                              onClick={() => setSelectedFolder(item.folder.id)}
                               className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/20 hover:border-[#F24DC2]/30 transition-all duration-300 cursor-pointer shadow-lg"
                             >
-                              <div className={`absolute inset-0 bg-gradient-to-br ${folder.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
+                              <div className={`absolute inset-0 bg-gradient-to-br ${item.folder.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
 
                               <div className="relative h-[380px] overflow-hidden">
                                 <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
                                   <Image
-                                    src={folder.image}
-                                    alt={folder.title}
+                                    src={item.folder.image}
+                                    alt={item.folder.title}
                                     fill
                                     className="object-cover"
                                     sizes="(max-width: 768px) 100vw, 50vw"
@@ -620,13 +669,13 @@ const Gallery: React.FC = () => {
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
                                 <div className="absolute top-4 left-4 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg">
-                                  {folder.photoCount} photos
+                                  {item.folder.photoCount} photos
                                 </div>
                               </div>
 
                               <div className="p-6 relative z-10">
-                                <h3 className="text-2xl font-bold text-white mb-2">{folder.title}</h3>
-                                <p className="text-gray-400 mb-3 text-sm">{folder.subtitle}</p>
+                                <h3 className="text-2xl font-bold text-white mb-2">{item.folder.title}</h3>
+                                <p className="text-gray-400 mb-3 text-sm">{item.folder.subtitle}</p>
                                 <div className="flex items-center text-[#2C97FF] transition-colors duration-300">
                                   <span className="text-xs font-medium mr-2">Click to explore</span>
                                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -640,23 +689,24 @@ const Gallery: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Navigation Arrows - Outside scrolling container so they stay fixed */}
+                    {/* Navigation Arrows - Manual Control */}
                     <button
-                      onClick={() => handleSlideNav('prev')}
-                      className="absolute left-8 top-1/2 transform -translate-y-1/2 z-40 bg-gradient-to-r from-[#F24DC2]/20 to-[#2C97FF]/20 hover:from-[#F24DC2]/40 hover:to-[#2C97FF]/40 backdrop-blur-md rounded-full p-4 text-white transition-all duration-200 border border-white/20 hover:scale-110"
-                      aria-label="Previous slide"
+                      onClick={() => scrollCarousel('left')}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-30 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] hover:from-[#2C97FF] hover:to-[#F24DC2] hover:shadow-[0_0_30px_rgba(242,77,194,0.6)] text-white p-4 rounded-full shadow-2xl transition-all duration-300"
+                      aria-label="Scroll left"
                     >
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" />
                       </svg>
                     </button>
+
                     <button
-                      onClick={() => handleSlideNav('next')}
-                      className="absolute right-8 top-1/2 transform -translate-y-1/2 z-40 bg-gradient-to-r from-[#2C97FF]/20 to-[#F24DC2]/20 hover:from-[#2C97FF]/40 hover:to-[#F24DC2]/40 backdrop-blur-md rounded-full p-4 text-white transition-all duration-200 border border-white/20 hover:scale-110"
-                      aria-label="Next slide"
+                      onClick={() => scrollCarousel('right')}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-30 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] hover:from-[#2C97FF] hover:to-[#F24DC2] hover:shadow-[0_0_30px_rgba(242,77,194,0.6)] text-white p-4 rounded-full shadow-2xl transition-all duration-300"
+                      aria-label="Scroll right"
                     >
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
                       </svg>
                     </button>
 
@@ -809,8 +859,9 @@ const Gallery: React.FC = () => {
                     <motion.h2 
                       className="text-4xl font-bold text-white mb-4"
                       style={{
-                        fontFamily: '"Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif',
-                        textShadow: '0 0 20px rgba(138, 64, 255, 0.4)',
+                        fontFamily: '"Orbitron", sans-serif',
+                        textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
+                        letterSpacing: '2px'
                       }}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}

@@ -186,11 +186,11 @@ export default function TeamMembers() {
           <motion.h1 
             className="mb-4 text-center relative inline-block"
             style={{
-              fontFamily: '"Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif',
+              fontFamily: '"Orbitron", sans-serif',
               fontSize: '3.2rem',
               fontWeight: 600,
               color: 'var(--text-light)',
-              textShadow: '0 0 20px rgba(138, 64, 255, 0.4)',
+              textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
               letterSpacing: '2px',
               paddingLeft: '40px'
             }}
@@ -371,7 +371,14 @@ export default function TeamMembers() {
 
                 {/* Team Details */}
                 <div className="p-8">
-                  <h2 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] mb-4">
+                  <h2 
+                    className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] mb-4"
+                    style={{
+                      fontFamily: '"Orbitron", sans-serif',
+                      textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
+                      letterSpacing: '2px'
+                    }}
+                  >
                     {selectedTeam.title}
                   </h2>
                   <p className="text-lg text-gray-300 leading-relaxed">

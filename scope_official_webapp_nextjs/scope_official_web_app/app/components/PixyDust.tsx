@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 interface Ripple {
   id: number;
@@ -51,6 +51,8 @@ const MagneticCursor: React.FC<MagneticCursorProps> = ({
     [rippleColors]
   );
 
+  const movementTimeoutRef = useRef<number | null>(null);
+
   // Mouse movement handler
   const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!enabled) return;
@@ -58,11 +60,13 @@ const MagneticCursor: React.FC<MagneticCursorProps> = ({
     setCursorPos({ x: e.clientX, y: e.clientY });
     setIsMoving(true);
     setIsVisible(true);
-
-    // Reset movement state
-    clearTimeout((window as any).movementTimeout);
-    (window as any).movementTimeout = setTimeout(() => {
+    // Reset movement state using ref to avoid using (window as any)
+    if (movementTimeoutRef.current) {
+      window.clearTimeout(movementTimeoutRef.current);
+    }
+    movementTimeoutRef.current = window.setTimeout(() => {
       setIsMoving(false);
+      movementTimeoutRef.current = null;
     }, 100);
   }, [enabled]);
 
@@ -154,7 +158,10 @@ const MagneticCursor: React.FC<MagneticCursorProps> = ({
       document.removeEventListener("mouseover", handleHoverDetection);
       document.removeEventListener("mouseleave", handleMouseLeave);
       document.body.style.cursor = "auto";
-      clearTimeout((window as any).movementTimeout);
+      if (movementTimeoutRef.current) {
+        window.clearTimeout(movementTimeoutRef.current);
+        movementTimeoutRef.current = null;
+      }
     };
   }, [enabled, handleMouseMove, handleClick, handleHoverDetection, handleMouseLeave]);
 

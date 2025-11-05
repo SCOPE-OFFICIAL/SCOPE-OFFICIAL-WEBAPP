@@ -43,7 +43,19 @@ interface Analytics {
     today: number
     lastWeek: number
     lastMonth: number
+    uniqueSessions: number
     byPage: Array<{ page: string; views: number; percentage: number }>
+  }
+  apiRequests: {
+    total: number
+    today: number
+    avgResponseTime: number
+    byEndpoint: Array<{ 
+      endpoint: string
+      requests: number
+      avgResponseTime: number
+      errorRate: number
+    }>
   }
   recentActivity: Array<{
     type: string
@@ -245,7 +257,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Popular Pages & Recent Trends */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             {/* Popular Pages */}
             <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6">
               <h3 className="text-xl font-bold text-white mb-4">🔥 Most Visited Pages</h3>
@@ -328,6 +340,99 @@ export default function AdminDashboard() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* API Requests Analytics */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div className="bg-gradient-to-br from-indigo-500/20 to-blue-500/20 backdrop-blur-xl border border-indigo-500/30 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-gray-300 text-sm font-medium">Total API Requests</h3>
+                <span className="text-2xl">🔌</span>
+              </div>
+              <p className="text-3xl font-bold text-white">{analytics.apiRequests.total.toLocaleString()}</p>
+              <p className="text-xs text-gray-400 mt-2">All time requests</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/20 backdrop-blur-xl border border-yellow-500/30 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-gray-300 text-sm font-medium">Today&apos;s Requests</h3>
+                <span className="text-2xl">⚡</span>
+              </div>
+              <p className="text-3xl font-bold text-white">{analytics.apiRequests.today.toLocaleString()}</p>
+              <p className="text-xs text-gray-400 mt-2">Last 24 hours</p>
+            </div>
+
+            <div className="bg-gradient-to-br from-pink-500/20 to-rose-500/20 backdrop-blur-xl border border-pink-500/30 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-gray-300 text-sm font-medium">Avg Response Time</h3>
+                <span className="text-2xl">⏱️</span>
+              </div>
+              <p className="text-3xl font-bold text-white">{analytics.apiRequests.avgResponseTime}ms</p>
+              <p className="text-xs text-gray-400 mt-2">Average latency</p>
+            </div>
+          </div>
+
+          {/* API Endpoints Table */}
+          <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-white mb-4">🔌 API Request Window</h3>
+            {analytics.apiRequests.byEndpoint.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-white/10">
+                      <th className="text-left text-gray-300 font-medium text-sm pb-3 px-2">Endpoint</th>
+                      <th className="text-right text-gray-300 font-medium text-sm pb-3 px-2">Requests</th>
+                      <th className="text-right text-gray-300 font-medium text-sm pb-3 px-2">Avg Time</th>
+                      <th className="text-right text-gray-300 font-medium text-sm pb-3 px-2">Error Rate</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analytics.apiRequests.byEndpoint.map((endpoint, idx) => (
+                      <motion.tr
+                        key={idx}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.3, delay: 0.05 * idx }}
+                        className="border-b border-white/5 hover:bg-white/5 transition-colors"
+                      >
+                        <td className="py-3 px-2">
+                          <code className="text-cyan-400 text-xs font-mono bg-cyan-500/10 px-2 py-1 rounded">
+                            {endpoint.endpoint}
+                          </code>
+                        </td>
+                        <td className="text-right text-white font-medium py-3 px-2">
+                          {endpoint.requests.toLocaleString()}
+                        </td>
+                        <td className="text-right py-3 px-2">
+                          <span className={`text-sm font-medium ${
+                            endpoint.avgResponseTime < 100 ? 'text-green-400' :
+                            endpoint.avgResponseTime < 500 ? 'text-yellow-400' :
+                            'text-red-400'
+                          }`}>
+                            {endpoint.avgResponseTime}ms
+                          </span>
+                        </td>
+                        <td className="text-right py-3 px-2">
+                          <span className={`text-sm font-medium ${
+                            endpoint.errorRate === 0 ? 'text-green-400' :
+                            endpoint.errorRate < 5 ? 'text-yellow-400' :
+                            'text-red-400'
+                          }`}>
+                            {endpoint.errorRate}%
+                          </span>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-8 text-gray-400">
+                <p className="text-4xl mb-2">📊</p>
+                <p>No API request data available yet</p>
+                <p className="text-sm mt-2">Data will appear as users interact with the website</p>
+              </div>
+            )}
           </div>
         </motion.div>
       )}
