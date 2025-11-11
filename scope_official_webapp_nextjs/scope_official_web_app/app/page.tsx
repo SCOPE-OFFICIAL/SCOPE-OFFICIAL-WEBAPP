@@ -92,7 +92,7 @@ function OriginalHome() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.4 }}
         >
-          Exploring the frontiers of electronics and circuit design
+          Exploring the forefront of technology through collaborative projects, cutting-edge research, and a vibrant community of innovators.
         </motion.div>
 
         {/* ANIMATED: CTA Button */}

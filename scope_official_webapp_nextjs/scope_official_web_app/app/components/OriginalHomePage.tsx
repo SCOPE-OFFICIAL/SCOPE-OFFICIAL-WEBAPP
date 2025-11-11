@@ -44,7 +44,7 @@ export default function OriginalHomePage() {
           </p>
           
           <div className="text-lg text-gray-400 max-w-2xl mx-auto">
-            Exploring the frontiers of electronics and circuit design
+            Exploring the forefront of technology through collaborative projects, cutting-edge research, and a vibrant community of innovators.
           </div>
         </div>
       </ScrollAnimation>

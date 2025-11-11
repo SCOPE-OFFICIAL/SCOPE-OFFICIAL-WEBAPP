@@ -87,17 +87,20 @@ export default function PhotoModal({ photo, tags, onClose }: PhotoModalProps) {
             )}
           </div>
 
-          {/* Interactive Photo */}
+          {/* Interactive Photo (responsive & scrollable on mobile) */}
           <div 
-            className="relative bg-black rounded-lg overflow-hidden shadow-2xl cursor-crosshair"
+            className="relative bg-black rounded-lg overflow-auto shadow-2xl cursor-crosshair max-h-[65vh] sm:max-h-[70vh] touch-auto"
             onMouseMove={handleMouseMove}
             onMouseLeave={() => setHoveredTag(null)}
+            style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
           >
-            <img
-              src={photo.image_url}
-              alt={photo.title}
-              className="w-full h-auto max-h-[70vh] object-contain"
-            />
+            <div className="w-full flex items-center justify-center">
+              <img
+                src={photo.image_url}
+                alt={photo.title}
+                className="max-w-full w-auto h-auto max-h-[60vh] sm:max-h-[70vh] object-contain mx-auto"
+              />
+            </div>
 
             {/* Invisible Hotspots */}
             {tags.map((tag) => (

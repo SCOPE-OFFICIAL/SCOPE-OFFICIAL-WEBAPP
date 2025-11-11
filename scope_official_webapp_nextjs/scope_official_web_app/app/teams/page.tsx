@@ -106,7 +106,7 @@ export default function TeamPage() {
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
             viewport={{ once: true, margin: "-100px" }}
           >
-            OUR TEAM
+            OUR CORE TEAM
           </motion.h1>
           <motion.p 
             className="section-subtitle"
