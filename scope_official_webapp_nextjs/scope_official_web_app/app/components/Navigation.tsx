@@ -189,10 +189,10 @@ export default function Navigation() {
                     {/* Animated gradient background for active state */}
                     {(viewMode === 'pages' && isActive(item.href)) && (
                       <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-lg"
+                        className="absolute inset-0 bg-gradient-to-r from-[#2C97FF] to-[#4169E1] rounded-lg"
                         initial={{ scale: 0.8, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        transition={{ duration: 0.36, ease: "easeOut" }}
                       />
                     )}
                     
@@ -200,7 +200,7 @@ export default function Navigation() {
                     {!(viewMode === 'pages' && isActive(item.href)) && (
                       <>
                         {/* Sliding background on hover */}
-                        <div className="absolute inset-0 bg-gradient-to-r from-[#F24DC2]/25 to-[#2C97FF]/25 rounded-lg transform translate-x-full transition-transform duration-400 ease-out group-hover:translate-x-0"></div>
+                        <div className="absolute inset-0 bg-gradient-to-r from-[#2C97FF]/25 to-[#4169E1]/25 rounded-lg transform translate-x-full transition-transform duration-300 ease-out group-hover:translate-x-0"></div>
                       </>
                     )}
                     
@@ -218,8 +218,8 @@ export default function Navigation() {
             className="md:hidden"
             whileTap={{ scale: 0.95 }}
           >
-            <motion.button
-              onClick={() => setIsMobileMenuOpen(true)}
+              <motion.button
+              onClick={() => setIsMobileMenuOpen(prev => !prev)}
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-menu"
               aria-label="Open mobile menu"
@@ -228,7 +228,7 @@ export default function Navigation() {
               transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
               {/* Gradient background animation for hover */}
-              <span className="absolute inset-0 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></span>
+              <span className="absolute inset-0 bg-gradient-to-r from-[#2C97FF] to-[#4169E1] opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full"></span>
               
               <motion.svg 
                 className="relative z-10 h-4 w-4" 
@@ -244,108 +244,39 @@ export default function Navigation() {
           </motion.div>
         </div>
       </div>
-    </motion.nav>
-
-    {/* Mobile Menu Panel - Centered Modal */}
-    <motion.div
-      id="mobile-menu"
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ 
-        opacity: isMobileMenuOpen ? 1 : 0,
-        scale: isMobileMenuOpen ? 1 : 0.95,
-        pointerEvents: isMobileMenuOpen ? 'auto' : 'none'
-      }}
-      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-      className="fixed inset-0 flex items-center justify-center z-[101] md:hidden p-4"
-      style={{
-        pointerEvents: isMobileMenuOpen ? 'auto' : 'none',
-      }}
-    >
-      {/* Semi-transparent backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-        onClick={() => setIsMobileMenuOpen(false)}
-      />
-      
-      {/* Menu Container - Centered and Non-scrollable */}
-      <div
-        className="relative w-full max-w-sm bg-gradient-to-b from-[#0a0e27]/95 to-[#040a28]/95 backdrop-blur-xl rounded-2xl border border-white/20 shadow-2xl overflow-hidden"
-        style={{
-          maxHeight: '90vh',
-          boxShadow: '0 20px 60px rgba(0, 0, 0, 0.8)',
-        }}
-      >
-      {/* Menu Header */}
-      <div className="flex items-center justify-between p-6 border-b border-white/30 bg-white/10 backdrop-blur-sm">
-        <div className="flex items-center space-x-3">
-          <Image 
-            src="/images/scope_logo.png" 
-            alt="SCOPE Logo" 
-            width={40}
-            height={40}
-            className="object-contain"
-          />
-          <div>
-            <div className="text-white font-bold text-xl tracking-wide drop-shadow-lg">SCOPE</div>
-            <div className="text-white/80 text-xs font-medium drop-shadow">School of ECE</div>
-          </div>
-        </div>
-        
-        <motion.button
-          onClick={() => setIsMobileMenuOpen(false)}
-          whileTap={{ scale: 0.9 }}
-          className="p-2.5 rounded-full border-2 border-white/40 text-white hover:bg-white/20 hover:border-white/60 transition-all duration-300 backdrop-blur-sm"
-          aria-label="Close mobile menu"
-        >
-          <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </motion.button>
-      </div>
-
-      {/* Menu Items - No internal scrolling */}
-      <div className="p-6">
-        <div className="space-y-2.5">
-          {navItems.map((item, index) => (
-            <motion.div
-              key={item.href}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.06, type: 'spring', stiffness: 100 }}
-            >
-              <Link
-                href={item.href}
-                onClick={(e) => handleNavigation(e, item)}
-                className={`block py-3 px-5 rounded-xl text-center text-base font-semibold transition-all duration-300 border-2 backdrop-blur-sm ${
-                  (viewMode === 'pages' && isActive(item.href))
-                    ? 'bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] text-white border-transparent shadow-lg shadow-[#F24DC2]/30'
-                    : 'bg-white/10 text-white border-white/30 hover:bg-white/20 hover:border-white/50 hover:shadow-md'
-                }`}
-              >
-                {item.label}
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Join Us Button */}
+      {isMobileMenuOpen && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: navItems.length * 0.06 + 0.15 }}
-          className="mt-5"
+          className="md:hidden w-full bg-white/6 backdrop-blur-xl border-t border-white/10 overflow-hidden"
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 30 }}
         >
-          <Link
-            href="/#faq"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="block w-full py-3 px-5 rounded-xl bg-gradient-to-r from-[#2C97FF] to-[#4169E1] text-white text-center text-base font-bold hover:from-[#2C97FF]/90 hover:to-[#4169E1]/90 transition-all duration-300 shadow-lg shadow-[#2C97FF]/40 border-2 border-white/20"
-          >
-            Join Us
-          </Link>
+          <div className="flex flex-col gap-2 px-4 py-3">
+            {navItems.map((item, index) => (
+              <motion.div
+                key={item.href}
+                initial={{ y: -8, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.03 * index, duration: 0.28, ease: 'easeOut' }}
+              >
+                <Link
+                  href={item.href}
+                  onClick={(e) => handleNavigation(e, item)}
+                  className={`block w-full py-3 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                    (viewMode === 'pages' && isActive(item.href))
+                      ? 'bg-gradient-to-r from-[#2C97FF] to-[#4169E1] text-white'
+                      : 'text-white/90 bg-white/5 border border-white/10'
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
-      </div>
-    </div>
-  </motion.div>
+      )}
+    </motion.nav>
   </>
   );
 }
