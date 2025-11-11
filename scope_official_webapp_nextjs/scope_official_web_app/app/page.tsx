@@ -87,7 +87,7 @@ function OriginalHome() {
         
         {/* ANIMATED: Description */}
         <motion.div 
-          className="text-lg text-gray-400 max-w-2xl mx-auto"
+          className="text-xs sm:text-lg text-gray-400 max-w-2xl mx-auto"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 1.4 }}

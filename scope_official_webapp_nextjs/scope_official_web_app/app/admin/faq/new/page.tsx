@@ -78,14 +78,14 @@ export default function NewFAQPage() {
             <label className="block text-white font-semibold mb-2">Category</label>
             <select
               {...register('category')}
-              className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600"
+              className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 [&>option]:bg-gray-700 [&>option]:text-white"
             >
-              <option value="">General</option>
-              <option value="events">Events</option>
-              <option value="membership">Membership</option>
-              <option value="technical">Technical</option>
-              <option value="projects">Projects</option>
-              <option value="other">Other</option>
+              <option value="" className="bg-gray-700 text-white">General</option>
+              <option value="events" className="bg-gray-700 text-white">Events</option>
+              <option value="membership" className="bg-gray-700 text-white">Membership</option>
+              <option value="technical" className="bg-gray-700 text-white">Technical</option>
+              <option value="projects" className="bg-gray-700 text-white">Projects</option>
+              <option value="other" className="bg-gray-700 text-white">Other</option>
             </select>
           </div>
 

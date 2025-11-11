@@ -69,6 +69,7 @@ interface Analytics {
 
 export default function AdminDashboard() {
   const router = useRouter()
+  const [adminName, setAdminName] = useState<string>('')
   const [stats, setStats] = useState<Stats>({
     totalEvents: 0,
     upcomingEvents: 0,
@@ -99,6 +100,10 @@ export default function AdminDashboard() {
       return
     }
 
+    // Get admin name from localStorage
+    const name = localStorage.getItem('admin_name') || localStorage.getItem('admin_email')
+    setAdminName(name || 'Admin')
+
     // Fetch dashboard stats
     fetchStats()
   }, [router])
@@ -127,6 +132,8 @@ export default function AdminDashboard() {
   const handleLogout = () => {
     localStorage.removeItem('admin_token')
     localStorage.removeItem('admin_email')
+    localStorage.removeItem('admin_name')
+    localStorage.removeItem('admin_role')
     router.push('/admin/login')
   }
 
@@ -144,7 +151,8 @@ export default function AdminDashboard() {
     { title: 'Partners', href: '/admin/partners', icon: '🤝', color: 'bg-gradient-to-r from-pink-500 to-purple-500' },
     { title: 'Team', href: '/admin/team', icon: '👥', color: 'bg-gradient-to-r from-purple-500 to-pink-500' },
     { title: 'Group Photos', href: '/admin/team/group-photos', icon: '📸', color: 'bg-gradient-to-r from-teal-500 to-green-500' },
-    { title: 'FAQ', href: '/admin/faq', icon: '❓', color: 'bg-gradient-to-r from-orange-500 to-red-500' }
+    { title: 'FAQ', href: '/admin/faq', icon: '❓', color: 'bg-gradient-to-r from-orange-500 to-red-500' },
+    { title: 'Manage Admins', href: '/admin/admins', icon: '🔐', color: 'bg-gradient-to-r from-yellow-500 to-orange-500' }
   ]
 
   if (loading) {
@@ -163,7 +171,7 @@ export default function AdminDashboard() {
           <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F24DC2] to-[#2C97FF]">
             Admin Dashboard
           </h1>
-          <p className="text-gray-400 mt-2">Welcome back! Manage your SCOPE website content here.</p>
+          <p className="text-gray-400 mt-2">Welcome back, {adminName}! Manage your SCOPE website content here.</p>
         </div>
         <button
           onClick={handleLogout}

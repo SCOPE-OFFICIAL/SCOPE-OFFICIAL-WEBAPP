@@ -281,11 +281,11 @@ export default function TagPhotoPage() {
                       setSelectedMember(e.target.value)
                       setCustomName('')
                     }}
-                    className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-600"
+                    className="w-full px-4 py-2 bg-gray-800 text-white rounded-lg border border-gray-600 [&>option]:bg-gray-800 [&>option]:text-white"
                   >
-                    <option value="">-- Or enter custom name below --</option>
+                    <option value="" className="bg-gray-800 text-white">-- Or enter custom name below --</option>
                     {teamMembers.map((member) => (
-                      <option key={member.id} value={member.id}>
+                      <option key={member.id} value={member.id} className="bg-gray-800 text-white">
                         {member.name} ({member.role})
                       </option>
                     ))}

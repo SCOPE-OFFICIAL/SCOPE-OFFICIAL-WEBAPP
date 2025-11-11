@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import Image from "next/image";
 
 interface GroupPhoto {
@@ -31,6 +31,7 @@ interface TeamData {
 }
 
 export default function TeamMembers() {
+  const reduceMotion = useReducedMotion();
   const [groupPhotos, setGroupPhotos] = useState<GroupPhoto[]>([]);
   const [photoTags, setPhotoTags] = useState<{ [key: string]: PhotoTag[] }>({});
   const [selectedTeam, setSelectedTeam] = useState<TeamData | null>(null);
@@ -149,6 +150,22 @@ export default function TeamMembers() {
           ];
           const durations = [25, 30, 20, 28, 22, 26];
           
+          // Reduce motion/animation for users that prefer reduced motion
+          if (reduceMotion) {
+            return (
+              <div
+                key={i}
+                className="absolute w-48 h-48 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full opacity-10"
+                style={{
+                  background: `linear-gradient(45deg, #F24DC2, #2C97FF)`,
+                  left: positions[i].left,
+                  top: positions[i].top,
+                  willChange: 'transform'
+                }}
+              />
+            );
+          }
+
           return (
             <motion.div
               key={i}
@@ -187,24 +204,17 @@ export default function TeamMembers() {
             className="mb-4 text-center relative inline-block"
             style={{
               fontFamily: '"Orbitron", sans-serif',
-              fontSize: '3.2rem',
+              fontSize: '2.4rem',
               fontWeight: 600,
               color: 'var(--text-light)',
               textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
-              letterSpacing: '2px',
-              paddingLeft: '40px'
+              letterSpacing: '2px'
             }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
             viewport={{ once: true }}
           >
-            <span 
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-7 rounded"
-              style={{
-                background: 'linear-gradient(to bottom, var(--secondary-pink), var(--primary-purple))'
-              }}
-            ></span>
             Our Team Members
           </motion.h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -245,6 +255,7 @@ export default function TeamMembers() {
                       src={photo.image_url}
                       alt={photo.title}
                       fill
+                      loading="lazy"
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
@@ -295,7 +306,7 @@ export default function TeamMembers() {
             
             {/* Modal content container */}
             <motion.div
-              className="relative z-[100000] bg-white/10 backdrop-blur-xl rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto border border-white/20 mx-4"
+              className="relative z-[100000] bg-white/10 backdrop-blur-xl rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden border border-white/20 mx-4 flex flex-col"
               variants={modalVariants}
               initial="hidden"
               animate="visible"
@@ -326,14 +337,16 @@ export default function TeamMembers() {
               <div className="relative">
 
                 {/* Team Image */}
-                <div className="relative h-[650px]">
+                <div className="relative h-[50vh] sm:h-[45vh] md:h-[40vh] lg:h-[45vh] w-full bg-black/70 overflow-hidden rounded-t-2xl">
                   <Image
                     src={selectedTeam.image}
                     alt={selectedTeam.title}
                     fill
-                    className="object-cover"
+                    loading="lazy"
+                    className="object-contain object-center"
+                    style={{ backgroundColor: 'rgba(10,10,15,0.6)' }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none"></div>
                   
                   {/* Name Tags for Team Members */}
                   {selectedTeam.members && selectedTeam.members.length > 0 && (
@@ -347,16 +360,18 @@ export default function TeamMembers() {
                           transform: 'translate(-50%, -50%)'
                         }}
                       >
-                        {/* Hover Area */}
-                        <div className="w-20 h-20 cursor-pointer relative">
+                        {/* Reduced hit/touch area to avoid overlaps with nearby markers.
+                            - Mobile: smaller (w-8), Small and up: slightly larger (w-10)
+                            - Boost z-index on hover so the active marker captures pointer events above neighbors */}
+                        <div className="w-8 h-8 sm:w-10 sm:h-10 cursor-pointer relative group-hover/member:z-50">
                           {/* Visible dot indicator - subtle by default, prominent on hover */}
-                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full opacity-40 group-hover/member:opacity-100 transition-all duration-300 shadow-lg border border-white/30 group-hover/member:scale-[2] group-hover/member:border-2"></div>
-                          
-                          {/* Hover trigger area - invisible unless hovered */}
-                          <div className="absolute inset-0 bg-transparent group-hover/member:bg-white/10 rounded-full transition-all duration-200"></div>
-                          
+                          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-3 h-3 sm:w-3 sm:h-3 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full opacity-40 group-hover/member:opacity-100 transition-all duration-300 shadow-lg border border-white/30 group-hover/member:scale-150 group-hover/member:border-2"></div>
+
+                          {/* Hover trigger area - small circular region */}
+                          <div className="absolute inset-0 rounded-full transition-all duration-200 bg-transparent group-hover/member:bg-white/10"></div>
+
                           {/* Name Tag - appears BELOW the marker */}
-                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 opacity-0 group-hover/member:opacity-100 transition-all duration-300 pointer-events-none z-30">
+                          <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 opacity-0 group-hover/member:opacity-100 transition-all duration-300 pointer-events-none z-60">
                             <div className="bg-black/95 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-sm font-semibold whitespace-nowrap border-2 border-[#F24DC2] shadow-2xl">
                               {member.name}
                               {/* Arrow pointing UP to the marker */}
@@ -369,19 +384,19 @@ export default function TeamMembers() {
                   )}
                 </div>
 
-                {/* Team Details */}
-                <div className="p-8">
+                {/* Team Details - reduced padding/size so it fits without internal scroll */}
+                <div className="p-6 sm:p-8">
                   <h2 
-                    className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] mb-4"
+                    className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] mb-3"
                     style={{
                       fontFamily: '"Orbitron", sans-serif',
-                      textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
-                      letterSpacing: '2px'
+                      textShadow: '0 0 14px rgba(242, 77, 194, 0.35)',
+                      letterSpacing: '1.5px'
                     }}
                   >
                     {selectedTeam.title}
                   </h2>
-                  <p className="text-lg text-gray-300 leading-relaxed">
+                  <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
                     {selectedTeam.description}
                   </p>
                 </div>

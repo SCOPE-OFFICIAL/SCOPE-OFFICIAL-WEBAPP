@@ -1310,15 +1310,19 @@ export default function HomePage() {
           >
             {/* Stable arrow buttons: CSS handles hover transform while preserving initial translate to avoid layout jumps */}
             <style jsx>{`
-              .arrow-btn { position: absolute; top: 50%; z-index: 20; color: white; font-size: 2.2rem; padding: 0.5rem; display: none; }
-              @media (min-width: 768px) { .arrow-btn { display: block; } }
+              /* Make arrows available on all screen sizes, but smaller / subtler on mobile */
+              .arrow-btn { position: absolute; top: 50%; z-index: 20; color: white; font-size: 1.6rem; padding: 0.25rem 0.5rem; display: block; background: rgba(0,0,0,0.25); border-radius: 8px; backdrop-filter: blur(6px); }
               .arrow-btn:focus { outline: none; }
+              /* Desktop: larger and more offset */
+              @media (min-width: 768px) {
+                .arrow-btn { font-size: 2.2rem; padding: 0.5rem; background: transparent; }
+              }
               /* Keep the centering translate in the same rule that also applies scale on hover so transforms don't get overwritten */
-              .arrow-btn.left { left: 0; transform: translate(-50%, -50%); }
-              .arrow-btn.right { right: 0; transform: translate(50%, -50%); }
+              .arrow-btn.left { left: 0.5rem; transform: translate(-25%, -50%); }
+              .arrow-btn.right { right: 0.5rem; transform: translate(25%, -50%); }
               .arrow-btn:hover { color: #d1d5db; }
-              .arrow-btn.left:hover { transform: translate(-60%, -50%) scale(1.08); }
-              .arrow-btn.right:hover { transform: translate(60%, -50%) scale(1.08); }
+              .arrow-btn.left:hover { transform: translate(-30%, -50%) scale(1.06); }
+              .arrow-btn.right:hover { transform: translate(30%, -50%) scale(1.06); }
             `}</style>
 
             <button
@@ -1353,14 +1357,24 @@ export default function HomePage() {
                 const isHovered = hoverIndex === index;
                 const isCenter = relativeIndex === 0 && hoverIndex === null;
 
+                // Responsive poster sizes: smaller on mobile, medium on small screens, large on desktop
+                // Base (mobile): w-64 h-[420px]; sm: w-80 h-[550px]; lg: w-96 h-[700px]
                 let styleClass = "absolute transition-all duration-700 ease-in-out rounded-xl shadow-xl object-cover ";
-                
+
                 if (relativeIndex === 0) {
-                  styleClass += (isHovered || isCenter ? "w-96 h-[700px] z-30 scale-100 opacity-100" : "w-80 h-[550px] z-20 scale-95 opacity-90");
+                  styleClass += (isHovered || isCenter
+                    ? "w-64 h-[420px] sm:w-80 sm:h-[550px] lg:w-96 lg:h-[700px] z-30 scale-100 opacity-100"
+                    : "w-64 h-[420px] sm:w-80 sm:h-[550px] lg:w-96 lg:h-[700px] z-20 scale-95 opacity-90");
                 } else if (relativeIndex === 1) {
-                  styleClass += (isHovered ? "translate-x-[230px] scale-100 z-30 opacity-100 w-96 h-[700px]" : "translate-x-[220px] scale-90 z-10 opacity-60 w-80 h-[550px]");
+                  // Right-side poster (translate positive). Use smaller translate on mobile and larger on sm+
+                  styleClass += (isHovered
+                    ? "sm:translate-x-[230px] translate-x-[170px] scale-100 z-30 opacity-100 w-64 h-[420px] sm:w-80 sm:h-[550px] lg:w-96 lg:h-[700px]"
+                    : "sm:translate-x-[220px] translate-x-[160px] scale-90 z-10 opacity-60 w-64 h-[420px] sm:w-80 sm:h-[550px] lg:w-96 lg:h-[700px]");
                 } else if (relativeIndex === pastEvents.length - 1) {
-                  styleClass += (isHovered ? "-translate-x-[230px] scale-100 z-30 opacity-100 w-96 h-[700px]" : "-translate-x-[220px] scale-90 z-10 opacity-60 w-80 h-[550px]");
+                  // Left-side poster (translate negative)
+                  styleClass += (isHovered
+                    ? "sm:-translate-x-[230px] -translate-x-[170px] scale-100 z-30 opacity-100 w-64 h-[420px] sm:w-80 sm:h-[550px] lg:w-96 lg:h-[700px]"
+                    : "sm:-translate-x-[220px] -translate-x-[160px] scale-90 z-10 opacity-60 w-64 h-[420px] sm:w-80 sm:h-[550px] lg:w-96 lg:h-[700px]");
                 } else {
                   styleClass += "opacity-0 pointer-events-none";
                 }

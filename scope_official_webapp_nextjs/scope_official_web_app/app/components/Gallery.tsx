@@ -36,7 +36,7 @@ const Gallery: React.FC = () => {
   // Render repeated items so we have monotonically increasing sequence numbers
   // Using sufficient repeats for smooth infinite scrolling
   // The continuous scroll hook automatically wraps at 1/REPEAT of total width
-  const REPEAT = 20; // Balanced value: enough for smooth infinite scrolling, not too heavy on DOM
+  const REPEAT = 6; // Reduced repeat to limit DOM nodes and improve scroll performance
 
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [cameFromEvents, setCameFromEvents] = useState(false);
@@ -72,23 +72,13 @@ const Gallery: React.FC = () => {
     const carousel = carouselRef.current;
     const track = trackRef.current;
     
-    if (!shouldScroll) {
-      console.log('[Gallery] Continuous scroll disabled:', { selectedFolder, reduceMotion, folderCount: folderCards.length });
-      return;
-    }
-    
-    if (!carousel || !track) {
-      console.log('[Gallery] Waiting for carousel/track refs...');
-      return;
-    }
+    if (!shouldScroll) return;
+    if (!carousel || !track) return;
 
     // Ensure the carousel is not paused when it mounts
     if (track.dataset) {
       track.dataset.paused = "0";
     }
-
-    console.log('[Gallery] ✅ Continuous scroll ENABLED - slider should be moving automatically');
-    console.log('[Gallery] Track element:', track, 'REPEAT:', REPEAT, 'Items:', folderCards.length);
   }, [folderCards.length, shouldScroll, selectedFolder, reduceMotion]);
 
   // Manual scroll controls
@@ -119,88 +109,54 @@ const Gallery: React.FC = () => {
       return;
     }
 
-    console.log('[Gallery Scroll] Setting up wheel event listener on wrapper:', wrapper);
-
     let scrollTimeout: number | null = null;
+    let pendingDelta = 0;
+    let ticking = false;
 
     const handleWheel = (e: WheelEvent) => {
-      console.log('[Gallery Scroll] Wheel event detected:', { deltaX: e.deltaX, deltaY: e.deltaY });
-      
       // Prevent default vertical scroll
       e.preventDefault();
       e.stopPropagation();
 
       // Pause auto-scroll while user is manually scrolling
-      if (track.dataset) {
-        track.dataset.paused = "1";
-      }
+      if (track.dataset) track.dataset.paused = "1";
 
-      // Get the global continuous scroll state
-      if (typeof window !== 'undefined') {
-        const globalKey = '__scope_continuous_scroller__' as const;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const globalState = (window as any)[globalKey];
-        
-        console.log('[Gallery Scroll] Global state:', globalState);
-        
-        if (globalState && globalState.scrollers) {
-          const scrollerState = globalState.scrollers.get('gallery');
-          
-          console.log('[Gallery Scroll] Scroller state:', scrollerState);
-          
-          if (scrollerState) {
-            // Support both vertical and horizontal scroll
-            // - deltaY: vertical scroll (up/down) - convert to horizontal
-            // - deltaX: horizontal scroll (left/right) - use directly
-            // Priority: if deltaX exists (horizontal touchpad swipe), use it
-            // Otherwise, convert deltaY (vertical scroll) to horizontal movement
-            
-            let scrollSpeed = 0;
-            
-            if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-              // Horizontal swipe detected (touchpad two-finger swipe left/right)
-              scrollSpeed = e.deltaX * 0.8; // Higher sensitivity for direct horizontal
-              console.log('[Gallery Scroll] Using horizontal deltaX:', scrollSpeed);
-            } else {
-              // Vertical scroll (mouse wheel or touchpad up/down)
-              // Convert to horizontal: down = right, up = left
-              scrollSpeed = e.deltaY * 0.5;
-              console.log('[Gallery Scroll] Using vertical deltaY converted:', scrollSpeed);
+      // accumulate desired offset and rAF it to avoid flooding layout
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX * 0.8 : e.deltaY * 0.5;
+      pendingDelta += delta;
+
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(() => {
+          try {
+            if (typeof window !== 'undefined') {
+              const globalKey = '__scope_continuous_scroller__' as const;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const globalState = (window as any)[globalKey];
+              if (globalState && globalState.scrollers) {
+                const scrollerState = globalState.scrollers.get('gallery');
+                if (scrollerState) {
+                  scrollerState.offset += pendingDelta;
+                }
+              }
             }
-            
-            const oldOffset = scrollerState.offset;
-            
-            // Directly update the offset
-            scrollerState.offset += scrollSpeed;
-            
-            console.log('[Gallery Scroll] Offset updated:', oldOffset, '→', scrollerState.offset);
-            
-            // The RAF loop will handle wrapping automatically
-          } else {
-            console.warn('[Gallery Scroll] Scroller state not found for gallery');
+          } finally {
+            pendingDelta = 0;
+            ticking = false;
           }
-        } else {
-          console.warn('[Gallery Scroll] Global state or scrollers not available');
-        }
+        });
       }
 
       // Clear existing timeout
-      if (scrollTimeout) {
-        window.clearTimeout(scrollTimeout);
-      }
+      if (scrollTimeout) window.clearTimeout(scrollTimeout);
 
-      // Resume auto-scroll after user stops scrolling for 2 seconds
+      // Resume auto-scroll after short idle
       scrollTimeout = window.setTimeout(() => {
-        if (track.dataset) {
-          track.dataset.paused = "0";
-        }
-        console.log('[Gallery Scroll] Auto-scroll resumed');
-      }, 2000) as unknown as number;
+        if (track.dataset) track.dataset.paused = "0";
+      }, 500) as unknown as number;
     };
 
-    // Add wheel event listener with passive: false to allow preventDefault
     wrapper.addEventListener('wheel', handleWheel, { passive: false });
-    console.log('[Gallery Scroll] ✅ Wheel event listener added to wrapper');
 
     return () => {
       wrapper.removeEventListener('wheel', handleWheel);
@@ -584,19 +540,12 @@ const Gallery: React.FC = () => {
               fontWeight: 600,
               color: 'var(--text-light)',
               textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
-              letterSpacing: '2px',
-              paddingLeft: '40px'
+              letterSpacing: '2px'
             }}
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <span 
-              className="absolute left-0 top-1/2 transform -translate-y-1/2 w-1 h-7 rounded"
-              style={{
-                background: 'linear-gradient(to bottom, var(--secondary-pink), var(--primary-purple))'
-              }}
-            ></span>
             Gallery
           </motion.h2>
           <motion.p 
@@ -661,6 +610,7 @@ const Gallery: React.FC = () => {
                                     src={item.folder.image}
                                     alt={item.folder.title}
                                     fill
+                                    loading="lazy"
                                     className="object-cover"
                                     sizes="(max-width: 768px) 100vw, 50vw"
                                   />
@@ -767,6 +717,7 @@ const Gallery: React.FC = () => {
                             src={folder.image}
                             alt={folder.title}
                             fill
+                            loading="lazy"
                             className="object-cover"
                             sizes="(max-width: 768px) 100vw, 50vw"
                           />
@@ -1084,9 +1035,9 @@ const Gallery: React.FC = () => {
                   alt={selectedImage.alt}
                   width={1200}
                   height={800}
+                  loading="lazy"
                   className="object-contain w-auto h-auto max-w-[90vw] max-h-[90vh]"
                   sizes="90vw"
-                  priority
                 />
                 
                 {/* Image gradient overlay */}

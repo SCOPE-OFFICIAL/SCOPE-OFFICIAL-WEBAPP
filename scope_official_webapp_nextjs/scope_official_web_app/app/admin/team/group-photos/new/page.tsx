@@ -134,15 +134,15 @@ export default function NewGroupPhotoPage() {
             <label className="block text-white font-semibold mb-2">Category *</label>
             <select
               {...register('category', { required: 'Category is required' })}
-              className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600"
+              className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 [&>option]:bg-gray-700 [&>option]:text-white"
             >
-              <option value="team">Core Team</option>
-              <option value="social-relations">Social Relations</option>
-              <option value="technical">Technical Team</option>
-              <option value="marketing">Marketing Team</option>
-              <option value="design">Design Team</option>
-              <option value="event">Event Team</option>
-              <option value="other">Other</option>
+              <option value="team" className="bg-gray-700 text-white">Core Team</option>
+              <option value="social-relations" className="bg-gray-700 text-white">Social Relations</option>
+              <option value="technical" className="bg-gray-700 text-white">Technical Team</option>
+              <option value="marketing" className="bg-gray-700 text-white">Marketing Team</option>
+              <option value="design" className="bg-gray-700 text-white">Design Team</option>
+              <option value="event" className="bg-gray-700 text-white">Event Team</option>
+              <option value="other" className="bg-gray-700 text-white">Other</option>
             </select>
             {errors.category && <p className="text-red-400 mt-1">{errors.category.message}</p>}
           </div>

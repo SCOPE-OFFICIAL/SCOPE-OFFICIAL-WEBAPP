@@ -220,17 +220,17 @@ export default function EditGroupPhotoPage() {
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-purple-500 outline-none"
+                  className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg focus:ring-2 focus:ring-purple-500 outline-none [&>option]:bg-gray-700 [&>option]:text-white"
                   required
                 >
-                  <option value="team">Team</option>
-                  <option value="technical">Technical</option>
-                  <option value="design">Design</option>
-                  <option value="events">Events</option>
-                  <option value="pr">Public Relations</option>
-                  <option value="coordinators">Coordinators</option>
-                  <option value="leads">Team Leads</option>
-                  <option value="other">Other</option>
+                  <option value="team" className="bg-gray-700 text-white">Team</option>
+                  <option value="technical" className="bg-gray-700 text-white">Technical</option>
+                  <option value="design" className="bg-gray-700 text-white">Design</option>
+                  <option value="events" className="bg-gray-700 text-white">Events</option>
+                  <option value="pr" className="bg-gray-700 text-white">Public Relations</option>
+                  <option value="coordinators" className="bg-gray-700 text-white">Coordinators</option>
+                  <option value="leads" className="bg-gray-700 text-white">Team Leads</option>
+                  <option value="other" className="bg-gray-700 text-white">Other</option>
                 </select>
               </div>
 

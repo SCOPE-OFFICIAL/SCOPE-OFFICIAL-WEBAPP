@@ -188,10 +188,9 @@ export default function FaqPage() {
           transition={{ duration: 0.8, delay: 0.2 }}
         >
           <motion.h1
-            className="tracking-tight"
+            className="tracking-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl"
             style={{
               fontFamily: '"Orbitron", sans-serif',
-              fontSize: '3.2rem',
               fontWeight: 600,
               color: 'var(--text-light)',
               textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
@@ -212,7 +211,7 @@ export default function FaqPage() {
           transition={{ duration: 0.8, delay: 0.4 }}
         >
           <motion.p 
-            className="text-gray-300 leading-relaxed text-center text-lg mb-12"
+            className="text-gray-300 leading-relaxed text-center text-sm sm:text-base md:text-lg mb-12 px-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
@@ -295,7 +294,7 @@ export default function FaqPage() {
           </div>
 
           <motion.div 
-            className="flex flex-col lg:flex-row gap-16 items-start"
+            className="flex flex-col lg:flex-row gap-16 items-start md:items-center lg:items-start"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.0 }}
@@ -399,48 +398,51 @@ export default function FaqPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <div className="relative hover:scale-105 transition-transform duration-300">
-                <Image
-                  src="/images/faq_pic.png"
-                  alt="Illustration of a person with a large question mark"
-                  width={380}
-                  height={410}
-                />
+              <div className="relative hover:scale-105 transition-transform duration-300 w-full max-w-[260px] sm:max-w-[320px] md:max-w-[380px]">
+                  <div className="relative w-full aspect-[380/410]">
+                    <Image
+                      src="/images/faq_pic.png"
+                      alt="Illustration of a person with a large question mark"
+                      fill
+                      sizes="(max-width: 640px) 80vw, (max-width: 1024px) 40vw, 380px"
+                      className="object-contain"
+                    />
+                  </div>
 
-                {/* Floating question marks animation - Simplified */}
-                <div className="absolute inset-0">
-                  {['?', '?', '?'].map((mark, i) => {
-                    const questionPositions = [
-                      { left: '60px', top: '70px' },
-                      { left: '280px', top: '90px' },
-                      { left: '170px', top: '200px' }
-                    ];
+                  {/* Floating question marks animation - Simplified (positions converted to % for responsiveness) */}
+                  <div className="absolute inset-0 pointer-events-none">
+                    {['?', '?', '?'].map((mark, i) => {
+                      const questionPositions = [
+                        { left: '62%', top: '18%' },
+                        { left: '88%', top: '22%' },
+                        { left: '45%', top: '55%' }
+                      ];
                     
-                    return (
-                      <motion.div
-                        key={i}
-                        className="absolute text-4xl text-[#F24DC2] opacity-30"
-                        style={{
-                          left: questionPositions[i].left,
-                          top: questionPositions[i].top,
-                        }}
-                        animate={{
-                          y: [0, -15, 0],
-                          opacity: [0.2, 0.4, 0.2],
-                        }}
-                        transition={{
-                          duration: 4 + i,
-                          repeat: Infinity,
-                          delay: i * 0.5,
-                          ease: "easeInOut",
-                        }}
-                      >
-                        {mark}
-                      </motion.div>
-                    );
-                  })}
+                      return (
+                        <motion.div
+                          key={i}
+                          className="absolute text-3xl sm:text-4xl text-[#F24DC2] opacity-30"
+                          style={{
+                            left: questionPositions[i].left,
+                            top: questionPositions[i].top,
+                          }}
+                          animate={{
+                            y: [0, -12, 0],
+                            opacity: [0.2, 0.45, 0.2],
+                          }}
+                          transition={{
+                            duration: 3.5 + i,
+                            repeat: Infinity,
+                            delay: i * 0.45,
+                            ease: "easeInOut",
+                          }}
+                        >
+                          {mark}
+                        </motion.div>
+                      );
+                    })}
+                  </div>
                 </div>
-              </div>
             </motion.div>
           </motion.div>
         </motion.div>

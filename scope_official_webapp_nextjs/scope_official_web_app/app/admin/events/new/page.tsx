@@ -395,14 +395,14 @@ export default function NewEventPage() {
               name="event_type"
               value={formData.event_type}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF]"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] [&>option]:bg-[#0d1b3d] [&>option]:text-white"
             >
-              <option value="workshop">Workshop</option>
-              <option value="hackathon">Hackathon</option>
-              <option value="webinar">Webinar</option>
-              <option value="competition">Competition</option>
-              <option value="meetup">Meetup</option>
-              <option value="other">Other</option>
+              <option value="workshop" className="bg-[#0d1b3d] text-white">Workshop</option>
+              <option value="hackathon" className="bg-[#0d1b3d] text-white">Hackathon</option>
+              <option value="webinar" className="bg-[#0d1b3d] text-white">Webinar</option>
+              <option value="competition" className="bg-[#0d1b3d] text-white">Competition</option>
+              <option value="meetup" className="bg-[#0d1b3d] text-white">Meetup</option>
+              <option value="other" className="bg-[#0d1b3d] text-white">Other</option>
             </select>
           </div>
 
@@ -415,12 +415,12 @@ export default function NewEventPage() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF]"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] [&>option]:bg-[#0d1b3d] [&>option]:text-white"
             >
-              <option value="published">Published</option>
-              <option value="draft">Draft</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
+              <option value="published" className="bg-[#0d1b3d] text-white">Published</option>
+              <option value="draft" className="bg-[#0d1b3d] text-white">Draft</option>
+              <option value="completed" className="bg-[#0d1b3d] text-white">Completed</option>
+              <option value="cancelled" className="bg-[#0d1b3d] text-white">Cancelled</option>
             </select>
           </div>
 
