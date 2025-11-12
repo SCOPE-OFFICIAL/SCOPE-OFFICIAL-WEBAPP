@@ -22,10 +22,13 @@ async function verifyToken(req: NextRequest): Promise<boolean> {
     const token = authHeader.substring(7)
     const { payload } = await jwtVerify(token, SECRET)
     
-    if (payload.role === 'admin') {
+    // Accept common admin roles. Older code/seeded admins use 'super_admin'
+    const role = typeof payload.role === 'string' ? payload.role : ''
+    const allowed = ['admin', 'super_admin', 'super-admin', 'owner']
+    if (role && allowed.includes(role)) {
       return true
     }
-    console.warn('[admin/partners] Token does not have admin role')
+    console.warn('[admin/partners] Token does not have required admin role:', role)
     return false
   } catch (error) {
     console.warn('[admin/partners] Token verification failed:', error)
