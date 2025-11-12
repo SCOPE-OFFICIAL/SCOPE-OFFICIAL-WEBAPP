@@ -13,6 +13,24 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
 const supabase = createClient(supabaseUrl, supabaseKey)
 
+/**
+ * Helper function to extract storage path from Supabase URL
+ * Supabase URLs format: https://[project].supabase.co/storage/v1/object/public/[bucket]/[path]
+ */
+function extractStoragePath(imageUrl: string, bucketName: string): string | null {
+  try {
+    const url = new URL(imageUrl)
+    const pathMatch = url.pathname.match(new RegExp(`/storage/v1/object/public/${bucketName}/(.+)`))
+    if (pathMatch && pathMatch[1]) {
+      return decodeURIComponent(pathMatch[1])
+    }
+    return null
+  } catch (error) {
+    console.error('Error extracting storage path:', error)
+    return null
+  }
+}
+
 // GET - Fetch past events
 export async function GET(request: NextRequest) {
   try {
@@ -130,6 +148,21 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 })
     }
 
+    // First, get the event data to find the storage path
+    const { data: eventData, error: fetchError } = await supabase
+      .from('past_events')
+      .select('poster_image_url')
+      .eq('id', id)
+      .single()
+
+    if (fetchError) {
+      console.error('Fetch error:', fetchError)
+      return NextResponse.json({ error: fetchError.message }, { status: 500 })
+    }
+
+    console.log('[DELETE past_events] Event data:', eventData)
+
+    // Delete from database first
     const { error } = await supabase
       .from('past_events')
       .delete()
@@ -138,6 +171,40 @@ export async function DELETE(request: NextRequest) {
     if (error) {
       console.error('Delete error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    // Delete from storage if image exists
+    if (eventData?.poster_image_url) {
+      try {
+        // Try to extract path from multiple possible bucket names
+        let storagePath = extractStoragePath(eventData.poster_image_url, 'past-event-posters')
+        let bucketName = 'past-event-posters'
+        
+        if (!storagePath) {
+          storagePath = extractStoragePath(eventData.poster_image_url, 'event-images')
+          bucketName = 'event-images'
+        }
+        
+        if (storagePath) {
+          console.log('[DELETE past_events] Deleting from storage:', bucketName, '/', storagePath)
+          
+          const { error: storageError } = await supabase.storage
+            .from(bucketName)
+            .remove([storagePath])
+
+          if (storageError) {
+            console.error('Storage deletion error:', storageError)
+            // Don't fail the request if storage deletion fails
+          } else {
+            console.log('[DELETE past_events] Successfully deleted from storage')
+          }
+        } else {
+          console.warn('[DELETE past_events] Could not extract storage path from URL:', eventData.poster_image_url)
+        }
+      } catch (storageErr) {
+        console.error('Storage cleanup error:', storageErr)
+        // Don't fail the request if storage deletion fails
+      }
     }
 
     return NextResponse.json({ message: 'Past event deleted successfully' })

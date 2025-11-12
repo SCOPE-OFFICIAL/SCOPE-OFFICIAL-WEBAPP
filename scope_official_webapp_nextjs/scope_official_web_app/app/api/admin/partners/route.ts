@@ -1,11 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
+import { createClient } from '@supabase/supabase-js'
 
 // Admin CRUD endpoint for partners. Requires JWT token from admin login
 
 const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
 const SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'fallback-secret-key')
+
+// Create Supabase client for storage operations
+const supabase = createClient(
+  SUPABASE_URL!,
+  SERVICE_ROLE_KEY!,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
+)
+
+/**
+ * Helper function to extract storage path from Supabase URL
+ */
+function extractStoragePath(imageUrl: string, bucketName: string): string | null {
+  try {
+    const url = new URL(imageUrl)
+    const pathMatch = url.pathname.match(new RegExp(`/storage/v1/object/public/${bucketName}/(.+)`))
+    if (pathMatch && pathMatch[1]) {
+      return decodeURIComponent(pathMatch[1])
+    }
+    return null
+  } catch (error) {
+    console.error('Error extracting storage path:', error)
+    return null
+  }
+}
 
 function unauthorized() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -191,6 +221,27 @@ export async function DELETE(req: NextRequest) {
   if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 })
 
   try {
+    // First, get the partner data to find the storage path
+    const fetchUrl = `${SUPABASE_URL}/rest/v1/partners?id=eq.${encodeURIComponent(id)}&select=image_url`
+    const fetchRes = await fetch(fetchUrl, {
+      method: 'GET',
+      headers: {
+        apikey: SERVICE_ROLE_KEY || '',
+        Authorization: `Bearer ${SERVICE_ROLE_KEY || ''}`
+      }
+    })
+
+    let imageUrl = null
+    if (fetchRes.ok) {
+      const data = await fetchRes.json()
+      if (data && data.length > 0) {
+        imageUrl = data[0].image_url
+      }
+    }
+
+    console.log('[DELETE partners] Partner image URL:', imageUrl)
+
+    // Delete from database
     const url = `${SUPABASE_URL}/rest/v1/partners?id=eq.${id}`
     const res = await fetch(url, {
       method: 'DELETE',
@@ -203,6 +254,38 @@ export async function DELETE(req: NextRequest) {
     if (!res.ok) {
       const text = await res.text()
       return NextResponse.json({ error: 'Supabase delete failed', details: text }, { status: 502 })
+    }
+
+    // Delete from storage if image exists
+    if (imageUrl) {
+      try {
+        // Try to extract path from multiple possible bucket names
+        let storagePath = extractStoragePath(imageUrl, 'partners-logos')
+        let bucketName = 'partners-logos'
+        
+        if (!storagePath) {
+          storagePath = extractStoragePath(imageUrl, 'partner-logos')
+          bucketName = 'partner-logos'
+        }
+        
+        if (storagePath) {
+          console.log('[DELETE partners] Deleting from storage:', bucketName, '/', storagePath)
+          
+          const { error: storageError } = await supabase.storage
+            .from(bucketName)
+            .remove([storagePath])
+
+          if (storageError) {
+            console.error('Storage deletion error:', storageError)
+          } else {
+            console.log('[DELETE partners] Successfully deleted from storage')
+          }
+        } else {
+          console.warn('[DELETE partners] Could not extract storage path from URL:', imageUrl)
+        }
+      } catch (storageErr) {
+        console.error('Storage cleanup error:', storageErr)
+      }
     }
 
     return NextResponse.json({ success: true })

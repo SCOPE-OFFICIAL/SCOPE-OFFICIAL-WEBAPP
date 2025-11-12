@@ -17,6 +17,23 @@ const supabase = createClient(
   }
 )
 
+/**
+ * Helper function to extract storage path from Supabase URL
+ */
+function extractStoragePath(imageUrl: string, bucketName: string): string | null {
+  try {
+    const url = new URL(imageUrl)
+    const pathMatch = url.pathname.match(new RegExp(`/storage/v1/object/public/${bucketName}/(.+)`))
+    if (pathMatch && pathMatch[1]) {
+      return decodeURIComponent(pathMatch[1])
+    }
+    return null
+  } catch (error) {
+    console.error('Error extracting storage path:', error)
+    return null
+  }
+}
+
 // GET - Fetch group photos with tags
 export async function GET(request: NextRequest) {
   try {
@@ -138,6 +155,20 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Photo ID is required' }, { status: 400 })
     }
 
+    // First, get the photo data to find the storage path
+    const { data: photoData, error: fetchError } = await supabase
+      .from('group_photos')
+      .select('image_url')
+      .eq('id', id)
+      .single()
+
+    if (fetchError) {
+      console.error('Supabase fetch error:', fetchError)
+      return NextResponse.json({ error: fetchError.message }, { status: 500 })
+    }
+
+    console.log('[DELETE group_photos] Photo data:', photoData)
+
     // Tags will be auto-deleted due to CASCADE
     const { error } = await supabase
       .from('group_photos')
@@ -147,6 +178,31 @@ export async function DELETE(request: NextRequest) {
     if (error) {
       console.error('Supabase error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    // Delete from storage if image exists
+    if (photoData?.image_url) {
+      try {
+        const storagePath = extractStoragePath(photoData.image_url, 'team-photos')
+        
+        if (storagePath) {
+          console.log('[DELETE group_photos] Deleting from storage:', storagePath)
+          
+          const { error: storageError } = await supabase.storage
+            .from('team-photos')
+            .remove([storagePath])
+
+          if (storageError) {
+            console.error('Storage deletion error:', storageError)
+          } else {
+            console.log('[DELETE group_photos] Successfully deleted from storage')
+          }
+        } else {
+          console.warn('[DELETE group_photos] Could not extract storage path from URL:', photoData.image_url)
+        }
+      } catch (storageErr) {
+        console.error('Storage cleanup error:', storageErr)
+      }
     }
 
     return NextResponse.json({ message: 'Photo deleted successfully' }, { status: 200 })

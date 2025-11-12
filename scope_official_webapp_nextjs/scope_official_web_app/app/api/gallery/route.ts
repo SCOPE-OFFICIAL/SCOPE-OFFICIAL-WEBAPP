@@ -17,6 +17,23 @@ const supabase = createClient(
   }
 )
 
+/**
+ * Helper function to extract storage path from Supabase URL
+ */
+function extractStoragePath(imageUrl: string, bucketName: string): string | null {
+  try {
+    const url = new URL(imageUrl)
+    const pathMatch = url.pathname.match(new RegExp(`/storage/v1/object/public/${bucketName}/(.+)`))
+    if (pathMatch && pathMatch[1]) {
+      return decodeURIComponent(pathMatch[1])
+    }
+    return null
+  } catch (error) {
+    console.error('Error extracting storage path:', error)
+    return null
+  }
+}
+
 // GET - Fetch all gallery images
 export async function GET(request: NextRequest) {
   try {
@@ -120,6 +137,21 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Image ID is required' }, { status: 400 })
     }
 
+    // First, get the image data to find the storage path
+    const { data: imageData, error: fetchError } = await supabase
+      .from('gallery')
+      .select('image_url')
+      .eq('id', id)
+      .single()
+
+    if (fetchError) {
+      console.error('Supabase fetch error:', fetchError)
+      return NextResponse.json({ error: fetchError.message }, { status: 500 })
+    }
+
+    console.log('[DELETE gallery] Image data:', imageData)
+
+    // Delete from database
     const { error } = await supabase
       .from('gallery')
       .delete()
@@ -128,6 +160,31 @@ export async function DELETE(request: NextRequest) {
     if (error) {
       console.error('Supabase error:', error)
       return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    // Delete from storage if image exists
+    if (imageData?.image_url) {
+      try {
+        const storagePath = extractStoragePath(imageData.image_url, 'gallery-images')
+        
+        if (storagePath) {
+          console.log('[DELETE gallery] Deleting from storage:', storagePath)
+          
+          const { error: storageError } = await supabase.storage
+            .from('gallery-images')
+            .remove([storagePath])
+
+          if (storageError) {
+            console.error('Storage deletion error:', storageError)
+          } else {
+            console.log('[DELETE gallery] Successfully deleted from storage')
+          }
+        } else {
+          console.warn('[DELETE gallery] Could not extract storage path from URL:', imageData.image_url)
+        }
+      } catch (storageErr) {
+        console.error('Storage cleanup error:', storageErr)
+      }
     }
 
     return NextResponse.json({ message: 'Image deleted successfully' }, { status: 200 })
