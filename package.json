@@ -1,14 +1,9 @@
 {
-	"dependencies": {
-		"@hookform/resolvers": "^5.2.2",
-		"@supabase/auth-helpers-nextjs": "^0.10.0",
-		"@supabase/ssr": "^0.7.0",
-		"@supabase/supabase-js": "^2.75.0",
-		"next-auth": "^4.24.11",
-		"react-hook-form": "^7.65.0",
-		"zod": "^4.1.12"
-	},
-	"devDependencies": {
-		"@netlify/plugin-nextjs": "^5.14.5"
+	"name": "scope-official-webapp",
+	"version": "1.0.0",
+	"private": true,
+	"description": "SCOPE Official Web Application",
+	"scripts": {
+		"install": "cd scope_official_webapp_nextjs/scope_official_web_app && pnpm install"
 	}
 }
