@@ -3,7 +3,7 @@ name: Mirror to Personal Account
 on:
   push:
     branches:
-      - main  # Or 'master', etc.
+      - main  # <-- ADJUST THIS if your main branch is 'master'
   delete:
 
 jobs:
@@ -15,14 +15,24 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set up SSH
+        # This action securely loads the SSH key from secrets
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
       - name: Push to mirror
         env:
-          GH_PAT: ${{ secrets.DESTINATION_PAT }}
-          GH_USER: "ROHANBAIJU" # This should be your username
-          DEST_REPO: "SCOPE-OFFICIAL-WEBAPP-FOR-HOSTING" # This is your mirror repo
-        
+          # Your personal username
+          GH_USER: "ROHANBAIJU"
+          # Your personal (mirror) repo name
+          DEST_REPO: "SCOPE-OFFICIAL-WEBAPP-FOR-HOSTING"
         run: |
-          echo "Pushing to https://github.com/$GH_USER/$DEST_REPO.git"
+          echo "Pushing to SSH address: git@github.com:$GH_USER/$DEST_REPO.git"
           
-          # Corrected line: removed the single quotes around the variables
-          git push --mirror "https://$GH_USER:$GH_PAT@github.com/$GH_USER/$DEST_REPO.git"
+          # This command adds github.com to the list of known hosts
+          # to prevent an interactive "Are you sure?" prompt.
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+          
+          # This is the new push command using the SSH URL
+          git push --mirror "git@github.com:$GH_USER/$DEST_REPO.git"
