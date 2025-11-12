@@ -1,9 +1,0 @@
-{
-	"name": "scope-official-webapp",
-	"version": "1.0.0",
-	"private": true,
-	"description": "SCOPE Official Web Application",
-	"scripts": {
-		"install": "cd scope_official_webapp_nextjs/scope_official_web_app && pnpm install"
-	}
-}
