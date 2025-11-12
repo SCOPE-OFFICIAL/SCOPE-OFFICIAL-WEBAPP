@@ -588,7 +588,8 @@ export default function HomePage() {
           
           {/* Main Container: Hexagon + Event Card Side by Side */}
           <motion.div 
-            className="flex flex-col lg:flex-row gap-[200px] items-start justify-center w-full px-8"
+            // increase left padding on small screens so the hexagon sits further from the left edge
+            className="flex flex-col lg:flex-row gap-[200px] items-start justify-center w-full pl-12 pr-8"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
