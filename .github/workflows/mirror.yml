@@ -17,7 +17,7 @@ jobs:
 
       - name: Push to mirror
         env:
-          GH_PAT: ${{ secrets.HOSTING_DESTINATION_PAT }}
+          GH_PAT: ${{ secrets.DESTINATION_PAT }}
           GH_USER: "ROHANBAIJU" # This should be your username
           DEST_REPO: "SCOPE-OFFICIAL-WEBAPP-FOR-HOSTING" # This is your mirror repo
         
