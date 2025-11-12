@@ -1,0 +1,28 @@
+# Netlify configuration for the Next.js app (App Router)
+# Place this file in the Next.js app folder. If you deploy from the Netlify UI
+# set the "Base directory" to this folder (e.g. scope_official_webapp_nextjs/scope_official_web_app)
+
+[build]
+# Build command - Netlify will run the install step separately (set Install command to `pnpm install` in the UI)
+  command = "pnpm build"
+# The Next.js on Netlify plugin writes the final site to this folder
+  publish = ".netlify/output/public"
+  functions = ".netlify/functions"
+
+[build.environment]
+# Recommend Node 18.x for compatibility
+  NODE_VERSION = "18"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Notes:
+# - When you create the site in the Netlify UI, set the Base directory to the folder
+#   that contains this file (example: scope_official_webapp_nextjs/scope_official_web_app).
+# - Set Install command to: `pnpm install`
+# - Set Build command to: `pnpm build`
+# - Set Publish directory to: `.netlify/output/public`
+# - It's recommended to add `@netlify/plugin-nextjs` as a devDependency locally as well:
+#     pnpm add -D @netlify/plugin-nextjs
+#   Netlify will also fetch/install the plugin at build time if listed here, but adding
+#   it to package.json makes local builds reproducible.
