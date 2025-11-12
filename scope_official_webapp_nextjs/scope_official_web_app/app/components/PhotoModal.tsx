@@ -54,7 +54,7 @@ export default function PhotoModal({ photo, tags, onClose }: PhotoModalProps) {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-4"
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-2 md:p-4"
         onClick={onClose}
       >
         {/* Close Button */}
@@ -71,29 +71,28 @@ export default function PhotoModal({ photo, tags, onClose }: PhotoModalProps) {
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.9, opacity: 0 }}
           transition={{ type: 'spring', damping: 25 }}
-          className="relative max-w-6xl max-h-[90vh] w-full"
+          className="relative w-full h-full max-w-7xl md:max-w-none md:w-[90vw] flex flex-col"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Photo Info Header */}
-          <div className="mb-4 text-center">
-            <h2 className="text-2xl font-bold text-white mb-1">{photo.title}</h2>
+          <div className="mb-2 md:mb-4 text-center flex-shrink-0">
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-1">{photo.title}</h2>
             {photo.description && (
-              <p className="text-gray-400">{photo.description}</p>
+              <p className="text-gray-400 text-sm md:text-base">{photo.description}</p>
             )}
             {tags.length > 0 && (
-              <p className="text-purple-400 text-sm mt-2">
+              <p className="text-purple-400 text-xs md:text-sm mt-2">
                 👥 {tags.length} {tags.length === 1 ? 'member' : 'members'} tagged • Hover over faces to see names
               </p>
             )}
           </div>
 
-          {/* Interactive Photo (responsive & scrollable on mobile) */}
+          {/* Interactive Photo - Mobile: scrollable, Desktop: full fill */}
           <div 
             className="relative bg-black rounded-lg overflow-hidden shadow-2xl cursor-crosshair 
-                       h-[65vh] md:h-[75vh] touch-auto"
+                       h-[60vh] md:h-[70vh] lg:h-[75vh] flex-shrink-0"
             onMouseMove={handleMouseMove}
             onMouseLeave={() => setHoveredTag(null)}
-            style={{ WebkitOverflowScrolling: 'touch', touchAction: 'pan-y' }}
           >
             <img
               src={photo.image_url}
@@ -140,16 +139,16 @@ export default function PhotoModal({ photo, tags, onClose }: PhotoModalProps) {
 
           {/* Tagged Members List */}
           {tags.length > 0 && (
-            <div className="mt-4 bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10">
-              <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
-                <span className="text-lg">👥</span>
+            <div className="mt-2 md:mt-4 bg-white/5 backdrop-blur-sm rounded-lg p-3 md:p-4 border border-white/10 flex-shrink-0">
+              <h3 className="text-white font-semibold mb-2 md:mb-3 flex items-center gap-2 text-sm md:text-base">
+                <span className="text-base md:text-lg">👥</span>
                 Tagged Members:
               </h3>
               <div className="flex flex-wrap gap-2">
                 {tags.map((tag) => (
                   <span
                     key={tag.id}
-                    className="px-3 py-1 bg-gradient-to-r from-purple-600/30 to-blue-600/30 text-white text-sm rounded-full border border-purple-500/30"
+                    className="px-2 md:px-3 py-1 bg-gradient-to-r from-purple-600/30 to-blue-600/30 text-white text-xs md:text-sm rounded-full border border-purple-500/30"
                   >
                     {tag.person_name}
                   </span>
