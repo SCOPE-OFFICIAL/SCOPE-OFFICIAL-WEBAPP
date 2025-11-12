@@ -1,0 +1,33 @@
+name: Mirror to Personal Account
+
+on:
+  # Triggers the action on every push
+  push:
+    branches:
+      - main  # Or 'master', or whatever your main branch is
+  # Also triggers on branch/tag deletion
+  delete:
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # This is necessary to get all history, branches, and tags
+          fetch-depth: 0
+
+      - name: Push to mirror
+        env:
+          # The token you stored as a secret
+          GH_PAT: ${{ secrets.HOSTING_DESTINATION_PAT }}
+          # Your personal username
+          GH_USER: "ROHANBAIJU"
+          # The name of the new mirror repo
+          DEST_REPO: "scope-webapp-for-hosting"
+        run: |
+          echo "Pushing to https://github.com/$GH_USER/$DEST_REPO.git"
+          # This command mirrors everything (all branches, tags)
+          # It authenticates using the PAT you created
+          git push --mirror "https://$GH_USER:$GH_PAT@github.com/$GH_USER/$DEST_REPO.git"
