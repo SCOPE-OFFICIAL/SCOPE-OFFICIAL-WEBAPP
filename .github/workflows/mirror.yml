@@ -25,7 +25,7 @@ jobs:
           # Your personal username
           GH_USER: "ROHANBAIJU"
           # The name of the new mirror repo
-          DEST_REPO: "scope-webapp-for-hosting"
+          DEST_REPO: "SCOPE-OFFICIAL-WEBAPP-FOR-HOSTING"
         run: |
           echo "Pushing to https://github.com/$GH_USER/$DEST_REPO.git"
           # This command mirrors everything (all branches, tags)
