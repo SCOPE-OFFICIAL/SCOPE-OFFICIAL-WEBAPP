@@ -257,6 +257,7 @@ export default function TeamMembers() {
                       fill
                       loading="lazy"
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
                     
@@ -345,6 +346,7 @@ export default function TeamMembers() {
                     loading="lazy"
                     className="object-contain object-center"
                     style={{ backgroundColor: 'rgba(10,10,15,0.6)' }}
+                    sizes="(max-width: 640px) 90vw, (max-width: 1280px) 75vw, 900px"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent pointer-events-none"></div>
                   

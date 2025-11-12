@@ -362,7 +362,7 @@ export default function HomePage() {
                 {/* Banner Image - responsive height */}
                 <div className="relative h-24 sm:h-32 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] overflow-hidden">
                   {ev.image_url ? (
-                    <Image src={ev.image_url} alt="Event Banner" fill className="object-cover opacity-90" />
+                    <Image src={ev.image_url} alt="Event Banner" fill className="object-cover opacity-90" sizes="100vw" />
                   ) : (
                     <div className="flex items-center justify-center h-full">
                       <span className="text-2xl sm:text-4xl font-bold text-white/20">EVENTS</span>
@@ -466,11 +466,11 @@ export default function HomePage() {
                 <div className="overflow-hidden rounded-2xl h-full">
                   {ev.poster_image_url ? (
                     <div className="relative w-full h-full">
-                      <Image src={ev.poster_image_url} alt="Event Poster" fill className="object-cover" />
+                      <Image src={ev.poster_image_url} alt="Event Poster" fill className="object-cover" sizes="100vw" />
                     </div>
                   ) : ev.image_url ? (
                     <div className="relative w-full h-full">
-                      <Image src={ev.image_url} alt="Event Poster" fill className="object-cover" />
+                      <Image src={ev.image_url} alt="Event Poster" fill className="object-cover" sizes="100vw" />
                     </div>
                   ) : (
                     <div className="flex items-center justify-center bg-gradient-to-br from-[#1a1c3a] to-[#0d1b3d] h-full">
@@ -753,6 +753,7 @@ export default function HomePage() {
                             fill
                             className="absolute inset-0 object-cover object-center sm:scale-110 scale-125 transform origin-center"
                             style={{ objectPosition: '50% 35%' }}
+                            sizes="180px"
                           />
                           <div className="absolute inset-0 sm:bg-black/40 bg-black/20 z-20" />
                         </div>
@@ -834,6 +835,7 @@ export default function HomePage() {
                             fill
                             className="absolute inset-0 object-cover object-center sm:scale-110 scale-125 transform origin-center"
                             style={{ objectPosition: '50% 35%' }}
+                            sizes="180px"
                           />
                           <div className="absolute inset-0 sm:bg-black/40 bg-black/20 z-20" />
                         </div>
@@ -1004,6 +1006,7 @@ export default function HomePage() {
                               alt="Event Banner"
                               fill
                               className="object-cover opacity-90"
+                              sizes="100vw"
                             />
                           ) : (
                             <div className="flex items-center justify-center h-full">
@@ -1184,11 +1187,11 @@ export default function HomePage() {
                         <div className="overflow-hidden rounded-2xl" style={{ width: '100%', height: '1000px' }}>
                               {upcomingEvents[currentEventIndex].poster_image_url ? (
                                 <div className="relative" style={{ width: '100%', height: '1000px' }}>
-                                  <Image src={upcomingEvents[currentEventIndex].poster_image_url as string} alt="Event Poster" fill className="object-cover" />
+                                  <Image src={upcomingEvents[currentEventIndex].poster_image_url as string} alt="Event Poster" fill className="object-cover" sizes="100vw" />
                                 </div>
                               ) : upcomingEvents[currentEventIndex].image_url ? (
                                 <div className="relative" style={{ width: '100%', height: '1000px' }}>
-                                  <Image src={upcomingEvents[currentEventIndex].image_url as string} alt="Event Poster" fill className="object-cover" />
+                                  <Image src={upcomingEvents[currentEventIndex].image_url as string} alt="Event Poster" fill className="object-cover" sizes="100vw" />
                                 </div>
                               ) : (
                             <div className="flex items-center justify-center bg-gradient-to-br from-[#1a1c3a] to-[#0d1b3d]" style={{ width: '100%', height: '600px' }}>
