@@ -5,13 +5,14 @@
 [build]
 # Build command - Netlify will run the install step separately (set Install command to `pnpm install` in the UI)
   command = "pnpm build"
-# The Next.js on Netlify plugin writes the final site to this folder
-  publish = ".netlify/output/public"
+# Let the Next.js plugin manage the final output folder. The plugin writes to
+# `.netlify/output` and the public web files are under `.netlify/output/public`.
+  publish = ".netlify/output"
   functions = ".netlify/functions"
 
 [build.environment]
-# Recommend Node 18.x for compatibility
-  NODE_VERSION = "18"
+# Use Node 20 to satisfy @supabase/supabase-js recommendation (avoid deprecation warnings)
+  NODE_VERSION = "20"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
@@ -21,7 +22,7 @@
 #   that contains this file (example: scope_official_webapp_nextjs/scope_official_web_app).
 # - Set Install command to: `pnpm install`
 # - Set Build command to: `pnpm build`
-# - Set Publish directory to: `.netlify/output/public`
+# - Set Publish directory to: `.netlify/output` (the plugin places the public files under `.netlify/output/public`)
 # - It's recommended to add `@netlify/plugin-nextjs` as a devDependency locally as well:
 #     pnpm add -D @netlify/plugin-nextjs
 #   Netlify will also fetch/install the plugin at build time if listed here, but adding
