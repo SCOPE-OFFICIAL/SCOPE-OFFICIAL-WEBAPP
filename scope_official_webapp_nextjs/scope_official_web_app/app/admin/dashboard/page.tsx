@@ -458,7 +458,7 @@ export default function AdminDashboard() {
         </motion.div>
       )}
 
-      {/* Recent Activity */}
+      {/* Recent Activity: split into To-do List and Git History panes */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -466,98 +466,179 @@ export default function AdminDashboard() {
         className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-6"
       >
         <h2 className="text-2xl font-bold text-white mb-4">🕐 Recent Activity</h2>
-        {analytics && analytics.recentActivity.length > 0 ? (
-          <div className="space-y-3">
-            {analytics.recentActivity.map((activity, idx) => {
-              const getActivityIcon = (type: string) => {
-                switch(type) {
-                  case 'event': return '📅'
-                  case 'team': return '👤'
-                  case 'gallery': return '🖼️'
-                  case 'question': return '❓'
-                  default: return '📝'
-                }
-              }
 
-              const getActivityColor = (type: string) => {
-                switch(type) {
-                  case 'event': 
-                    return {
-                      bg: 'bg-blue-500/5',
-                      border: 'border-blue-500/20',
-                      hover: 'hover:bg-blue-500/10',
-                      iconBg: 'bg-blue-500/20'
-                    }
-                  case 'team': 
-                    return {
-                      bg: 'bg-purple-500/5',
-                      border: 'border-purple-500/20',
-                      hover: 'hover:bg-purple-500/10',
-                      iconBg: 'bg-purple-500/20'
-                    }
-                  case 'gallery': 
-                    return {
-                      bg: 'bg-green-500/5',
-                      border: 'border-green-500/20',
-                      hover: 'hover:bg-green-500/10',
-                      iconBg: 'bg-green-500/20'
-                    }
-                  case 'question': 
-                    return {
-                      bg: 'bg-orange-500/5',
-                      border: 'border-orange-500/20',
-                      hover: 'hover:bg-orange-500/10',
-                      iconBg: 'bg-orange-500/20'
-                    }
-                  default: 
-                    return {
-                      bg: 'bg-gray-500/5',
-                      border: 'border-gray-500/20',
-                      hover: 'hover:bg-gray-500/10',
-                      iconBg: 'bg-gray-500/20'
-                    }
-                }
-              }
-
-              const colorClasses = getActivityColor(activity.type)
-              const timeAgo = getTimeAgo(activity.timestamp)
-
-              return (
-                <motion.div
-                  key={idx}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: idx * 0.05 }}
-                  className={`flex items-center gap-4 p-4 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.hover} transition-all`}
-                >
-                  <div className={`w-10 h-10 rounded-full ${colorClasses.iconBg} flex items-center justify-center flex-shrink-0`}>
-                    <span className="text-xl">{getActivityIcon(activity.type)}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white font-medium truncate">{activity.title}</p>
-                    <p className="text-xs text-gray-400">
-                      {activity.action} • {timeAgo}
-                      {activity.status && ` • ${activity.status}`}
-                      {activity.role && ` • ${activity.role}`}
-                    </p>
-                  </div>
-                  {activity.status && (
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      activity.status === 'published' || activity.status === 'answered' 
-                        ? 'bg-green-500/20 text-green-400' 
-                        : 'bg-yellow-500/20 text-yellow-400'
-                    }`}>
-                      {activity.status}
-                    </span>
-                  )}
-                </motion.div>
-              )
-            })}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* To-do List pane */}
+          <div className="bg-white/3 rounded-lg p-4">
+            <h3 className="text-lg font-bold text-white mb-3">📝 To-do List</h3>
+            <ToDoPane />
           </div>
-        ) : (
-          <p className="text-gray-400">No recent activity...</p>
-        )}
+
+          {/* Git history pane */}
+          <div className="bg-white/3 rounded-lg p-4 overflow-auto">
+            <h3 className="text-lg font-bold text-white mb-3">📦 Git Commit History</h3>
+            <GitHistoryPane />
+          </div>
+        </div>
       </motion.div>
+    </div>
+  )
+}
+
+// ---------------------------
+// ToDoPane (client-side component)
+// ---------------------------
+function ToDoPane() {
+  const [todos, setTodos] = useState<Array<any>>([])
+  const [loadingTodos, setLoadingTodos] = useState(true)
+  const [newTitle, setNewTitle] = useState('')
+  const [newDetails, setNewDetails] = useState('')
+
+  const getAuthHeaders = () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
+    if (!token) return null
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  }
+
+  const load = async () => {
+    setLoadingTodos(true)
+    try {
+      const headers = getAuthHeaders()
+      if (!headers) return
+      const res = await fetch('/api/admin/todos', { headers })
+      if (res.ok) {
+        const data = await res.json()
+        setTodos(data.todos || [])
+      }
+    } catch (err) {
+      console.error('Failed to load todos', err)
+    } finally {
+      setLoadingTodos(false)
+    }
+  }
+
+  useEffect(() => { load() }, [])
+
+  const add = async () => {
+    if (!newTitle.trim()) return
+    try {
+      const headers = getAuthHeaders()
+      if (!headers) return alert('Not authenticated')
+      const res = await fetch('/api/admin/todos', { method: 'POST', headers, body: JSON.stringify({ title: newTitle.trim(), details: newDetails }) })
+      if (res.ok) {
+        setNewTitle('')
+        setNewDetails('')
+        await load()
+      } else {
+        const body = await res.json()
+        alert(body.error || 'Failed to add todo')
+      }
+    } catch (err) { console.error(err); alert('Failed to add todo') }
+  }
+
+  const toggleDone = async (id: string, isDone: boolean) => {
+    try {
+      const headers = getAuthHeaders()
+      if (!headers) return
+      const res = await fetch(`/api/admin/todos?id=${encodeURIComponent(id)}`, { method: 'PATCH', headers, body: JSON.stringify({ is_done: !isDone }) })
+      if (res.ok) load()
+    } catch (err) { console.error(err) }
+  }
+
+  const remove = async (id: string) => {
+    if (!confirm('Delete this to-do?')) return
+    try {
+      const headers = getAuthHeaders()
+      if (!headers) return
+      const res = await fetch(`/api/admin/todos?id=${encodeURIComponent(id)}`, { method: 'DELETE', headers })
+      if (res.ok) load()
+    } catch (err) { console.error(err) }
+  }
+
+  return (
+    <div>
+      <div className="mb-3">
+        <input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="New task title" className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white mb-2" />
+        <input value={newDetails} onChange={e => setNewDetails(e.target.value)} placeholder="Details (optional)" className="w-full px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-white mb-2" />
+        <div className="flex gap-2">
+          <button onClick={add} className="px-4 py-2 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] text-white rounded-lg">Add</button>
+        </div>
+      </div>
+
+      <div className="space-y-2 max-h-80 overflow-auto">
+        {loadingTodos ? (
+          <p className="text-gray-400">Loading...</p>
+        ) : todos.length === 0 ? (
+          <p className="text-gray-400">No to-dos yet</p>
+        ) : (
+          todos.map((t: any) => (
+            <div key={t.id} className={`flex items-center justify-between p-3 rounded-lg border border-white/10 ${t.is_done ? 'bg-green-500/5' : 'bg-white/3'}`}>
+              <div className="flex-1 min-w-0">
+                <p className={`text-white font-medium truncate ${t.is_done ? 'line-through text-gray-400' : ''}`}>{t.title}</p>
+                {t.details && <p className="text-xs text-gray-400 truncate">{t.details}</p>}
+              </div>
+              <div className="flex items-center gap-2 ml-4">
+                {!t.is_done && <button onClick={() => toggleDone(t.id, t.is_done)} className="px-3 py-1 bg-green-500/20 text-green-400 rounded">Finish</button>}
+                <button onClick={() => remove(t.id)} className="px-3 py-1 bg-red-500/20 text-red-400 rounded">Delete</button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ---------------------------
+// GitHistoryPane (client-side component)
+// ---------------------------
+function GitHistoryPane() {
+  const [commits, setCommits] = useState<Array<any>>([])
+  const [loading, setLoading] = useState(true)
+
+  const getAuthHeaders = () => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null
+    if (!token) return null
+    return { Authorization: `Bearer ${token}` }
+  }
+
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true)
+      try {
+        const headers = getAuthHeaders()
+        if (!headers) return
+        const res = await fetch('/api/admin/git-history', { headers })
+        if (res.ok) {
+          const data = await res.json()
+          setCommits(data.commits || [])
+        } else {
+          console.error('Failed to load git history')
+        }
+      } catch (err) {
+        console.error(err)
+      } finally { setLoading(false) }
+    }
+    load()
+  }, [])
+
+  return (
+    <div className="max-h-80 overflow-auto">
+      {loading ? <p className="text-gray-400">Loading...</p> : (
+        commits.length === 0 ? <p className="text-gray-400">No commits available</p> : (
+          <div className="space-y-3">
+            {commits.map((c: any, idx: number) => (
+              <div key={c.sha || c.hash || idx} className="p-3 rounded-lg border border-white/10 bg-white/3">
+                <p className="text-sm text-gray-300 font-mono truncate">{(c.sha || c.hash || '').slice(0,8)} — <span className="text-white font-medium">{c.message}</span></p>
+                <p className="text-xs text-gray-400">{c.author || 'Unknown'} • {c.date ? new Date(c.date).toLocaleString() : 'Unknown date'}</p>
+              </div>
+            ))}
+          </div>
+        )
+      )}
     </div>
   )
 }
