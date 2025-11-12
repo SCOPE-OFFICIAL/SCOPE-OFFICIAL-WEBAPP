@@ -5,8 +5,8 @@
 [build]
 # Build command - Netlify will run the install step separately (set Install command to `pnpm install` in the UI)
   command = "pnpm build"
-# Publish directory must be set to allow the Next.js plugin to work correctly
-  publish = ".netlify"
+# DO NOT set publish directory when using @netlify/plugin-nextjs
+# The plugin automatically creates .netlify/functions and deploys correctly
 
 [build.environment]
 # Use Node 20 to satisfy @supabase/supabase-js recommendation (avoid deprecation warnings)
