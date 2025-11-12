@@ -1,6 +1,7 @@
-'use client'
+"use client"
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { GroupPhoto, PhotoTag } from '@/lib/types/database'
 
@@ -94,10 +95,20 @@ export default function PhotoModal({ photo, tags, onClose }: PhotoModalProps) {
             onMouseMove={handleMouseMove}
             onMouseLeave={() => setHoveredTag(null)}
           >
-            <img
+            {/*
+              Responsive behavior:
+              - On small screens keep `object-contain` so the whole image is visible.
+              - On larger screens (>=426px) use `object-cover` so the image fills the modal container.
+              We keep a plain <img> for simplicity (avoids layout shift with next/image in this client component),
+              and use utility classes to switch between contain/cover based on width.
+            */}
+            <Image
               src={photo.image_url}
               alt={photo.title}
-              className="w-full h-full object-contain md:object-cover"
+              fill
+              className="object-contain min-[426px]:object-cover"
+              sizes="(max-width: 425px) 100vw, 80vw"
+              style={{ objectPosition: 'center' }}
             />
 
             {/* Invisible Hotspots */}

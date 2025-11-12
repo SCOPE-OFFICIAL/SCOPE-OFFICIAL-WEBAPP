@@ -338,13 +338,21 @@ export default function TeamMembers() {
               <div className="relative">
 
                 {/* Team Image */}
-                <div className="relative h-[50vh] sm:h-[45vh] md:h-[40vh] lg:h-[45vh] w-full bg-black/70 overflow-hidden rounded-t-2xl">
+                {/*
+                  Modal image container heights:
+                  - Keep mobile similar to before for small screens (h-[50vh]).
+                  - Increase heights for tablet/desktop so image fills more vertical space on larger viewports.
+                  Adjusted values: sm -> 55vh, md -> 65vh, lg -> 70vh
+                */}
+                <div className="relative h-[50vh] sm:h-[55vh] md:h-[65vh] lg:h-[70vh] w-full bg-black/70 overflow-hidden rounded-t-2xl">
                   <Image
                     src={selectedTeam.image}
                     alt={selectedTeam.title}
                     fill
                     loading="lazy"
-                    className="object-contain object-center"
+                    // Keep full image visible on small/mobile (contain),
+                    // but make it fill the modal on larger screens (>=426px) using object-cover.
+                    className="object-contain min-[426px]:object-cover object-center"
                     style={{ backgroundColor: 'rgba(10,10,15,0.6)' }}
                     sizes="(max-width: 640px) 90vw, (max-width: 1280px) 75vw, 900px"
                   />
