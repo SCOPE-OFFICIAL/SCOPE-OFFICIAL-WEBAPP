@@ -7,7 +7,6 @@
   command = "pnpm build"
 # Important: Do NOT set publish directory - the @netlify/plugin-nextjs handles this automatically
 # It will process the .next folder and create .netlify/functions and other output
-  publish = ""
 
 [build.environment]
 # Use Node 20 to satisfy @supabase/supabase-js recommendation (avoid deprecation warnings)
