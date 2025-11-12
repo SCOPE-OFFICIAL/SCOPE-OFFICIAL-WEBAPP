@@ -1,12 +1,9 @@
 name: Mirror to Personal Account
 
 on:
-  # Triggers the action on every push
   push:
     branches:
-      - main  # <-- 1. CHANGE THIS if your main branch is 'master' or different
-  
-  # Also triggers on branch/tag deletion
+      - main  # Or 'master', etc.
   delete:
 
 jobs:
@@ -16,23 +13,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          # This is necessary to get all history, branches, and tags
           fetch-depth: 0
 
       - name: Push to mirror
         env:
-          # The token you stored as a secret in the organization repo
           GH_PAT: ${{ secrets.HOSTING_DESTINATION_PAT }}
-          
-          # Your personal GitHub username
-          GH_USER: "ROHANBAIJU" # <-- 2. CHANGE THIS
-          
-          # The name of your new personal (mirror) repo
-          DEST_REPO: "SCOPE-OFFICIAL-WEBAPP-FOR-HOSTING" # <-- 3. CHANGE THIS
+          GH_USER: "ROHANBAIJU" # This should be your username
+          DEST_REPO: "SCOPE-OFFICIAL-WEBAPP-FOR-HOSTING" # This is your mirror repo
         
         run: |
           echo "Pushing to https://github.com/$GH_USER/$DEST_REPO.git"
           
-          # This command mirrors everything (all branches, tags)
-          # It authenticates using the PAT you created
-          git push --mirror "https://'$GH_USER:$GH_PAT'@github.com/$GH_USER/$DEST_REPO.git"
+          # Corrected line: removed the single quotes around the variables
+          git push --mirror "https://$GH_USER:$GH_PAT@github.com/$GH_USER/$DEST_REPO.git"
