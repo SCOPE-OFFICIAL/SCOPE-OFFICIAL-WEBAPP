@@ -1461,7 +1461,8 @@ export default function HomePage() {
             </div>
             
             {/* Event card content - optimized for mobile with extra bottom padding */}
-            <div className="p-4 pb-20">
+            {/* Reduce bottom padding on tablet so modal doesn't have excessive empty space */}
+            <div className="p-4 pb-8 md:pb-12 lg:pb-20">
               {renderEventCard()}
             </div>
           </motion.div>

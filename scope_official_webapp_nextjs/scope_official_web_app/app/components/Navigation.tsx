@@ -153,8 +153,8 @@ export default function Navigation() {
             </Link>
           </motion.div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-2">
+          {/* Desktop Navigation (show on large screens only; use hamburger on tablet and below) */}
+          <div className="hidden lg:flex items-center space-x-2">
             {/* Navigation Links */}
             {navItems.map((item, index) => (
               <motion.div
@@ -213,9 +213,9 @@ export default function Navigation() {
             ))}
           </div>
 
-          {/* Mobile menu button */}
+          {/* Mobile / Tablet menu button (visible up to large screens) */}
           <motion.div 
-            className="md:hidden"
+            className="lg:hidden"
             whileTap={{ scale: 0.95 }}
           >
               <motion.button
@@ -246,7 +246,7 @@ export default function Navigation() {
       </div>
       {isMobileMenuOpen && (
         <motion.div
-          className="md:hidden w-full bg-white/6 backdrop-blur-xl border-t border-white/10 overflow-hidden"
+          className="lg:hidden w-full bg-white/6 backdrop-blur-xl border-t border-white/10 overflow-hidden"
           initial={{ height: 0, opacity: 0 }}
           animate={{ height: 'auto', opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}

@@ -596,15 +596,17 @@ const Gallery: React.FC = () => {
                             key={`${item.folder.id}-${item.seq}`}
                             data-index={item.logicalIdx}
                             data-seq={item.seq}
-                            className="snap-start flex-shrink-0 w-[48%] max-w-[900px] min-w-[280px]"
+                            className="snap-start flex-shrink-0 w-[48%] max-w-[900px] min-w-[320px] h-full"
                           >
+                            {/* make the card stretch to the carousel height and split image/content consistently */}
                             <div
                               onClick={() => setSelectedFolder(item.folder.id)}
-                              className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/20 hover:border-[#F24DC2]/30 transition-all duration-300 cursor-pointer shadow-lg"
+                              className="group relative overflow-hidden flex flex-col h-full rounded-lg md:rounded-xl lg:rounded-3xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/20 hover:border-[#F24DC2]/30 transition-all duration-300 cursor-pointer shadow-lg"
                             >
                               <div className={`absolute inset-0 bg-gradient-to-br ${item.folder.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
 
-                              <div className="relative h-[380px] overflow-hidden">
+                              {/* Image area: fixed portion of the card so all cards match height */}
+                              <div className="relative flex-shrink-0 h-[58%] md:h-[60%] lg:h-[62%] overflow-hidden">
                                 <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
                                   <Image
                                     src={item.folder.image}
@@ -623,9 +625,13 @@ const Gallery: React.FC = () => {
                                 </div>
                               </div>
 
-                              <div className="p-6 relative z-10">
-                                <h3 className="text-2xl font-bold text-white mb-2">{item.folder.title}</h3>
-                                <p className="text-gray-400 mb-3 text-sm">{item.folder.subtitle}</p>
+                              {/* Content area: takes remaining space and keeps layout consistent */}
+                              <div className="p-6 relative z-10 flex-1 flex flex-col justify-between overflow-hidden">
+                                <div>
+                                  <h3 className="text-2xl font-bold text-white mb-2 line-clamp-2">{item.folder.title}</h3>
+                                  <p className="text-gray-400 mb-3 text-sm line-clamp-2">{item.folder.subtitle}</p>
+                                </div>
+
                                 <div className="flex items-center text-[#2C97FF] transition-colors duration-300">
                                   <span className="text-xs font-medium mr-2">Click to explore</span>
                                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
