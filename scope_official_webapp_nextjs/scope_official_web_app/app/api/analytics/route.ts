@@ -143,13 +143,18 @@ export async function GET() {
       return acc
     }, {})
 
-    const topApiEndpoints = Object.entries(apiRequestsByEndpoint)
-      .map(([endpoint, stats]) => ({
-        endpoint,
-        requests: stats.count,
-        avgResponseTime: Math.round(stats.totalTime / stats.count),
-        errorRate: Math.round((stats.errors / stats.count) * 100)
-      }))
+    // Type the entries so `stats` is recognized as EndpointStats (avoids 'unknown' type error)
+    // Build top API endpoints list using Object.keys to preserve typing of stats
+    const topApiEndpoints = Object.keys(apiRequestsByEndpoint)
+      .map((endpoint) => {
+        const stats: EndpointStats = apiRequestsByEndpoint[endpoint]
+        return {
+          endpoint,
+          requests: stats.count,
+          avgResponseTime: stats.count > 0 ? Math.round(stats.totalTime / stats.count) : 0,
+          errorRate: stats.count > 0 ? Math.round((stats.errors / stats.count) * 100) : 0
+        }
+      })
       .sort((a, b) => b.requests - a.requests)
       .slice(0, 10)
 
