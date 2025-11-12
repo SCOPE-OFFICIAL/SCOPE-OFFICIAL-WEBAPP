@@ -29,6 +29,10 @@ importers:
       zod:
         specifier: ^4.1.12
         version: 4.1.12
+    devDependencies:
+      '@netlify/plugin-nextjs':
+        specifier: ^5.14.5
+        version: 5.14.5
 
 packages:
 
@@ -169,6 +173,10 @@ packages:
     engines: {node: ^18.17.0 || ^20.3.0 || >=21.0.0}
     cpu: [x64]
     os: [win32]
+
+  '@netlify/plugin-nextjs@5.14.5':
+    resolution: {integrity: sha512-AEt6p33YoZGnS4oV1oJnQZiMhzVptZJF7MyxygXrIuR0H0o72GBVIyn3/k1pyNtmWYyWL7WjZLLmR0aYt/OYqg==}
+    engines: {node: '>=18.0.0'}
 
   '@next/env@15.5.6':
     resolution: {integrity: sha512-3qBGRW+sCGzgbpc5TS1a0p7eNxnOarGVQhZxfvTdnV0gFI61lX7QNtQ4V1TSREctXzYn5NetbUsLvyqwLFJM6Q==}
@@ -561,6 +569,8 @@ snapshots:
 
   '@img/sharp-win32-x64@0.34.4':
     optional: true
+
+  '@netlify/plugin-nextjs@5.14.5': {}
 
   '@next/env@15.5.6': {}
 

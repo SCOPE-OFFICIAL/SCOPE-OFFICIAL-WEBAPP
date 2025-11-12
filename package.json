@@ -7,5 +7,8 @@
 		"next-auth": "^4.24.11",
 		"react-hook-form": "^7.65.0",
 		"zod": "^4.1.12"
+	},
+	"devDependencies": {
+		"@netlify/plugin-nextjs": "^5.14.5"
 	}
 }
