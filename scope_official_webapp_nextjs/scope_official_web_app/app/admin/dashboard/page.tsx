@@ -210,15 +210,28 @@ export default function AdminDashboard() {
             <motion.a
               key={action.title}
               href={action.href}
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={{ opacity: 0, scale: 0.97 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4, delay: 0.4 + index * 0.1 }}
-              whileHover={{ scale: 1.05, y: -5 }}
-              whileTap={{ scale: 0.95 }}
-              className={`${action.color} rounded-xl p-6 text-white text-center cursor-pointer shadow-lg hover:shadow-2xl transition-all`}
+              transition={{ duration: 0.08, delay: 0.05 + index * 0.02 }}
+              // faster hover/unhover response so the card snaps back quickly when the cursor leaves
+              whileHover={{ scale: 1.06, y: -6, transition: { duration: 0.4, ease: 'easeOut' } }}
+              whileTap={{ scale: 0.975 }}
+              className={`${action.color} rounded-xl p-6 text-white text-center cursor-pointer shadow-lg transition-transform duration-200 transform-gpu relative overflow-hidden group`}
             >
-              <div className="text-4xl mb-3">{action.icon}</div>
-              <h3 className="font-bold text-lg">{action.title}</h3>
+              {/* Subtle shine overlay that appears on hover */}
+              <span className="absolute inset-0 pointer-events-none bg-gradient-to-r from-white/6 via-white/12 to-white/6 opacity-0 group-hover:opacity-30 transition-opacity duration-100 mix-blend-screen blur-sm" />
+
+              {/* Floating icon with motion-like transform on hover */}
+              <div className="text-4xl mb-3 transform transition-transform duration-100 group-hover:-translate-y-1 group-hover:rotate-2">
+                {action.icon}
+              </div>
+
+              <h3 className="font-bold text-lg transition-colors duration-300 group-hover:underline">{action.title}</h3>
+
+              {/* Glow/ring on hover */}
+              <span className="absolute -inset-px rounded-xl ring-0 group-hover:ring-4 group-hover:ring-white/20 transition-all duration-100 pointer-events-none" />
+              {/* Colored glow shadow that fades in on hover to give a stronger emphasis */}
+              <span className="absolute inset-0 rounded-xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-100" style={{ boxShadow: '0 18px 50px rgba(242,77,194,0.14), 0 6px 20px rgba(44,151,255,0.08)' }} />
             </motion.a>
           ))}
         </div>
