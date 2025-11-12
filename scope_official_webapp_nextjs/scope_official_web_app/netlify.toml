@@ -5,10 +5,10 @@
 [build]
 # Build command - Netlify will run the install step separately (set Install command to `pnpm install` in the UI)
   command = "pnpm build"
-# Let the Next.js plugin manage the final output folder. The plugin writes to
-# `.netlify/output` and the public web files are under `.netlify/output/public`.
-  publish = ".netlify/output"
-  functions = ".netlify/functions"
+# Do NOT hard-code publish/functions directories when using the Netlify Next.js plugin.
+# Let the plugin create `.netlify/output` during the build so it can populate the
+# functions and public files in the correct places. Having these paths set here
+# can cause race conditions where the plugin expects them to already exist.
 
 [build.environment]
 # Use Node 20 to satisfy @supabase/supabase-js recommendation (avoid deprecation warnings)
