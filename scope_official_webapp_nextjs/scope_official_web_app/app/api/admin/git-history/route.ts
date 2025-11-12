@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { jwtVerify } from 'jose'
 
 const SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'fallback-secret-key')
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN || process.env.GH_TOKEN 
-const GITHUB_OWNER = process.env.GITHUB_OWNER 
-const GITHUB_REPO = process.env.GITHUB_REPO 
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || process.env.GH_TOKEN
+const GITHUB_OWNER = process.env.GITHUB_OWNER ?? ''
+const GITHUB_REPO = process.env.GITHUB_REPO ?? ''
 
 function unauthorized() {
   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -33,6 +33,11 @@ export async function GET(req: NextRequest) {
     // Use GitHub API to fetch recent commits for the configured repo.
     // This works on Netlify and serverless environments when a token is provided.
     const perPage = 50
+    if (!GITHUB_OWNER || !GITHUB_REPO) {
+      console.error('[GET /api/admin/git-history] GITHUB_OWNER or GITHUB_REPO not configured')
+      return NextResponse.json({ error: 'GitHub owner/repo not configured on server' }, { status: 500 })
+    }
+
     const url = `https://api.github.com/repos/${encodeURIComponent(GITHUB_OWNER)}/${encodeURIComponent(GITHUB_REPO)}/commits?per_page=${perPage}`
 
     const headers: Record<string,string> = { Accept: 'application/vnd.github+json' }
@@ -60,7 +65,8 @@ export async function GET(req: NextRequest) {
 
     // Only return commits from the last 7 days
     const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000
-    const recentCommits = commits.filter((c: any) => {
+    type Commit = { sha: string; author: string | null; email: string | null; date: string | null; message: string; url?: string; html_url?: string }
+    const recentCommits = (commits as Commit[]).filter((c) => {
       if (!c.date) return false
       const d = new Date(c.date)
       if (isNaN(d.getTime())) return false
