@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Infinite Logo Ticker</title>
+    <style>
+        /* CSS Variables for easy customization */
+        :root {
+            --logo-width: 180px;  /* Width of each logo container */
+            --num-logos: 6;      /* Number of original logos */
+            --animation-speed: 25s; /* Duration of the scroll animation */
+        }
+
+        /* Basic page styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            display: grid;
+            place-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        h2 {
+            color: #333;
+        }
+
+        /* * The main container. 
+         * 'overflow: hidden' is crucial to create the "window" effect.
+         * 'mask' provides a nice fade-out effect on the edges.
+        */
+        .logo-ticker-container {
+            width: 90%;
+            max-width: 1200px;
+            overflow: hidden;
+            background-color: #ffffff;
+            padding: 40px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            -webkit-mask-image: linear-gradient(
+                to right,
+                transparent 0%,
+                black 10%,
+                black 90%,
+                transparent 100%
+            );
+            mask-image: linear-gradient(
+                to right,
+                transparent 0%,
+                black 10%,
+                black 90%,
+                transparent 100%
+            );
+        }
+
+        /*
+         * The track that holds and moves the logos.
+         * We use flexbox to lay them out in a row.
+         * The width is calculated: (logo width) * (number of logos * 2)
+         * We need two copies of the logos for the infinite loop.
+        */
+        .logo-ticker-track {
+            display: flex;
+            align-items: center;
+            /* Calculate the total width for 2 sets of logos */
+            width: calc(var(--logo-width) * var(--num-logos) * 2);
+            /* The animation */
+            animation: scroll var(--animation-speed) linear infinite;
+        }
+
+        /* * Keyframes for the scrolling animation.
+         * It moves the track to the left by the width of *one* full set of logos.
+         * When it hits 100%, it instantly loops back to 0% (the second set is now in view).
+        */
+        @keyframes scroll {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                /* Move left by the width of the original 6 logos */
+                transform: translateX(calc(var(--logo-width) * var(--num-logos) * -1));
+            }
+        }
+
+        /* Styling for each logo item */
+        .logo-item {
+            flex-shrink: 0; /* Prevents logos from shrinking */
+            width: var(--logo-width);
+            padding: 0 20px;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+            text-align: center;
+        }
+
+        /* Styling for the logo image itself */
+        .logo-item img {
+            max-width: 100%;
+            height: 45px; /* Fixed height for uniformity */
+            object-fit: contain;
+            filter: grayscale(1); /* Makes logos monochrome for a clean look */
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        /* Add a hover effect */
+        .logo-item:hover img {
+            filter: grayscale(0);
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        /* Pause animation on hover */
+        .logo-ticker-track:hover {
+            animation-play-state: paused;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h2>Infinite Logo Ticker</h2>
+
+    <div class="logo-ticker-container">
+        <div class="logo-ticker-track">
+            
+            <div class="logo-item">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
+            </div>
+            <div class="logo-item">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
+            </div>
+            <div class="logo-item">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
+            </div>
+            <div class="logo-item">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple">
+            </div>
+            <div class="logo-item">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Meta-Logo.svg" alt="Meta">
+            </div>
+            <div class="logo-item">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix">
+            </div>
+
+            <div class="logo-item" aria-hidden="true">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft">
+            </div>
+            <div class="logo-item" aria-hidden="true">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
+            </div>
+            <div class="logo-item" aria-hidden="true">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg" alt="Amazon">
+            </div>
+            <div class="logo-item" aria-hidden="true">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple">
+            </div>
+            <div class="logo-item" aria-hidden="true">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/a/ab/Meta-Logo.svg" alt="Meta">
+            </div>
+            <div class="logo-item" aria-hidden="true">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg" alt="Netflix">
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
