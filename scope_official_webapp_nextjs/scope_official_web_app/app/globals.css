@@ -705,7 +705,7 @@ a:hover {
 /* Modal social icons (inside the team modal) */
 .modal-socials {
   display: flex;
-  gap: 0.9rem;
+  gap: 1.25rem; /* increased spacing between icons */
   align-items: center;
 }
 
@@ -713,12 +713,12 @@ a:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 46px;
-  height: 46px;
+  width: 36px; /* reduced size */
+  height: 36px; /* reduced size */
   border-radius: 8px;
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.04);
-  color: #9be3ff;
+  color: #ffffff;
   transition: all 0.18s ease;
   box-shadow: 0 6px 18px rgba(0,0,0,0.45);
 }
@@ -759,7 +759,7 @@ a:hover {
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
   border: 1px solid rgba(255, 255, 255, 0.04);
-  color: #9be3ff;
+  color: #ffffff;
   transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
   cursor: pointer;
@@ -814,8 +814,8 @@ a:hover {
 }
 
 .social-icon-link .icon {
-  width: 20px !important;
-  height: 20px !important;
+  width: 18px !important; /* slightly smaller icon */
+  height: 18px !important; /* slightly smaller icon */
   transition: transform 0.18s ease, opacity 0.18s ease;
   z-index: 1;
   position: relative;
@@ -881,23 +881,30 @@ a:hover {
 @media (max-width: 768px) {
   /* Ensure modal can expand taller on small screens without overflowing viewport */
   .team-modal {
-    max-height: 72vh; /* keep some space for system UI */
+    max-height: 96vh; /* increased so modal can be taller on phones */
   }
 
   /* Make the modal content column take more vertical space so the image area can grow */
+  /* allow the inner flex to size naturally and let right column scroll when needed */
   .team-modal .flex {
-    min-height: 76vh;
+    min-height: auto;
+    max-height: 96vh;
   }
 
   /* Give the image container a larger height on mobile so portrait heads don't get cut off */
   .team-modal .modal-image-container {
-    height: 44vh; /* ~44% of viewport height — adjustable if you want more/less */
-    min-height: 320px; /* ensure a sensible minimum on small devices */
+    /* larger image for mobile while keeping room for right column */
+    height: 44vh; /* increased for better portrait visibility */
+    min-height: 260px; /* sensible minimum for small phones */
   }
 
   /* Ensure the right content scrolls within the modal if content is long */
   .team-modal .overflow-y-auto {
-    max-height: calc(92vh - 44vh);
+    max-height: calc(96vh - 44vh);
+    /* enable smooth scrolling inside the right column */
+    overflow-y: auto;
+    padding-bottom: 1rem; /* ensure icons aren't clipped by container bottom */
+    box-sizing: border-box;
   }
 }
 
@@ -941,6 +948,26 @@ a:hover {
   .social-icon-link .icon {
     width: 17px !important;
     height: 17px !important;
+  }
+
+  /* Make modal image slightly smaller on very small screens so text is visible */
+  .team-modal .modal-image-container {
+    height: 54vh; /* increased to give image more presence on small phones */
+    min-height: 200px;
+  }
+
+  /* Ensure modal right column can scroll and social icons are pinned near bottom */
+  .team-modal .overflow-y-auto {
+    max-height: calc(96vh - 38vh);
+    overflow-y: auto;
+  }
+
+  .modal-socials {
+    display: flex;
+    gap: 1rem; /* slightly larger gap on very small screens */
+    align-items: center;
+    justify-content: flex-start;
+    margin-top: 8px;
   }
 }
 
