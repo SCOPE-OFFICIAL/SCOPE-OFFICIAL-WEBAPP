@@ -6,7 +6,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Typeahead from '../../../../../components/Typeahead'
+import Typeahead from '../../../../components/Typeahead'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 
