@@ -385,7 +385,7 @@ export default function TeamPage() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 8, scale: 0.98 }}
               transition={{ duration: 0.22 }}
-              className="relative z-10 max-w-6xl w-full bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg p-0 mx-4 shadow-2xl overflow-hidden"
+              className="team-modal relative z-10 max-w-6xl w-full bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg p-0 mx-4 shadow-2xl overflow-hidden"
               role="dialog"
               aria-modal="true"
               aria-labelledby="team-modal-title"
@@ -394,7 +394,7 @@ export default function TeamPage() {
                 {/* decorative vertical accent (right edge) */}
                 <div className="modal-accent" aria-hidden="true" />
                 {/* Left: image (stack on small screens) */}
-                <div className="w-full md:w-1/2 relative h-64 md:h-full flex-shrink-0">
+                <div className="modal-image-container w-full md:w-1/2 relative h-64 md:h-full flex-shrink-0">
                   {selectedMember.photo_url ? (
                     <Image
                       src={selectedMember.photo_url}

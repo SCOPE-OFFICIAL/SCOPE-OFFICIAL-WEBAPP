@@ -116,10 +116,8 @@ export default function PartnersTicker({ className = '' }: { className?: string 
           animation: scroll-css var(--animation-speed) linear infinite;
         }
 
-        /* Pause animation on hover */
-        .ticker-track-css:hover {
-          animation-play-state: paused;
-        }
+        /* Do not pause on hover: keep the ticker continuously scrolling so users
+           can still interact with links while motion continues. */
 
         /* The Keyframes */
         @keyframes scroll-css {

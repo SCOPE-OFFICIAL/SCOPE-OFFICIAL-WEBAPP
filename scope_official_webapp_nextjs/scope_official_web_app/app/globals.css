@@ -877,6 +877,30 @@ a:hover {
   }
 }
 
+/* Modal sizing adjustments for mobile so team lead image is fully visible */
+@media (max-width: 768px) {
+  /* Ensure modal can expand taller on small screens without overflowing viewport */
+  .team-modal {
+    max-height: 72vh; /* keep some space for system UI */
+  }
+
+  /* Make the modal content column take more vertical space so the image area can grow */
+  .team-modal .flex {
+    min-height: 76vh;
+  }
+
+  /* Give the image container a larger height on mobile so portrait heads don't get cut off */
+  .team-modal .modal-image-container {
+    height: 44vh; /* ~44% of viewport height — adjustable if you want more/less */
+    min-height: 320px; /* ensure a sensible minimum on small devices */
+  }
+
+  /* Ensure the right content scrolls within the modal if content is long */
+  .team-modal .overflow-y-auto {
+    max-height: calc(92vh - 44vh);
+  }
+}
+
 @media (max-width: 480px) {
   .section-title {
     font-size: 2rem; /* Updated to match About Us heading responsive size */
