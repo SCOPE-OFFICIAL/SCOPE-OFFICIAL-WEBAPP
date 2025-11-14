@@ -585,14 +585,18 @@ a:hover {
   border-radius: 16px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
   overflow: hidden; /* critical: clips the slider button when hidden */
-  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.3s ease;
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
   height: 380px;
   border: 1px solid rgba(255, 255, 255, 0.15);
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .team-member-card:hover {
-  transform: translateY(-8px);
+  transform: translateY(-8px) translate3d(0, 0, 0);
   box-shadow: 0 12px 35px rgba(138, 64, 255, 0.4), 0 0 50px rgba(255, 64, 168, 0.3);
 }
 
@@ -608,12 +612,15 @@ a:hover {
 .member-background-image {
   object-fit: cover;
   object-position: center top;
-  transition: transform 0.5s ease;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              filter 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   filter: brightness(1.15) contrast(1.05);
+  will-change: transform, filter;
+  backface-visibility: hidden;
 }
 
 .team-member-card:hover .member-background-image {
-  transform: scale(1.08);
+  transform: scale(1.08) translate3d(0, 0, 0);
   filter: brightness(1.2) contrast(1.08);
 }
 
@@ -631,7 +638,7 @@ a:hover {
     rgba(4, 10, 40, 0.95) 100%
   );
   z-index: 2;
-  transition: background 0.3s ease;
+  transition: background 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .team-member-card:hover .member-overlay {
@@ -719,12 +726,15 @@ a:hover {
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(255,255,255,0.04);
   color: #ffffff;
-  transition: all 0.18s ease;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 6px 18px rgba(0,0,0,0.45);
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .modal-social-link:hover {
-  transform: translateY(-4px);
+  transform: translateY(-4px) translate3d(0, 0, 0);
   box-shadow: 0 12px 28px rgba(0,0,0,0.5);
   background: linear-gradient(90deg, rgba(0,230,255,0.06), rgba(185,64,255,0.06));
   color: #00e6ff;
@@ -760,12 +770,17 @@ a:hover {
   -webkit-backdrop-filter: blur(6px);
   border: 1px solid rgba(255, 255, 255, 0.04);
   color: #ffffff;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
+              box-shadow 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
+              background 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
   cursor: pointer;
   position: relative;
   overflow: hidden;
   flex-shrink: 0;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
 }
 
 .social-icon-link::before {
@@ -776,7 +791,7 @@ a:hover {
   width: 100%;
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
-  transition: left 0.28s ease;
+  transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .social-icon-link:hover::before {
@@ -784,7 +799,7 @@ a:hover {
 }
 
 .social-icon-link:hover {
-  transform: translateY(-4px);
+  transform: translateY(-4px) translate3d(0, 0, 0);
   box-shadow: 0 12px 28px rgba(0,0,0,0.55);
   background: linear-gradient(90deg, rgba(0,230,255,0.04), rgba(185,64,255,0.04));
 }
@@ -1008,6 +1023,30 @@ a:hover {
 .card-hover-glow,
 .card-hover-scale {
   will-change: transform, opacity;
+  transform: translate3d(0, 0, 0);
+}
+
+/* GPU acceleration for team cards */
+.team-member-card,
+.team-modal,
+.member-socials,
+.social-icon-link {
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Optimize image rendering */
+img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Contain layout for better performance */
+.team-member-wrapper,
+.event-card {
+  contain: layout style paint;
 }
 
 /* Reduce motion for users who prefer reduced motion */

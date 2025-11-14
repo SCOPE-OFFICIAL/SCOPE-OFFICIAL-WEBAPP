@@ -115,11 +115,13 @@ export default function TeamPage() {
         className="relative z-10"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
         style={{ 
           overflow: 'visible', 
           scrollbarWidth: 'none',
-          msOverflowStyle: 'none'
+          msOverflowStyle: 'none',
+          willChange: 'opacity',
+          transform: 'translate3d(0, 0, 0)'
         }}
       >
 
@@ -128,15 +130,15 @@ export default function TeamPage() {
         className="our-team-section"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
       >
         {/* Left: Heading and paragraph */}
         <motion.div 
           className="intro-text"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-100px", amount: 0.3 }}
         >
           <motion.h1 
             className="section-title"
@@ -147,8 +149,8 @@ export default function TeamPage() {
             }}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+            viewport={{ once: true, margin: "-100px", amount: 0.3 }}
           >
             OUR CORE TEAM
           </motion.h1>
@@ -156,8 +158,8 @@ export default function TeamPage() {
             className="section-subtitle"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.6, ease: "easeOut", delay: 0.4 }}
-            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.4, ease: "easeOut", delay: 0.2 }}
+            viewport={{ once: true, margin: "-100px", amount: 0.3 }}
           >
             Introducing the core members of SCOPE and their respectful roles.
           </motion.p>
@@ -178,11 +180,11 @@ export default function TeamPage() {
               </div>
               <motion.div 
                 className="team-member-card"
-                whileHover={{ y: -10, transition: { duration: 0.3 } }}
+                whileHover={{ y: -10, transition: { duration: 0.2, ease: "easeOut" } }}
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                viewport={{ once: true, margin: "-100px" }}
+                transition={{ duration: 0.4, ease: "easeOut" }}
+                viewport={{ once: true, margin: "-100px", amount: 0.3 }}
               >
                 <div className="member-image-background">
                   {facultyCoordinator.photo_url ? (
@@ -191,6 +193,9 @@ export default function TeamPage() {
                       alt={facultyCoordinator.name}
                       fill
                       className="member-background-image"
+                      quality={85}
+                      loading="lazy"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   ) : (
                     <div style={{ 
@@ -281,11 +286,11 @@ export default function TeamPage() {
                 </div>
                 <motion.div 
                   className="team-member-card"
-                  whileHover={{ y: -10, transition: { duration: 0.3 } }}
+                  whileHover={{ y: -10, transition: { duration: 0.2, ease: "easeOut" } }}
                   initial={{ opacity: 0 }}
                   whileInView={{ opacity: 1 }}
-                  transition={{ duration: 0.5, delay: index * 0.05 }}
-                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.3, delay: index * 0.03 }}
+                  viewport={{ once: true, margin: "-50px", amount: 0.3 }}
                 >
                   <div className="member-image-background">
                     {member.photo_url ? (
@@ -294,6 +299,9 @@ export default function TeamPage() {
                         alt={member.name}
                         fill
                         className="member-background-image"
+                        quality={85}
+                        loading="lazy"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       />
                     ) : (
                       <div style={{ 
@@ -365,27 +373,29 @@ export default function TeamPage() {
         </div>
       </motion.section>
 
-      {/* Modal for extra info */}
-      <AnimatePresence>
+      </motion.div>
+
+      {/* Modal for extra info moved outside animated container to avoid stacking context issues */}
+      <AnimatePresence mode="wait">
         {modalOpen && selectedMember && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="fixed inset-0 z-[9999] flex items-center justify-center">
             <motion.div
               className="absolute inset-0"
               initial={{ opacity: 0 }}
               animate={{ opacity: 0.75 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.18 }}
+              transition={{ duration: 0.15 }}
               onClick={closeModal}
               style={{ background: 'rgba(0,0,0,0.75)' }}
             />
 
             <motion.div
               key={selectedMember.id}
-              initial={{ opacity: 0, y: 8, scale: 0.98 }}
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 8, scale: 0.98 }}
-              transition={{ duration: 0.22 }}
-              className="team-modal relative z-10 max-w-6xl w-full bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg p-0 mx-4 shadow-2xl overflow-hidden"
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="team-modal relative z-[10000] max-w-6xl w-full bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg p-0 mx-4 shadow-2xl overflow-hidden"
               role="dialog"
               aria-modal="true"
               aria-labelledby="team-modal-title"
@@ -401,6 +411,9 @@ export default function TeamPage() {
                       alt={selectedMember.name}
                       fill
                       className="object-cover w-full h-full"
+                      quality={90}
+                      priority
+                      sizes="(max-width: 768px) 100vw, 50vw"
                     />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-purple-700 to-pink-500 flex items-center justify-center text-white font-bold">
@@ -456,8 +469,6 @@ export default function TeamPage() {
           </div>
         )}
       </AnimatePresence>
-
-      </motion.div>
     </div>
   );
 }

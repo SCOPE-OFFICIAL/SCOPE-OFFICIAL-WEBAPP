@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  // Performance optimizations
+  reactStrictMode: true,
+  swcMinify: true,
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
   // For monorepos we previously set `outputFileTracingRoot` to the workspace
   // root so Next could collect files used by server functions. However, when
   // deploying to Vercel this can cause the runtime to look for `.next` in a
