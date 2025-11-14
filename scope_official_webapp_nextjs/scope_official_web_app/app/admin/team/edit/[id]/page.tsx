@@ -34,8 +34,10 @@ export default function EditTeamMemberPage() {
         setValue('role', member.role)
         setValue('year', member.year || '')
         setValue('bio', member.bio || '')
+        setValue('personality', member.personality || '')
         setValue('email', member.email || '')
         setValue('linkedin_url', member.linkedin_url || '')
+        setValue('github_url', member.github_url || '')
         setValue('instagram_url', member.instagram_url || '')
         setValue('photo_url', member.photo_url || '')
         setValue('display_order', member.display_order)
@@ -213,6 +215,28 @@ export default function EditTeamMemberPage() {
               {...register('instagram_url')}
               type="url"
               placeholder="https://instagram.com/username"
+              className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600"
+            />
+          </div>
+
+          {/* Personality / More Info */}
+          <div className="mb-6">
+            <label className="block text-white font-semibold mb-2">Personality / More Info</label>
+            <textarea
+              {...register('personality')}
+              rows={4}
+              placeholder="Add a short paragraph describing personality, strengths, interests..."
+              className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600"
+            />
+          </div>
+
+          {/* GitHub */}
+          <div className="mb-6">
+            <label className="block text-white font-semibold mb-2">GitHub URL</label>
+            <input
+              {...register('github_url')}
+              type="url"
+              placeholder="https://github.com/username"
               className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600"
             />
           </div>

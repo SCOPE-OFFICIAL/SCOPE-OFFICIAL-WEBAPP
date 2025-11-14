@@ -12,6 +12,15 @@
   box-sizing: border-box;
 }
 
+/* Full width wrapper so background elements can bleed outside the inner container */
+.sectionWrapper {
+  position: relative;
+  overflow: visible;
+  width: 100%;
+  padding: 60px 0;
+  box-sizing: border-box;
+}
+
 /* Background effects removed to eliminate scrolling issues */
 
 .subHeadline {

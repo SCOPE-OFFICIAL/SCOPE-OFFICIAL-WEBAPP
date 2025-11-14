@@ -142,6 +142,17 @@ export default function NewTeamMemberPage() {
             />
           </div>
 
+          {/* Personality / More Info */}
+          <div className="mb-6">
+            <label className="block text-white font-semibold mb-2">Personality / More Info</label>
+            <textarea
+              {...register('personality')}
+              rows={4}
+              placeholder="Add a short paragraph describing personality, strengths, interests..."
+              className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600"
+            />
+          </div>
+
           {/* Email */}
           <div className="mb-6">
             <label className="block text-white font-semibold mb-2">Email</label>
@@ -171,6 +182,17 @@ export default function NewTeamMemberPage() {
               {...register('instagram_url')}
               type="url"
               placeholder="https://instagram.com/username"
+              className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600"
+            />
+          </div>
+
+          {/* GitHub */}
+          <div className="mb-6">
+            <label className="block text-white font-semibold mb-2">GitHub URL</label>
+            <input
+              {...register('github_url')}
+              type="url"
+              placeholder="https://github.com/username"
               className="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600"
             />
           </div>

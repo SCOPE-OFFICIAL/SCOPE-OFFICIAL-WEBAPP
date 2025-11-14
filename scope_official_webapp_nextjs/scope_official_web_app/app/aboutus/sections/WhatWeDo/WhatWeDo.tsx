@@ -4,6 +4,7 @@ import styles from "./WhatWeDo.module.css";
 import SectionTitle from "../../components/SectionTitle/SectionTitle";
 import PartnersTicker from '../../../components/PartnersTicker';
 import FeatureCard from "../../components/FeatureCard/FeatureCard";
+import BackgroundBalls from "../../../components/BackgroundBalls";
 
 const WhatWeDo: React.FC = () => {
   const programs = [
@@ -28,16 +29,18 @@ const WhatWeDo: React.FC = () => {
   ];
 
   return (
-    <div 
-      className={styles.container}
-      style={{ 
-        overflow: 'visible', 
-        height: 'auto', 
-        minHeight: 'auto',
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none'
-      }}
-    >
+    <section className={styles.sectionWrapper}>
+      <BackgroundBalls />
+      <div 
+        className={styles.container}
+        style={{ 
+          overflow: 'visible', 
+          height: 'auto', 
+          minHeight: 'auto',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}
+      >
       {/* Main Title of the section: WHAT WE OFFER */}
       <SectionTitle title="WHAT WE OFFER" showLines={false} />
       
@@ -82,6 +85,7 @@ const WhatWeDo: React.FC = () => {
         <div className={styles.separatorLine}></div>
       </div>
     </div>
+    </section>
   );
 };
 

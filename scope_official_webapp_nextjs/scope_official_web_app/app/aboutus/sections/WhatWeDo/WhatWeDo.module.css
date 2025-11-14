@@ -333,3 +333,12 @@
     height: 8px;
   }
 }
+
+/* Full width wrapper for full-bleed animated decorations */
+.sectionWrapper {
+  position: relative;
+  overflow: visible;
+  width: 100%;
+  padding: 60px 0;
+  box-sizing: border-box;
+}

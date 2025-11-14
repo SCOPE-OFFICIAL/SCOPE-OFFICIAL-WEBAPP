@@ -193,6 +193,16 @@ export default function AdminTeamPage() {
                         LinkedIn
                       </a>
                     )}
+                      {member.github_url && (
+                        <a
+                          href={member.github_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-gray-300 hover:text-gray-200 text-xs"
+                        >
+                          GitHub
+                        </a>
+                      )}
                     {member.instagram_url && (
                       <a
                         href={member.instagram_url}

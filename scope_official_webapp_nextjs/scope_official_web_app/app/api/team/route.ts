@@ -75,9 +75,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Whitelist expected fields to avoid inserting unexpected keys
+    const insertPayload: Record<string, any> = {
+      name: body.name,
+      role: body.role,
+      year: body.year ?? null,
+      bio: body.bio ?? null,
+      email: body.email ?? null,
+      linkedin_url: body.linkedin_url ?? null,
+      instagram_url: body.instagram_url ?? null,
+      github_url: body.github_url ?? null,
+      personality: body.personality ?? null,
+      photo_url: body.photo_url ?? null,
+      display_order: typeof body.display_order === 'number' ? body.display_order : 0,
+      is_active: typeof body.is_active === 'boolean' ? body.is_active : true,
+    }
+
     const { data, error } = await supabase
       .from('team_members')
-      .insert([body])
+      .insert([insertPayload])
       .select()
       .single()
 
@@ -103,9 +119,21 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Member ID is required' }, { status: 400 })
     }
 
+    // Only allow known fields to be updated
+    const allowedKeys = new Set([
+      'name', 'role', 'year', 'bio', 'email', 'linkedin_url', 'instagram_url', 'github_url', 'personality', 'photo_url', 'display_order', 'is_active'
+    ])
+
+    const filteredUpdates: { [k: string]: string | number | boolean | null } = {}
+    for (const key of Object.keys(updates)) {
+      if (allowedKeys.has(key)) {
+        filteredUpdates[key] = updates[key] ?? null
+      }
+    }
+
     const { data, error } = await supabase
       .from('team_members')
-      .update(updates)
+      .update(filteredUpdates)
       .eq('id', id)
       .select()
       .single()

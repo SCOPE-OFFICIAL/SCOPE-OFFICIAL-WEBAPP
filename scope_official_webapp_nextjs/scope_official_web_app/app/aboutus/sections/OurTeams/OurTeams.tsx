@@ -1,6 +1,7 @@
 import React from "react";
 import styles from "./OurTeams.module.css";
 import SectionTitle from "../../components/SectionTitle/SectionTitle";
+import BackgroundBalls from "../../../components/BackgroundBalls";
 import TeamCard from "../../components/TeamCard/TeamCard";
 import HorizontalDivider from "../../components/HorizontalDivider/HorizontalDivider";
 
@@ -16,6 +17,8 @@ const OurTeams: React.FC = () => {
   return (
     <section className={styles.ourTeamsSection} id="team">
       <div className={styles.container}>
+        {/* Background animated balls */}
+        <BackgroundBalls />
         <HorizontalDivider marginBottom="30px" />
         <SectionTitle title="OUR TEAMS" showLines={true} />
         {/* Decorative background element */}

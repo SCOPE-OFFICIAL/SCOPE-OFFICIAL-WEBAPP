@@ -147,6 +147,16 @@ export default function ManagePartners() {
       visible: p.visible !== false,
       imagePreview: p.image_url
     });
+
+    // Scroll the page to top so the edit form is visible to the user
+    if (typeof window !== 'undefined' && window.scrollTo) {
+      try {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch {
+        // fallback for older browsers
+        window.scrollTo(0, 0);
+      }
+    }
   };
 
   const saveEdit = async () => {

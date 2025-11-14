@@ -1,4 +1,5 @@
 import React from "react";
+import BackgroundBalls from "../../../components/BackgroundBalls";
 import styles from "./AboutUs.module.css";
 import SectionTitle from "../../components/SectionTitle/SectionTitle";
 import { FaLightbulb, FaCog } from "react-icons/fa";
@@ -37,17 +38,20 @@ export default function AboutUs() {
   ];
 
   return (
-    <div 
-      className={styles.container} 
-      style={{ 
-        overflow: 'visible', 
-        height: 'auto', 
-        minHeight: 'auto',
-        scrollbarWidth: 'none',
-        msOverflowStyle: 'none'
-      }}
-    >
-      <SectionTitle title="ABOUT US" showLines={true} />
+    // Section wrapper spans full width so decorative balls can bleed outside the content container
+    <section className={styles.sectionWrapper}>
+      <BackgroundBalls />
+      <div 
+        className={styles.container} 
+        style={{ 
+          overflow: 'visible', 
+          height: 'auto', 
+          minHeight: 'auto',
+          scrollbarWidth: 'none',
+          msOverflowStyle: 'none'
+        }}
+      >
+        <SectionTitle title="ABOUT US" showLines={true} />
       <p className={styles.subHeadline}>
         Empowering the next generation of innovators
       </p>
@@ -64,5 +68,6 @@ export default function AboutUs() {
         ))}
       </div>
     </div>
+    </section>
   );
 }

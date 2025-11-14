@@ -38,6 +38,8 @@ export interface TeamMember {
   bio: string | null
   instagram_url: string | null
   linkedin_url: string | null
+  github_url?: string | null
+  personality?: string | null
   email: string | null
   year: string | null
   is_active: boolean

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import BackgroundBalls from "../components/BackgroundBalls";
 
 // Type for Event from database
 interface Event {
@@ -544,21 +545,24 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#040a28] via-[#0d1b3d] to-[#040a28] text-gray-200 font-sans relative overflow-hidden">
-      {/* DISABLED: All background animations removed */}
+      {/* Background animations (balls/particles) */}
+      <BackgroundBalls />
 
       {/* Main Content Area - Use a relative z-index to place content above background */}
       <main className="relative z-10">
         {/* Upcoming Events Section - WITH SMOOTH ANIMATIONS */}
-        <motion.section 
-          className="py-[200px] px-[30px] bg-[#040A28] text-white relative"
-          initial={{ opacity: 0, y: 100 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ 
-            duration: 0.8, 
-            ease: "easeOut",
-            type: "tween"
-          }}
-        >
+        <section className="relative overflow-visible w-full">
+          <BackgroundBalls />
+          <motion.section 
+            className="py-[200px] px-[30px] bg-[#040A28] text-white relative"
+            initial={{ opacity: 0, y: 100 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ 
+              duration: 0.8, 
+              ease: "easeOut",
+              type: "tween"
+            }}
+          >
           {/* Smooth Section Divider */}
           <motion.div
             className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#F24DC2] to-transparent mb-16"
@@ -1264,7 +1268,7 @@ export default function HomePage() {
             )}
           </motion.div>
         </motion.section>
-
+    </section>
 
         {/* Past Events Section - WITH SMOOTH ANIMATIONS */}
         <motion.section 

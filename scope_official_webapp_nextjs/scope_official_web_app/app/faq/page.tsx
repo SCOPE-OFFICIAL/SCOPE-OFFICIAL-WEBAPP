@@ -393,12 +393,12 @@ export default function FaqPage() {
 
             {/* Animated Illustration - Simplified */}
             <motion.div 
-              className="lg:w-1/2 flex items-center justify-center"
+              className="w-full lg:w-1/2 flex items-center justify-center mt-8 lg:mt-0"
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <div className="relative hover:scale-105 transition-transform duration-300 w-full max-w-[260px] sm:max-w-[320px] md:max-w-[380px]">
+              <div className="relative hover:scale-105 transition-transform duration-300 w-full max-w-[260px] sm:max-w-[320px] md:max-w-[380px] mx-auto">
                   <div className="relative w-full aspect-[380/410]">
                     <Image
                       src="/images/faq_pic.png"
@@ -409,7 +409,7 @@ export default function FaqPage() {
                     />
                   </div>
 
-                  {/* Floating question marks animation - Simplified (positions converted to % for responsiveness) */}
+                  {/* Floating question marks animation - hidden on very small screens to avoid overflow */}
                   <div className="absolute inset-0 pointer-events-none">
                     {['?', '?', '?'].map((mark, i) => {
                       const questionPositions = [
@@ -421,7 +421,7 @@ export default function FaqPage() {
                       return (
                         <motion.div
                           key={i}
-                          className="absolute text-3xl sm:text-4xl text-[#F24DC2] opacity-30"
+                          className="hidden sm:block absolute text-3xl sm:text-4xl text-[#F24DC2] opacity-30"
                           style={{
                             left: questionPositions[i].left,
                             top: questionPositions[i].top,

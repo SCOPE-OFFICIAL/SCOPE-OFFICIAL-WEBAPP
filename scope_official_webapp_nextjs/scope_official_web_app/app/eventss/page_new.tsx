@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import AnimatedButton from '../components/AnimatedButton';
+import BackgroundBalls from "../components/BackgroundBalls";
 
 export default function HomePage() {
   const router = useRouter();
@@ -145,10 +146,14 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen text-gray-200 font-sans relative">
+      {/* Background balls/particles animation (client) */}
+      <BackgroundBalls />
       {/* Main Content Area */}
       <main className="container mx-auto px-8 py-16 lg:py-24 relative z-10">
         {/* Upcoming Events Section */}
-        <motion.section 
+        <section className="relative overflow-visible w-full">
+          <BackgroundBalls />
+          <motion.section 
           className="flex flex-col lg:flex-row items-center lg:items-start justify-between mb-24"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -264,7 +269,8 @@ export default function HomePage() {
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
             />
           </motion.div>
-        </motion.section>
+  </motion.section>
+  </section>
 
         {/* Past Events Section */}
         <motion.section 
