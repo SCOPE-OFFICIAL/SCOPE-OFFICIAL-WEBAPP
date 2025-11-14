@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { event_name, poster_image_url, display_order, is_visible } = body
+    const { event_name, poster_image_url, display_order, is_visible, description, gallery_folder } = body
 
     if (!event_name || !poster_image_url) {
       return NextResponse.json(
@@ -80,7 +80,9 @@ export async function POST(request: NextRequest) {
           event_name,
           poster_image_url,
           display_order: display_order || 0,
-          is_visible: is_visible !== undefined ? is_visible : true
+          is_visible: is_visible !== undefined ? is_visible : true,
+          description: description ?? null,
+          gallery_folder: gallery_folder ?? null
         }
       ])
       .select()
@@ -108,13 +110,15 @@ export async function PUT(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { event_name, poster_image_url, display_order, is_visible } = body
+    const { event_name, poster_image_url, display_order, is_visible, description, gallery_folder } = body
 
-    const updateData: Record<string, string | number | boolean> = {}
+    const updateData: Record<string, string | number | boolean | null> = {}
     if (event_name !== undefined) updateData.event_name = event_name
     if (poster_image_url !== undefined) updateData.poster_image_url = poster_image_url
     if (display_order !== undefined) updateData.display_order = display_order
     if (is_visible !== undefined) updateData.is_visible = is_visible
+    if (description !== undefined) updateData.description = description
+    if (gallery_folder !== undefined) updateData.gallery_folder = gallery_folder
 
     const { data, error } = await supabase
       .from('past_events')

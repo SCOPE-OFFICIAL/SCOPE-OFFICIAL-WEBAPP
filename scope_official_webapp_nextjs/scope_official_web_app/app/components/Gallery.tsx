@@ -39,6 +39,7 @@ const Gallery: React.FC = () => {
   const REPEAT = 6; // Reduced repeat to limit DOM nodes and improve scroll performance
 
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
+  const [highlightFolder, setHighlightFolder] = useState<string | null>(null);
   const [cameFromEvents, setCameFromEvents] = useState(false);
   const [selectedImage, setSelectedImage] = useState<{ image: string; alt: string } | null>(null);
   const [folderCards, setFolderCards] = useState<FolderData[]>([]);
@@ -57,125 +58,88 @@ const Gallery: React.FC = () => {
   // Scroll to a specific slide (center it in the viewport)
   const scrollToSlide = useCallback((index: number) => {
     const container = carouselRef.current;
-    if (!container) return;
-    const child = container.children[index] as HTMLElement | undefined;
-    if (!child) return;
-    // center the child in the container viewport
-    const offset = child.offsetLeft - (container.clientWidth - child.clientWidth) / 2;
-    container.scrollTo({ left: offset, behavior: 'smooth' });
-  }, []);
-
-  // Handle hover: DON'T pause auto-scroll on hover - let it keep scrolling
-  // Users can still click on cards while they're scrolling
-  // This provides a better infinite scroll experience
-  useEffect(() => {
-    const carousel = carouselRef.current;
     const track = trackRef.current;
-    
-    if (!shouldScroll) return;
-    if (!carousel || !track) return;
+    if (!container || !track) return;
 
-    // Ensure the carousel is not paused when it mounts
-    if (track.dataset) {
-      track.dataset.paused = "0";
-    }
-  }, [folderCards.length, shouldScroll, selectedFolder, reduceMotion]);
-
-  // Manual scroll controls
-  const scrollCarousel = useCallback((direction: 'left' | 'right') => {
-    if (typeof window === 'undefined') return;
-    
-    const globalKey = '__scope_continuous_scroller__' as const;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const globalState = (window as any)[globalKey];
-    
-    if (globalState && globalState.scrollers) {
-      const scrollerState = globalState.scrollers.get('gallery');
-      if (scrollerState) {
-        // Move by approximately one card width
-        const scrollAmount = 500; // Adjust based on your card width
-        scrollerState.offset += direction === 'right' ? scrollAmount : -scrollAmount;
-        console.log('[Gallery Scroll] Manual scroll:', direction, 'new offset:', scrollerState.offset);
-      }
-    }
-  }, []);
-
-  // Add horizontal scroll support using trackpad/mouse wheel
-  useEffect(() => {
-    const wrapper = carouselWrapperRef.current;
-    const track = trackRef.current;
-    if (!wrapper || !track) {
-      console.log('[Gallery Scroll] Wrapper or track ref not ready, will retry when refs are available');
+    // find all repeated children inside the track with matching data-index
+    const matches = Array.from(track.querySelectorAll(`[data-index="${index}"]`)) as HTMLElement[];
+    if (!matches.length) {
+      // fallback: if no matches, do nothing
       return;
     }
 
-    let scrollTimeout: number | null = null;
-    let pendingDelta = 0;
-    let ticking = false;
+    // choose the matched element closest to the current viewport center so scrolling feels natural
+    const containerRect = container.getBoundingClientRect();
+    const viewportCenterX = containerRect.left + containerRect.width / 2;
 
-    const handleWheel = (e: WheelEvent) => {
-      // Prevent default vertical scroll
-      e.preventDefault();
-      e.stopPropagation();
+    let best = matches[0];
+    let bestDiff = Math.abs((best.getBoundingClientRect().left + best.getBoundingClientRect().width / 2) - viewportCenterX);
+    for (let i = 1; i < matches.length; i++) {
+      const m = matches[i];
+      const mRect = m.getBoundingClientRect();
+      const diff = Math.abs((mRect.left + mRect.width / 2) - viewportCenterX);
+        const container = carouselRef.current;
+        const track = trackRef.current;
+        let appliedEl: HTMLElement | null = null;
+        let applyTimeout: number | null = null;
+        let clearTimeoutId: number | null = null;
+          const container = carouselRef.current;
+          const track = trackRef.current;
+          if (!container || !track) return;
 
-      // Pause auto-scroll while user is manually scrolling
-      if (track.dataset) track.dataset.paused = "1";
-
-      // accumulate desired offset and rAF it to avoid flooding layout
-      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX * 0.8 : e.deltaY * 0.5;
-      pendingDelta += delta;
-
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(() => {
-          try {
-            if (typeof window !== 'undefined') {
-              const globalKey = '__scope_continuous_scroller__' as const;
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              const globalState = (window as any)[globalKey];
-              if (globalState && globalState.scrollers) {
-                const scrollerState = globalState.scrollers.get('gallery');
-                if (scrollerState) {
-                  scrollerState.offset += pendingDelta;
-                }
-              }
-            }
-          } finally {
-            pendingDelta = 0;
-            ticking = false;
+          // find all repeated children inside the track with matching data-index
+          const matches = Array.from(track.querySelectorAll(`[data-index="${index}"]`)) as HTMLElement[];
+          if (!matches.length) {
+            // fallback: if no matches, do nothing
+            return;
           }
-        });
-      }
 
-      // Clear existing timeout
-      if (scrollTimeout) window.clearTimeout(scrollTimeout);
+          // choose the matched element closest to the current viewport center so scrolling feels natural
+          const containerRect = container.getBoundingClientRect();
+          const viewportCenterX = containerRect.left + containerRect.width / 2;
 
-      // Resume auto-scroll after short idle
-      scrollTimeout = window.setTimeout(() => {
-        if (track.dataset) track.dataset.paused = "0";
-      }, 500) as unknown as number;
-    };
+          let best = matches[0];
+          let bestDiff = Math.abs((best.getBoundingClientRect().left + best.getBoundingClientRect().width / 2) - viewportCenterX);
+          for (let i = 1; i < matches.length; i++) {
+            const m = matches[i];
+            const mRect = m.getBoundingClientRect();
+            const diff = Math.abs((mRect.left + mRect.width / 2) - viewportCenterX);
+            if (diff < bestDiff) {
+              best = m;
+              bestDiff = diff;
+            }
+          }
 
-    wrapper.addEventListener('wheel', handleWheel, { passive: false });
+          const bestRect = best.getBoundingClientRect();
+          // compute how much to change scrollLeft so best element is centered in container
+          const delta = (bestRect.left + bestRect.width / 2) - viewportCenterX;
+          const newScrollLeft = container.scrollLeft + delta;
+          container.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+    if (idx === -1) return;
 
-    return () => {
-      wrapper.removeEventListener('wheel', handleWheel);
-      if (scrollTimeout) {
-        window.clearTimeout(scrollTimeout);
-      }
-      console.log('[Gallery Scroll] Wheel event listener removed');
-    };
-  }, [folderCards.length]);
-
-  // Keep currentSlide in sync with programmatic navigation
-  useEffect(() => {
-    // Only perform snap-to-slide when continuous loop is NOT active.
-    // Continuous loop (RAF) manages scrollLeft directly and we shouldn't jump during that.
-    const continuousActive = !reduceMotion && !selectedFolder && folderCards.length > 1;
-    if (!continuousActive && carouselRef.current) {
-      scrollToSlide(currentSlide);
+    // If carousel mode (3+ folders), center the card
+    if (folderCards.length > 2 && carouselRef.current) {
+      // small delay to ensure DOM rendered
+      window.setTimeout(() => {
+        try {
+          scrollToSlide(idx);
+        } catch (err) {
+          console.warn('[Gallery] scrollToSlide failed', err);
+        }
+      }, 80);
+      return;
     }
-  }, [currentSlide, scrollToSlide, reduceMotion, selectedFolder, folderCards.length]);
+
+    // Grid mode: scroll the folder card into view if present
+    try {
+      const el = document.querySelector(`[data-folder-id="${selectedFolder}"]`) as HTMLElement | null;
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+      }
+    } catch (err) {
+      console.warn('[Gallery] could not scroll to folder element', err);
+    }
+  }, [selectedFolder, folderCards, scrollToSlide]);
 
   // initial data fetch will be started after fetchGalleryData is declared
 
@@ -258,6 +222,27 @@ const Gallery: React.FC = () => {
       const data = await res.json();
       const images: GalleryImage[] = data.images || [];
 
+      // Also fetch past_events to obtain admin-provided descriptions and folder mappings
+      let pastEvents: Array<{ gallery_folder?: string; event_name?: string; description?: string }> = []
+      try {
+        const peRes = await fetch('/api/past-events?visible=true')
+        const peJson = await peRes.json()
+        pastEvents = peJson.pastEvents || []
+      } catch (err) {
+        console.warn('[Gallery] could not fetch past events for metadata', err)
+      }
+
+      // Map gallery_folder -> past event metadata (pick first matching)
+      const pastMap: Record<string, { event_name?: string; description?: string }> = {}
+      for (const pe of pastEvents) {
+        if (pe.gallery_folder) {
+          const key = String(pe.gallery_folder)
+          if (!pastMap[key]) {
+            pastMap[key] = pe
+          }
+        }
+      }
+
       // Group images by folder
       const folders: { [key: string]: GalleryImage[] } = {};
       images.forEach(img => {
@@ -278,6 +263,7 @@ const Gallery: React.FC = () => {
         const adminMetadata = savedMetadata ? JSON.parse(savedMetadata) : null
 
         // Merge with default metadata
+        // If admin created a past event tied to this folder, prefer its title/description
         const defaultMetadata = folderMetadata[folderName] || {
           title: folderName.toUpperCase(),
           subtitle: `Explore ${folderName} gallery`,
@@ -291,7 +277,8 @@ const Gallery: React.FC = () => {
           gradient: 'from-purple-600 via-blue-600 to-indigo-600'
         };
 
-        // Use admin-set metadata if available, otherwise use defaults
+        // Use admin-set metadata from localStorage if available, otherwise use defaults
+        // Additionally, if a past_events row exists for this folder, prefer its event_name/description
         const metadata = adminMetadata ? {
           title: adminMetadata.title || defaultMetadata.title,
           subtitle: adminMetadata.subtitle || defaultMetadata.subtitle,
@@ -304,6 +291,11 @@ const Gallery: React.FC = () => {
           },
           gradient: adminMetadata.gradient || defaultMetadata.gradient
         } : defaultMetadata;
+
+        // Do NOT override folder display title/subtitle with past event data.
+        // Folder names and their display metadata must remain independent from past event posters.
+        // If admins want to customize folder metadata, they should use the Gallery admin UI (localStorage `event_meta_...`).
+        // We may still retain past event metadata for other uses, but we must not change the folder card title here.
 
         // Use display image from admin metadata if set, otherwise use first image
         const displayImage = adminMetadata?.displayImage || folderImages[0]?.image_url || '/images/default-gallery.jpg';
@@ -348,18 +340,169 @@ const Gallery: React.FC = () => {
 
   // (fetchGalleryData is implemented above as a stable useCallback)
 
-  // Check for localStorage to auto-select gallery folder
+  // Check for localStorage to auto-select gallery folder OR highlight a folder
   useEffect(() => {
-    const storedFolder = localStorage.getItem('galleryFolder');
-    
-    if (storedFolder) {
-      console.log('[Gallery] auto-select folder from localStorage:', storedFolder);
-      setSelectedFolder(storedFolder);
-      setCameFromEvents(true); // Mark that user came from events page
-      // Clear the stored folder after using it
-      localStorage.removeItem('galleryFolder');
+    try {
+      // Legacy: if a stored 'galleryFolder' exists, auto-open it (backwards compatibility)
+      const storedFolder = localStorage.getItem('galleryFolder');
+      if (storedFolder) {
+        console.log('[Gallery] auto-select folder from localStorage:', storedFolder);
+        setSelectedFolder(storedFolder);
+        setCameFromEvents(true);
+        localStorage.removeItem('galleryFolder');
+        return;
+      }
+
+      // New: support a highlight-only flow triggered by Events page
+      const highlight = localStorage.getItem('galleryHighlightFolder');
+      if (highlight) {
+        console.log('[Gallery] highlight folder from localStorage:', highlight);
+        setHighlightFolder(highlight);
+        setCameFromEvents(true);
+        // clear persisted value immediately so refresh doesn't re-trigger
+        localStorage.removeItem('galleryHighlightFolder');
+
+        // auto-clear highlight after a few seconds
+        const tid = window.setTimeout(() => setHighlightFolder(null), 4000);
+        return () => window.clearTimeout(tid);
+      }
+    } catch (err) {
+      console.warn('[Gallery] localStorage check failed', err);
     }
   }, []);
+
+  // If a highlightFolder is set, find the visible DOM instance (in the carousel or grid),
+  // apply a temporary inline highlight (box-shadow), ensure it's scrolled into view,
+  // and then clear the highlight after a short timeout.
+  useEffect(() => {
+    if (!highlightFolder || folderCards.length === 0) return;
+
+    const container = carouselRef.current;
+    const track = trackRef.current;
+    let appliedEl: HTMLElement | null = null;
+
+    try {
+      if (track && container && folderCards.length > 2) {
+        const matches = Array.from(track.querySelectorAll(`[data-folder-id="${highlightFolder}"]`)) as HTMLElement[];
+        if (matches.length > 0) {
+          // choose the matched element closest to viewport center
+          const containerRect = container.getBoundingClientRect();
+          const viewportCenterX = containerRect.left + containerRect.width / 2;
+          let best = matches[0];
+          let bestDiff = Math.abs((best.getBoundingClientRect().left + best.getBoundingClientRect().width / 2) - viewportCenterX);
+          for (let i = 1; i < matches.length; i++) {
+            const m = matches[i];
+            const diff = Math.abs((m.getBoundingClientRect().left + m.getBoundingClientRect().width / 2) - viewportCenterX);
+            if (diff < bestDiff) {
+              best = m;
+              bestDiff = diff;
+            }
+          }
+
+          // inner clickable card is the first child
+          const inner = (best.firstElementChild as HTMLElement) || best;
+          appliedEl = inner;
+        }
+      }
+
+      // fallback: grid mode or no carousel match - pick the first element in DOM
+      if (!appliedEl) {
+        const el = document.querySelector(`[data-folder-id="${highlightFolder}"]`) as HTMLElement | null;
+        if (el) {
+          // If the element itself is the card (grid) use it, else prefer its first child
+          appliedEl = (el.classList.contains('group') ? el : (el.querySelector('.group') as HTMLElement) || (el.firstElementChild as HTMLElement) || el);
+        }
+      }
+
+      // Apply inline highlight styles so the ring is visible regardless of layout
+      if (appliedEl) {
+        appliedEl.style.boxShadow = '0 0 0 4px rgba(242,77,194,0.95)';
+        appliedEl.style.transition = 'box-shadow 300ms ease, transform 300ms ease';
+        appliedEl.style.zIndex = '40';
+
+        // Smoothly scroll the highlighted element into view (center it)
+        try {
+          appliedEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        } catch {
+          // fallback to scrollToSlide by index
+          const idx = folderCards.findIndex((f) => f.id === highlightFolder);
+          if (idx !== -1 && carouselRef.current) {
+            scrollToSlide(idx);
+          }
+        }
+      }
+    } catch {
+      console.warn('[Gallery] highlight effect failed');
+    }
+
+    const tid = window.setTimeout(() => {
+      try {
+        if (appliedEl) {
+          appliedEl.style.boxShadow = '';
+          appliedEl.style.transition = '';
+          appliedEl.style.zIndex = '';
+        } else {
+          // cleanup any remaining matches
+          const els = Array.from(document.querySelectorAll(`[data-folder-id="${highlightFolder}"] .group`)) as HTMLElement[];
+          els.forEach((e) => {
+            e.style.boxShadow = '';
+            e.style.transition = '';
+            e.style.zIndex = '';
+          });
+        }
+      } catch {}
+      setHighlightFolder(null);
+    }, 3500);
+
+    return () => {
+      window.clearTimeout(tid as unknown as number);
+      try {
+        if (appliedEl) {
+          appliedEl.style.boxShadow = '';
+          appliedEl.style.transition = '';
+          appliedEl.style.zIndex = '';
+        }
+      } catch {}
+    };
+  }, [highlightFolder, folderCards, scrollToSlide]);
+
+  // Also support URL query/hash-based auto-open, e.g. /#gallery?open=FOLDER or /?open=FOLDER
+  useEffect(() => {
+    if (!folderCards || folderCards.length === 0) return;
+    if (selectedFolder) return; // already selected via localStorage or user action
+
+    try {
+      // Try search params first
+      const sp = new URLSearchParams(window.location.search || '')
+      const openParam = sp.get('open')
+      if (openParam) {
+        const decoded = decodeURIComponent(openParam)
+        const found = folderCards.find(f => f.id === decoded)
+        if (found) {
+          console.log('[Gallery] auto-open from URL search param open=', decoded)
+          setSelectedFolder(decoded)
+          setCameFromEvents(true)
+          return
+        }
+      }
+
+      // Try hash if search param not present. Support formats like /#gallery?open=FOLDER or /#gallery&open=FOLDER
+      const hash = window.location.hash || ''
+      if (hash.includes('open=')) {
+        const maybe = hash.split('open=')[1].split('&')[0]
+        const decoded = decodeURIComponent(maybe)
+        const found = folderCards.find(f => f.id === decoded)
+        if (found) {
+          console.log('[Gallery] auto-open from URL hash open=', decoded)
+          setSelectedFolder(decoded)
+          setCameFromEvents(true)
+          return
+        }
+      }
+    } catch (err) {
+      console.warn('Error parsing URL for gallery auto-open', err)
+    }
+  }, [folderCards, selectedFolder])
 
   const getCurrentGallery = useCallback((): GalleryImage[] => {
     const folder = folderCards.find((f) => f.id === selectedFolder);
@@ -438,14 +581,39 @@ const Gallery: React.FC = () => {
   };
 
   const handleBackNavigation = () => {
-    console.log('[Gallery] back navigation triggered, cameFromEvents:', cameFromEvents);
-    if (cameFromEvents) {
-      // Navigate back to events page
-      window.location.href = '/eventss';
-    } else {
-      // Regular back to folders behavior
+    console.log('[Gallery] back navigation triggered, cameFromEvents:', cameFromEvents, 'selectedFolder:', selectedFolder);
+
+    // If a folder is open, close it first and return to the main folders/carousel view.
+    // This avoids immediately navigating back to the Events page when user expects to return to the Gallery carousel.
+    if (selectedFolder) {
       setSelectedFolder(null);
+      setCameFromEvents(false);
+      // remove open= param/hash from URL without reloading
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('open');
+        // also remove open= from hash if present
+        let hash = url.hash || '';
+        if (hash.includes('open=')) {
+          hash = hash.replace(/([#&]?open=[^&]*)/, '');
+          // cleanup leftover ? or & at start
+          hash = hash.replace(/[#&]?\?/, '#').replace(/#$/, '');
+        }
+        window.history.replaceState({}, document.title, url.pathname + (hash || url.search ? (url.search + hash) : ''));
+      } catch (err) {
+        console.warn('[Gallery] could not clean URL after closing folder', err);
+      }
+      return;
     }
+
+    // If no folder open but user originally came from Events, navigate back there.
+    if (cameFromEvents) {
+      window.location.href = '/eventss';
+      return;
+    }
+
+    // Default behavior: ensure no folder is selected
+    setSelectedFolder(null);
   };
 
   const containerVariants = {
@@ -596,12 +764,13 @@ const Gallery: React.FC = () => {
                             key={`${item.folder.id}-${item.seq}`}
                             data-index={item.logicalIdx}
                             data-seq={item.seq}
+                            data-folder-id={item.folder.id}
                             className="snap-start flex-shrink-0 w-[48%] max-w-[900px] min-w-[320px] h-full"
                           >
                             {/* make the card stretch to the carousel height and split image/content consistently */}
                             <div
                               onClick={() => setSelectedFolder(item.folder.id)}
-                              className="group relative overflow-hidden flex flex-col h-full rounded-lg md:rounded-xl lg:rounded-3xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/20 hover:border-[#F24DC2]/30 transition-all duration-300 cursor-pointer shadow-lg"
+                              className={`group relative overflow-hidden flex flex-col h-full rounded-lg md:rounded-xl lg:rounded-3xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/20 hover:border-[#F24DC2]/30 transition-all duration-300 cursor-pointer shadow-lg ${item.folder.id === highlightFolder ? 'ring-4 ring-[#F24DC2]' : ''}`}
                             >
                               <div className={`absolute inset-0 bg-gradient-to-br ${item.folder.gradient} opacity-0 group-hover:opacity-20 transition-opacity duration-500`} />
 
@@ -693,8 +862,9 @@ const Gallery: React.FC = () => {
                   folderCards.map((folder) => (
                     <motion.div
                       key={folder.id}
+                      data-folder-id={folder.id}
                       onClick={() => setSelectedFolder(folder.id)}
-                      className="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/30 hover:border-[#F24DC2]/30 transition-all duration-500 cursor-pointer"
+                      className={`group relative overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-700/30 hover:border-[#F24DC2]/30 transition-all duration-500 cursor-pointer ${highlightFolder === folder.id ? 'ring-4 ring-[#F24DC2]' : ''}`}
                       whileHover={{ 
                         scale: 1.02,
                         y: -10,

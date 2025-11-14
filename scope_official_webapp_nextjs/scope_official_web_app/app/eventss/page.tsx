@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import BackgroundBalls from "../components/BackgroundBalls";
+import { useRouter } from 'next/navigation';
 
 // Type for Event from database
 interface Event {
@@ -30,16 +31,20 @@ interface Event {
 // Type for Past Event from database
 interface PastEvent {
   id: string
-  event_name: string
+  event_name?: string
+  title?: string
+  description?: string | null
   poster_image_url: string
-  display_order: number
-  is_visible: boolean
+  display_order?: number
+  is_visible?: boolean
+  event_date?: string | null
+  gallery_folder?: string | null
 }
 
 export default function HomePage() {
   // State for fetched events
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([])
-  const [pastEvents, setPastEvents] = useState<string[]>([])
+  const [pastEvents, setPastEvents] = useState<PastEvent[]>([])
   const [loading, setLoading] = useState(true)
   
   // Event Card Carousel State
@@ -105,21 +110,37 @@ export default function HomePage() {
           throw new Error('Failed to fetch past events')
         }
         
-        const data = await response.json()
-        // Extract poster URLs from past events
-        const posterUrls = (data.pastEvents || []).map((event: PastEvent) => event.poster_image_url)
-        setPastEvents(posterUrls.length > 0 ? posterUrls : [
-          "/images/past-event-1.jpg",
-          "/images/past-event-2-matlab.jpg",
-          "/images/past-event-3-tech.jpg"
-        ])
+          const data = await response.json()
+          // Use full past event objects from the API. If API doesn't return objects, map to objects.
+          const raw = data.pastEvents || []
+          const events: PastEvent[] = raw.map((e: any) => ({
+            id: e.id ?? (e.event_name || Math.random().toString(36).slice(2,8)),
+            title: e.event_name || e.title || null,
+            description: e.description || e.short_description || null,
+            poster_image_url: e.poster_image_url || e.poster || e.image_url || '/images/past-event-1.jpg',
+            display_order: e.display_order ?? null,
+            is_visible: e.is_visible ?? true,
+            event_date: e.event_date ?? null,
+            gallery_folder: e.gallery_folder ?? e.gallery_album ?? null,
+          }))
+
+          if (events.length > 0) {
+            setPastEvents(events)
+          } else {
+            // fallback posters as minimal objects
+            setPastEvents([
+              { id: 'fallback-1', poster_image_url: '/images/past-event-1.jpg', title: 'Fallback Event 1' },
+              { id: 'fallback-2', poster_image_url: '/images/past-event-2-matlab.jpg', title: 'Fallback Event 2' },
+              { id: 'fallback-3', poster_image_url: '/images/past-event-3-tech.jpg', title: 'Fallback Event 3' }
+            ])
+          }
       } catch (err) {
         console.error('Error fetching past events:', err)
         // Fallback to default images
         setPastEvents([
-          "/images/past-event-1.jpg",
-          "/images/past-event-2-matlab.jpg",
-          "/images/past-event-3-tech.jpg"
+          { id: 'fallback-1', poster_image_url: '/images/past-event-1.jpg', title: 'Fallback Event 1' },
+          { id: 'fallback-2', poster_image_url: '/images/past-event-2-matlab.jpg', title: 'Fallback Event 2' },
+          { id: 'fallback-3', poster_image_url: '/images/past-event-3-tech.jpg', title: 'Fallback Event 3' }
         ])
       }
     }
@@ -213,6 +234,31 @@ export default function HomePage() {
   const [touchStartX, setTouchStartX] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const swipeThreshold = 50;
+  // Modal state for Past Events poster details
+  const [showPastModal, setShowPastModal] = useState(false);
+  const [selectedPastIndex, setSelectedPastIndex] = useState<number | null>(null);
+  const [pastModalClosing, setPastModalClosing] = useState(false);
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null);
+
+  const router = useRouter();
+
+  const handleSeeGalleryClick = (path: string, folderName?: string) => {
+    // If a folder name was provided, store it so the Gallery page can auto-open it
+    try {
+      if (typeof window !== 'undefined' && folderName) {
+        // Instead of auto-opening the folder, mark it for highlight/scroll on the Gallery page.
+        // This keeps the folder closed but brings attention to the correct card.
+        localStorage.setItem('galleryHighlightFolder', folderName)
+      }
+    } catch (err) {
+      console.warn('Could not set galleryFolder in localStorage', err)
+    }
+
+    // set navigation to run after the closing animation
+    // always navigate to the gallery section (without auto-open)
+    setPendingNavigation('/#gallery');
+    setPastModalClosing(true);
+  };
 
   // Effect for loading fonts
   useEffect(() => {
@@ -258,6 +304,8 @@ export default function HomePage() {
 
   const handleImageClick = (index: number) => {
     setCurrentIndex(index);
+    setSelectedPastIndex(index);
+    setShowPastModal(true);
   };
 
   // Auto-advance Past Events every 5 seconds.
@@ -1360,7 +1408,8 @@ export default function HomePage() {
                 else if (diff < -swipeThreshold) handlePrev();
               }}
             >
-              {pastEvents.map((src, index) => {
+              {pastEvents.map((evt, index) => {
+                const src = evt.poster_image_url || '/images/past-event-1.jpg'
                 const relativeIndex = (index + pastEvents.length - currentIndex) % pastEvents.length;
                 const isHovered = hoverIndex === index;
                 const isCenter = relativeIndex === 0 && hoverIndex === null;
@@ -1389,9 +1438,9 @@ export default function HomePage() {
                 
                 return (
                   <Image
-                    key={index}
+                    key={evt.id || index}
                     src={src}
-                    alt={`Past Event ${index + 1}`}
+                    alt={evt.title || `Past Event ${index + 1}`}
                     width={320}
                     height={420}
                     className={styleClass}
@@ -1468,6 +1517,94 @@ export default function HomePage() {
             {/* Reduce bottom padding on tablet so modal doesn't have excessive empty space */}
             <div className="p-4 pb-8 md:pb-12 lg:pb-20">
               {renderEventCard()}
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Past Event Poster Modal - opens when a past poster is clicked */}
+      {showPastModal && selectedPastIndex !== null && (
+        <motion.div
+          className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+          role="dialog"
+          aria-modal="true"
+          initial={{ opacity: 0 }}
+          animate={pastModalClosing ? { opacity: 0 } : { opacity: 1 }}
+          transition={{ duration: 0.25 }}
+          onClick={() => setPastModalClosing(true)}
+          onAnimationComplete={() => {
+            if (pastModalClosing) {
+              setShowPastModal(false);
+              setPastModalClosing(false);
+              if (pendingNavigation) {
+                // navigate after the modal has finished closing
+                router.push(pendingNavigation);
+                setPendingNavigation(null);
+              }
+            }
+          }}
+        >
+          <motion.div
+            className="max-w-5xl mx-auto my-8 bg-gradient-to-br from-[#040A28] via-[#0d1b3d] to-[#040A28] rounded-2xl shadow-2xl border border-white/10 overflow-hidden max-h-[90vh]"
+            initial={{ y: 40 }}
+            animate={pastModalClosing ? { y: 40 } : { y: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+            onClick={(e) => e.stopPropagation()}
+            style={{ display: 'flex', flexDirection: 'column' }}
+          >
+            <div className="flex justify-end p-3 border-b border-white/5">
+              <button
+                onClick={() => setPastModalClosing(true)}
+                aria-label="Close"
+                className="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center transition-all duration-200"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="p-4 lg:p-6 flex flex-col lg:flex-row gap-4 items-start overflow-auto" style={{ maxHeight: '80vh' }}>
+              <div className="w-full lg:w-1/2">
+                <div className="rounded-lg overflow-hidden">
+                  <div className="relative w-full h-[50vh] md:h-[60vh] lg:h-[70vh] flex items-center justify-center">
+                    {selectedPastIndex !== null && (
+                      <Image
+                        src={pastEvents[selectedPastIndex].poster_image_url}
+                        alt={pastEvents[selectedPastIndex].title || `Past Event ${selectedPastIndex + 1}`}
+                        fill
+                        className="object-contain"
+                        style={{ objectPosition: 'center' }}
+                        sizes="(max-width: 640px) 90vw, (max-width: 1024px) 50vw, 40vw"
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="w-full lg:w-1/2 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-2xl font-bold text-white mb-2">{pastEvents[selectedPastIndex].title || 'Past Event'}</h3>
+                  <p className="text-sm text-gray-300">{pastEvents[selectedPastIndex].description || 'This is a preview of the selected past event poster. Use the button below to navigate to the gallery for this event.'}</p>
+                </div>
+
+                <div className="mt-6 flex gap-3">
+                  <button
+                    onClick={() => {
+                      if (selectedPastIndex !== null && pastEvents[selectedPastIndex].gallery_folder) {
+                        handleSeeGalleryClick(
+                          `/#gallery?open=${encodeURIComponent(pastEvents[selectedPastIndex].gallery_folder!)}`,
+                          pastEvents[selectedPastIndex].gallery_folder!
+                        )
+                      } else {
+                        handleSeeGalleryClick('/#gallery')
+                      }
+                    }}
+                    className="bg-[#004c94] hover:bg-[#003E7A] px-4 py-2 rounded text-white font-bold"
+                  >
+                    See Gallery Pics
+                  </button>
+                  <button onClick={() => setShowPastModal(false)} className="px-4 py-2 rounded border border-white/10 text-white">Close</button>
+                </div>
+              </div>
             </div>
           </motion.div>
         </motion.div>

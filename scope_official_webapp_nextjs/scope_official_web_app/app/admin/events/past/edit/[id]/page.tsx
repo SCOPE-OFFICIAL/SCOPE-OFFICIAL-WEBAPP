@@ -6,6 +6,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Typeahead from '../../../../../components/Typeahead'
 import { useRouter, useParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 
@@ -23,7 +24,9 @@ export default function EditPastEventPage() {
     event_name: '',
     poster_image_url: '',
     display_order: 0,
-    is_visible: true
+    is_visible: true,
+    description: '',
+    gallery_folder: ''
   })
 
   useEffect(() => {
@@ -45,7 +48,9 @@ export default function EditPastEventPage() {
           event_name: event.event_name,
           poster_image_url: event.poster_image_url,
           display_order: event.display_order,
-          is_visible: event.is_visible
+          is_visible: event.is_visible,
+          description: event.description || '',
+          gallery_folder: event.gallery_folder || ''
         })
         setPosterPreview(event.poster_image_url)
       } else {
@@ -60,13 +65,15 @@ export default function EditPastEventPage() {
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type, checked } = e.target as HTMLInputElement
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : type === 'number' ? parseInt(value) || 0 : value
     }))
   }
+
+  
 
   const handlePosterUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -223,6 +230,34 @@ export default function EditPastEventPage() {
               placeholder="0"
             />
             <p className="text-gray-500 text-xs mt-1">Lower numbers appear first in the carousel</p>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Description
+            </label>
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange as any}
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2C97FF]"
+              rows={4}
+              placeholder="Short description for the past event"
+            />
+          </div>
+
+          {/* Gallery Folder */}
+          <div>
+            <label className="block text-sm font-medium text-gray-300 mb-2">
+              Gallery Folder (optional)
+            </label>
+            <Typeahead
+              value={formData.gallery_folder}
+              onChange={(v) => setFormData(prev => ({ ...prev, gallery_folder: v }))}
+              placeholder="Type to search or enter a folder name"
+            />
+            <p className="text-gray-500 text-xs mt-1">Choose an existing gallery folder to link photos</p>
           </div>
 
           {/* Visibility */}
