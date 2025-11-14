@@ -78,43 +78,24 @@ const Gallery: React.FC = () => {
       const m = matches[i];
       const mRect = m.getBoundingClientRect();
       const diff = Math.abs((mRect.left + mRect.width / 2) - viewportCenterX);
-        const container = carouselRef.current;
-        const track = trackRef.current;
-        let appliedEl: HTMLElement | null = null;
-        let applyTimeout: number | null = null;
-        let clearTimeoutId: number | null = null;
-          const container = carouselRef.current;
-          const track = trackRef.current;
-          if (!container || !track) return;
+      if (diff < bestDiff) {
+        best = m;
+        bestDiff = diff;
+      }
+    }
 
-          // find all repeated children inside the track with matching data-index
-          const matches = Array.from(track.querySelectorAll(`[data-index="${index}"]`)) as HTMLElement[];
-          if (!matches.length) {
-            // fallback: if no matches, do nothing
-            return;
-          }
+    const bestRect = best.getBoundingClientRect();
+    // compute how much to change scrollLeft so best element is centered in container
+    const delta = (bestRect.left + bestRect.width / 2) - viewportCenterX;
+    const newScrollLeft = container.scrollLeft + delta;
+    container.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+  }, []);
 
-          // choose the matched element closest to the current viewport center so scrolling feels natural
-          const containerRect = container.getBoundingClientRect();
-          const viewportCenterX = containerRect.left + containerRect.width / 2;
-
-          let best = matches[0];
-          let bestDiff = Math.abs((best.getBoundingClientRect().left + best.getBoundingClientRect().width / 2) - viewportCenterX);
-          for (let i = 1; i < matches.length; i++) {
-            const m = matches[i];
-            const mRect = m.getBoundingClientRect();
-            const diff = Math.abs((mRect.left + mRect.width / 2) - viewportCenterX);
-            if (diff < bestDiff) {
-              best = m;
-              bestDiff = diff;
-            }
-          }
-
-          const bestRect = best.getBoundingClientRect();
-          // compute how much to change scrollLeft so best element is centered in container
-          const delta = (bestRect.left + bestRect.width / 2) - viewportCenterX;
-          const newScrollLeft = container.scrollLeft + delta;
-          container.scrollTo({ left: newScrollLeft, behavior: 'smooth' });
+  // When a folder is selected programmatically (from events -> gallery), ensure it's scrolled into view
+  useEffect(() => {
+    if (!selectedFolder) return;
+    // find index
+    const idx = folderCards.findIndex((f) => f.id === selectedFolder);
     if (idx === -1) return;
 
     // If carousel mode (3+ folders), center the card
@@ -371,6 +352,14 @@ const Gallery: React.FC = () => {
     }
   }, []);
 
+  // Manual carousel scroll helper (used by arrow buttons)
+  const scrollCarousel = useCallback((direction: 'left' | 'right') => {
+    const container = carouselRef.current;
+    if (!container) return;
+    const scrollAmount = Math.max(320, Math.floor(container.clientWidth * 0.45));
+    container.scrollBy({ left: direction === 'right' ? scrollAmount : -scrollAmount, behavior: 'smooth' });
+  }, []);
+
   // If a highlightFolder is set, find the visible DOM instance (in the carousel or grid),
   // apply a temporary inline highlight (box-shadow), ensure it's scrolled into view,
   // and then clear the highlight after a short timeout.
@@ -380,10 +369,15 @@ const Gallery: React.FC = () => {
     const container = carouselRef.current;
     const track = trackRef.current;
     let appliedEl: HTMLElement | null = null;
+    let applyTimeout: number | null = null;
+    let clearTimeoutId: number | null = null;
+
+    console.debug('[Gallery] highlight effect start', { highlightFolder, folderCount: folderCards.length });
 
     try {
       if (track && container && folderCards.length > 2) {
         const matches = Array.from(track.querySelectorAll(`[data-folder-id="${highlightFolder}"]`)) as HTMLElement[];
+        console.debug('[Gallery] highlight matches in track:', matches.length);
         if (matches.length > 0) {
           // choose the matched element closest to viewport center
           const containerRect = container.getBoundingClientRect();
@@ -399,48 +393,62 @@ const Gallery: React.FC = () => {
             }
           }
 
-          // inner clickable card is the first child
-          const inner = (best.firstElementChild as HTMLElement) || best;
-          appliedEl = inner;
+          // use the outer wrapper (the repeated item) so the highlight isn't clipped
+          appliedEl = best;
+
+          // determine logical index
+          const logicalIdx = best.dataset.index ? Number(best.dataset.index) : folderCards.findIndex((f) => f.id === highlightFolder);
+          console.debug('[Gallery] highlight chosen instance', { logicalIdx, seq: best.dataset.seq, appliedElTag: appliedEl?.tagName });
+
+          if (typeof logicalIdx === 'number' && logicalIdx >= 0) {
+            // center the logical index first
+            console.debug('[Gallery] calling scrollToSlide for logicalIdx', logicalIdx);
+            scrollToSlide(logicalIdx);
+          }
         }
       }
 
       // fallback: grid mode or no carousel match - pick the first element in DOM
+
       if (!appliedEl) {
         const el = document.querySelector(`[data-folder-id="${highlightFolder}"]`) as HTMLElement | null;
+        console.debug('[Gallery] fallback querySelector result', !!el);
         if (el) {
-          // If the element itself is the card (grid) use it, else prefer its first child
-          appliedEl = (el.classList.contains('group') ? el : (el.querySelector('.group') as HTMLElement) || (el.firstElementChild as HTMLElement) || el);
+          // `el` is the outer wrapper for carousel items or the motion.div in grid view
+          appliedEl = el;
         }
       }
 
-      // Apply inline highlight styles so the ring is visible regardless of layout
       if (appliedEl) {
-        appliedEl.style.boxShadow = '0 0 0 4px rgba(242,77,194,0.95)';
-        appliedEl.style.transition = 'box-shadow 300ms ease, transform 300ms ease';
-        appliedEl.style.zIndex = '40';
-
-        // Smoothly scroll the highlighted element into view (center it)
-        try {
-          appliedEl.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
-        } catch {
-          // fallback to scrollToSlide by index
-          const idx = folderCards.findIndex((f) => f.id === highlightFolder);
-          if (idx !== -1 && carouselRef.current) {
-            scrollToSlide(idx);
+        // wait a moment after scroll so the element is in final position
+        applyTimeout = window.setTimeout(() => {
+          try {
+            if (!appliedEl) return;
+            console.debug('[Gallery] applying highlight to element (outer wrapper)', appliedEl);
+            // Apply an outline + subtle glow box-shadow on the wrapper so it's not clipped by inner overflow
+            appliedEl.style.outline = '4px solid rgba(242,77,194,0.95)';
+            appliedEl.style.outlineOffset = '6px';
+            appliedEl.style.boxShadow = '0 20px 40px rgba(242,77,194,0.12)';
+            appliedEl.style.transition = 'outline 300ms ease, box-shadow 300ms ease, transform 300ms ease';
+            appliedEl.style.zIndex = '40';
+          } catch (e) {
+            console.warn('[Gallery] failed to style appliedEl', e);
           }
-        }
+        }, 260);
       }
-    } catch {
-      console.warn('[Gallery] highlight effect failed');
+    } catch (e) {
+      console.warn('[Gallery] highlight effect failed', e);
     }
 
-    const tid = window.setTimeout(() => {
+    // clear highlight after a few seconds
+    clearTimeoutId = window.setTimeout(() => {
       try {
         if (appliedEl) {
           appliedEl.style.boxShadow = '';
           appliedEl.style.transition = '';
           appliedEl.style.zIndex = '';
+          appliedEl.style.outline = '';
+          appliedEl.style.outlineOffset = '';
         } else {
           // cleanup any remaining matches
           const els = Array.from(document.querySelectorAll(`[data-folder-id="${highlightFolder}"] .group`)) as HTMLElement[];
@@ -448,19 +456,26 @@ const Gallery: React.FC = () => {
             e.style.boxShadow = '';
             e.style.transition = '';
             e.style.zIndex = '';
+            e.style.outline = '';
+            e.style.outlineOffset = '';
           });
         }
-      } catch {}
+      } catch (err) {
+        console.warn('[Gallery] cleanup error', err);
+      }
       setHighlightFolder(null);
     }, 3500);
 
     return () => {
-      window.clearTimeout(tid as unknown as number);
+      if (applyTimeout) window.clearTimeout(applyTimeout as unknown as number);
+      if (clearTimeoutId) window.clearTimeout(clearTimeoutId as unknown as number);
       try {
         if (appliedEl) {
           appliedEl.style.boxShadow = '';
           appliedEl.style.transition = '';
           appliedEl.style.zIndex = '';
+          appliedEl.style.outline = '';
+          appliedEl.style.outlineOffset = '';
         }
       } catch {}
     };
