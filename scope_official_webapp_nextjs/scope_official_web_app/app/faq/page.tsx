@@ -19,6 +19,7 @@ export default function FaqPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchFAQs();
@@ -40,31 +41,54 @@ export default function FaqPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitError(null);
     
     if (!formData.question.trim()) {
-      alert('Please enter your question');
+      setSubmitError('Please enter your question.');
+      return;
+    }
+
+    if (!formData.user_name.trim()) {
+      setSubmitError('Please enter your name.');
+      return;
+    }
+
+    if (!formData.user_email.trim()) {
+      setSubmitError('Please enter your email.');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.user_email.trim())) {
+      setSubmitError('Please enter a valid email address.');
       return;
     }
 
     setSubmitting(true);
 
     try {
-      const res = await fetch('/api/user-questions', {
+      const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          name: formData.user_name.trim(),
+          email: formData.user_email.trim(),
+          question: formData.question.trim(),
+        }),
       });
+
+      const data = await res.json();
 
       if (res.ok) {
         setSubmitSuccess(true);
         setFormData({ user_name: '', user_email: '', question: '' });
         setTimeout(() => setSubmitSuccess(false), 5000);
       } else {
-        alert('Failed to submit question. Please try again.');
+        setSubmitError(data?.error || 'Failed to submit your question. Please try again.');
       }
     } catch (error) {
       console.error('Error submitting question:', error);
-      alert('Error submitting question. Please try again.');
+      setSubmitError('An unexpected error occurred. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -312,8 +336,18 @@ export default function FaqPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="bg-green-900/30 border border-green-600 rounded-lg p-4 mb-4"
                 >
-                  <p className="text-green-300 font-semibold">✅ Your question has been submitted! We&apos;ll review and answer it soon.</p>
-                  <p className="text-green-200 text-sm mt-2">📧 If you provided an email, check your inbox (and spam folder) for our response!</p>
+                  <p className="text-green-300 font-semibold">Your question has been sent successfully.</p>
+                  <p className="text-green-200 text-sm mt-2">Please check your inbox (and spam folder) for follow-up messages.</p>
+                </motion.div>
+              )}
+
+              {submitError && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-red-900/30 border border-red-600 rounded-lg p-4 mb-4"
+                >
+                  <p className="text-red-200 font-medium">{submitError}</p>
                 </motion.div>
               )}
 
@@ -341,7 +375,7 @@ export default function FaqPage() {
                 
                 <div>
                   <label
-                    htmlFor="phone"
+                    htmlFor="email"
                     className="block text-sm font-medium text-gray-300 mb-2"
                   >
                     Email
