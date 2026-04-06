@@ -129,7 +129,7 @@ export default function TeamPage() {
 
   return (
     <div 
-      className="team-page-container min-h-screen relative"
+      className="team-page-container min-h-fit relative"
       style={{ 
         overflow: 'visible', 
         scrollbarWidth: 'none',
@@ -182,7 +182,7 @@ export default function TeamPage() {
           style={{
             maxWidth: '1400px',
             margin: '0 auto',
-            padding: '4rem 2rem'
+            padding: '0.75rem 2rem 3rem'
           }}
         >
           {/* Left: Heading and paragraph */}
@@ -314,13 +314,11 @@ export default function TeamPage() {
                     className="member-overlay" 
                     style={{
                       position: 'absolute',
-                      top: 0,
+                      bottom: 0,
                       left: 0,
                       right: 0,
-                      bottom: 0,
-                      background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)',
-                      opacity: 0,
-                      transition: 'opacity 0.3s ease'
+                      height: '50%',
+                      pointerEvents: 'none'
                     }}
                   />
                   <button
@@ -529,13 +527,11 @@ export default function TeamPage() {
                       className="member-overlay" 
                       style={{
                         position: 'absolute',
-                        top: 0,
+                        bottom: 0,
                         left: 0,
                         right: 0,
-                        bottom: 0,
-                        background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%)',
-                        opacity: 0,
-                        transition: 'opacity 0.3s ease'
+                        height: '50%',
+                        pointerEvents: 'none'
                       }}
                     />
                     <button

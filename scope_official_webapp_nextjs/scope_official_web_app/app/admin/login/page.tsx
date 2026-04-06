@@ -8,6 +8,12 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import {
+  consumePostLoginRedirect,
+  getAdminToken,
+  getRedirectFromSearch,
+  setAdminSession
+} from '@/app/admin/utils/auth'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -16,6 +22,11 @@ export default function AdminLoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+
+  const getRedirectTargetFromQuery = () => {
+    if (typeof window === 'undefined') return null
+    return getRedirectFromSearch(window.location.search)
+  }
 
   // Ensure inputs are empty on mount / after reload to avoid browser autofill showing saved credentials
   useEffect(() => {
@@ -26,8 +37,16 @@ export default function AdminLoginPage() {
       setEmail('')
       setPassword('')
     }, 50)
+
+    const existingToken = getAdminToken()
+    if (existingToken) {
+      const redirectFromQuery = getRedirectTargetFromQuery()
+      const redirectFromStorage = consumePostLoginRedirect()
+      router.replace(redirectFromQuery || redirectFromStorage || '/admin/dashboard')
+    }
+
     return () => clearTimeout(t)
-  }, [])
+  }, [router])
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,14 +63,16 @@ export default function AdminLoginPage() {
       const data = await response.json()
 
       if (response.ok) {
-        // Save token and user info to localStorage
-        localStorage.setItem('admin_token', data.token)
-        localStorage.setItem('admin_email', data.user.email)
-        localStorage.setItem('admin_name', data.user.name || email)
-        localStorage.setItem('admin_role', data.user.role)
-        
-        // Redirect to admin dashboard
-        router.push('/admin/dashboard')
+        setAdminSession({
+          token: data.token,
+          email: data.user.email,
+          name: data.user.name || email,
+          role: data.user.role
+        })
+
+        const redirectFromQuery = getRedirectTargetFromQuery()
+        const redirectFromStorage = consumePostLoginRedirect()
+        router.replace(redirectFromQuery || redirectFromStorage || '/admin/dashboard')
       } else {
         setError(data.error || 'Invalid credentials')
       }

@@ -10,6 +10,7 @@ interface Partner {
   name: string;
   image_url: string;
   link?: string;
+  show_on_website?: boolean;
 }
 
 export default function Partners() {
@@ -23,8 +24,10 @@ export default function Partners() {
     const fetchPartners = async () => {
       try {
         const res = await fetch('/api/partners');
+        console.log('Partners: /api/partners status', res.status);
         if (res.ok) {
           const data = await res.json();
+          console.log('Partners: partners payload', data);
           if (data && data.partners) {
             setPartners(data.partners);
           }
@@ -56,6 +59,19 @@ export default function Partners() {
   // Register this partners track with the shared transform-based scroller
   useContinuousScroll(trackRef, { speed: 40, id: 'partners' });
 
+  const visiblePartners = partners.filter((partner) => partner.show_on_website === true);
+
+  if (visiblePartners.length === 0) {
+    return (
+      <section className="py-12 px-6 partners-root">
+        <div className={`max-w-7xl mx-auto ${whatStyles.container}`}>
+          <h3 className={whatStyles.programsTitle}>OUR PARTNERS</h3>
+          <p className="text-gray-400">No visible partners yet.</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-12 px-6 partners-root">
       <div className={`max-w-7xl mx-auto ${whatStyles.container}`}>
@@ -64,7 +80,7 @@ export default function Partners() {
           <div ref={containerRef} id="partners-carousel" className="w-full overflow-x-hidden overflow-y-hidden" style={{ scrollBehavior: 'auto' }}>
             <div ref={trackRef} data-repeat={repeatCount} className="flex items-center gap-6 px-6 py-4">
               {Array.from({ length: repeatCount }).flatMap((_, r) =>
-                partners.map((p, i) => (
+                visiblePartners.map((p, i) => (
                   <a key={`${p.id}-${r}-${i}`} href={p.link || '#'} target="_blank" rel="noreferrer" className="flex-shrink-0 w-48 h-28 flex items-center justify-center bg-white/5 rounded-lg border border-white/10">
                     <Image src={p.image_url} alt={p.name} width={192} height={80} className="max-h-20 max-w-full object-contain" />
                   </a>

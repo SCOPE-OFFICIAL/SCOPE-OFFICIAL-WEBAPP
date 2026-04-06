@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter, useParams } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { TeamMember, TeamMemberFormData } from '@/lib/types/database'
+import { getAdminToken } from '@/app/admin/utils/auth'
 
 export default function EditTeamMemberPage() {
   const router = useRouter()
@@ -61,11 +62,17 @@ export default function EditTeamMemberPage() {
     setUploading(true)
     const formData = new FormData()
     formData.append('file', file)
-    formData.append('bucket', 'team-photos')
+    const token = getAdminToken()
+    const headers: HeadersInit = {}
+    if (token) {
+      headers.Authorization = `Bearer ${token}`
+    }
 
     try {
-      const res = await fetch('/api/upload', {
+      const res = await fetch('/api/admin/team/upload', {
         method: 'POST',
+        headers,
+        credentials: 'include',
         body: formData,
       })
 
@@ -74,11 +81,13 @@ export default function EditTeamMemberPage() {
         setValue('photo_url', url)
         setImagePreview(url)
       } else {
-        alert('Failed to upload image')
+        const body = await res.json().catch(() => null)
+        alert(body?.error || 'Failed to upload image')
       }
     } catch (error) {
       console.error('Error uploading image:', error)
-      alert('Error uploading image')
+      const message = error instanceof Error ? error.message : 'Error uploading image'
+      alert(message)
     } finally {
       setUploading(false)
     }

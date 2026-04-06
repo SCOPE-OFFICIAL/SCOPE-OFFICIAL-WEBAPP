@@ -3,8 +3,14 @@ import { db } from '@/lib/firebase'
 import { collection, getDocs } from 'firebase/firestore'
 import { SignJWT } from 'jose'
 
+interface AdminRecord {
+  email?: string
+  password?: string
+  role?: string
+}
+
 const SECRET = new TextEncoder().encode(
-process.env.NEXTAUTH_SECRET || 'fallback-secret'
+process.env.NEXTAUTH_SECRET || 'fallback-secret-key'
 )
 
 export async function POST(request: NextRequest) {
@@ -27,11 +33,11 @@ if (!email || !password) {
 const snapshot = await getDocs(collection(db, 'admins'))
 
 // Convert docs safely
-const admins = snapshot.docs.map(doc => doc.data())
+const admins = snapshot.docs.map(doc => doc.data() as AdminRecord)
 
 // 🔥 Match ONLY email + password
 const admin = admins.find(
-  (a: any) =>
+  (a) =>
     a.email?.trim() === email &&
     a.password?.trim() === password
 )
@@ -45,20 +51,32 @@ if (!admin) {
 
 // ✅ Minimal JWT (no dependency on extra fields)
 const token = await new SignJWT({
-  email: admin.email
+  email: admin.email,
+  role: admin.role || 'admin'
 })
   .setProtectedHeader({ alg: 'HS256' })
   .setIssuedAt()
   .setExpirationTime('7d')
   .sign(SECRET)
 
-return NextResponse.json({
+const response = NextResponse.json({
   success: true,
   token,
   user: {
-    email: admin.email
+    email: admin.email,
+    role: admin.role || 'admin'
   }
 })
+
+response.cookies.set('admin_token', token, {
+  httpOnly: true,
+  sameSite: 'lax',
+  secure: process.env.NODE_ENV === 'production',
+  path: '/',
+  maxAge: 60 * 60 * 24 * 7
+})
+
+return response
 
 
 } catch (error) {

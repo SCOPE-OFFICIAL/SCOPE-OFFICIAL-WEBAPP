@@ -1,0 +1,58 @@
+[
+  {
+    "id": "da501bf7-21b8-4598-b9a5-ca1443e5d9f3",
+    "name": "NAAC",
+    "image_url": "https://i.ibb.co/rRfmZ0Xb/1775482529251-Whats-App-Image-2025-11-12-at-20-11-54-3c43ea05-removebg-preview-png.png",
+    "link": null,
+    "visible": true,
+    "sort_order": 1
+  },
+  {
+    "id": "1095d749-3e65-4186-8940-90a8d70e70db",
+    "name": "REVA University",
+    "image_url": "https://i.ibb.co/bM2PLCxz/1775482548643-Whats-App-Image-2025-11-12-at-20-11-58-aad526d2-removebg-preview-png.png",
+    "link": null,
+    "visible": true,
+    "sort_order": 2
+  },
+  {
+    "id": "746c70d2-b1b7-4efe-a2f8-b462c301f7ca",
+    "name": "IEEE",
+    "image_url": "https://i.ibb.co/hFQv0MNt/1775482571343-Whats-App-Image-2025-11-12-at-20-12-03-b65b3198-removebg-preview-png.png",
+    "link": null,
+    "visible": true,
+    "sort_order": 3
+  },
+  {
+    "id": "46067aed-beef-44cb-9c12-3b4be3971f93",
+    "name": "COREel",
+    "image_url": "https://i.ibb.co/DfThHnqp/1775482581456-Whats-App-Image-2025-11-12-at-20-12-07-8e377222-removebg-preview-png.png",
+    "link": null,
+    "visible": true,
+    "sort_order": 4
+  },
+  {
+    "id": "bbd49d5e-3ae8-47ec-9f2d-4cca966f0264",
+    "name": "sumn",
+    "image_url": "https://i.ibb.co/J8bM9dH/1775482599661-Whats-App-Image-2025-11-12-at-20-12-13-fbe15f84-removebg-preview-png.png",
+    "link": null,
+    "visible": true,
+    "sort_order": 5
+  },
+  {
+    "id": "fe6f5506-f7ca-46ba-890f-4d7f1a34d0a6",
+    "name": "IEEE SPS",
+    "image_url": "https://i.ibb.co/qYHpmZ8Z/1775482613606-Whats-App-Image-2025-11-12-at-20-12-17-f7c24563-removebg-preview-png.png",
+    "link": null,
+    "visible": true,
+    "sort_order": 6
+  },
+  {
+    "id": "a5d9d7cb-666f-4a14-8d8c-818d0ca37c74",
+    "name": "matlab",
+    "image_url": "https://i.ibb.co/nNkg0d13/1775484000064-Whats-App-Image-2025-11-12-at-20-11-49-87a994bd-removebg-preview-png.png",
+    "link": null,
+    "visible": true,
+    "sort_order": 7
+  }
+]

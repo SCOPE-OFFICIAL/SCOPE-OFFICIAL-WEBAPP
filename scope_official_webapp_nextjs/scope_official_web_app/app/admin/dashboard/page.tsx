@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import { clearAdminSession, resolveAdminSession } from '@/app/admin/utils/auth'
 
 interface Stats {
   totalEvents: number
@@ -93,24 +94,57 @@ export default function AdminDashboard() {
   }
 
   useEffect(() => {
-    // Check if user is logged in
-    const token = localStorage.getItem('admin_token')
-    if (!token) {
-      router.push('/admin/login')
-      return
+    let cancelled = false
+
+    const bootstrap = async () => {
+      setLoading(true)
+      try {
+        const authenticated = await resolveAdminSession(8000)
+        if (!authenticated) {
+          router.replace('/admin/login?redirect=/admin/dashboard')
+          return
+        }
+
+        const name = localStorage.getItem('admin_name') || localStorage.getItem('admin_email')
+        if (!cancelled) {
+          setAdminName(name || 'Admin')
+        }
+
+        await fetchStats()
+      } catch (error) {
+        console.error('[dashboard] bootstrap failed', error)
+        router.replace('/admin/login?redirect=/admin/dashboard')
+      } finally {
+        if (!cancelled) {
+          setLoading(false)
+        }
+      }
     }
 
-    // Get admin name from localStorage
-    const name = localStorage.getItem('admin_name') || localStorage.getItem('admin_email')
-    setAdminName(name || 'Admin')
+    bootstrap()
 
-    // Fetch dashboard stats
-    fetchStats()
+    return () => {
+      cancelled = true
+    }
   }, [router])
 
   const fetchStats = async () => {
+    const controller = new AbortController()
+    const timeoutId = window.setTimeout(() => controller.abort(), 10000)
+
     try {
-      const response = await fetch('/api/analytics')
+      const response = await fetch('/api/analytics', {
+        credentials: 'include',
+        cache: 'no-store',
+        signal: controller.signal
+      })
+
+      console.log('[dashboard] /api/analytics status', response.status)
+
+      if (!response.ok) {
+        throw new Error(`Analytics request failed with status ${response.status}`)
+      }
+
       const data = await response.json()
       
       if (data.stats) {
@@ -125,16 +159,13 @@ export default function AdminDashboard() {
     } catch (error) {
       console.error('Failed to fetch analytics:', error)
     } finally {
-      setLoading(false)
+      window.clearTimeout(timeoutId)
     }
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('admin_token')
-    localStorage.removeItem('admin_email')
-    localStorage.removeItem('admin_name')
-    localStorage.removeItem('admin_role')
-    router.push('/admin/login')
+    clearAdminSession()
+    router.replace('/admin/login')
   }
 
   const statCards = [

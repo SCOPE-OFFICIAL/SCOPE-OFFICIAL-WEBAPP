@@ -180,7 +180,7 @@ function UnifiedScroll() {
           {/* Section 3: About Us */}
           <motion.div 
             id="about-us"
-            className="min-h-screen"
+            className="min-h-fit"
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
@@ -191,7 +191,7 @@ function UnifiedScroll() {
           {/* Section 4: Teams */}
           <motion.div 
             id="team"
-            className="min-h-screen"
+            className="min-h-fit"
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.6 }}
@@ -201,7 +201,7 @@ function UnifiedScroll() {
 
           {/* Section 5: Team Members */}
           <motion.div 
-            className="min-h-screen"
+            className="min-h-fit"
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.8 }}
@@ -212,7 +212,7 @@ function UnifiedScroll() {
           {/* Section 6: Gallery */}
           <motion.div 
             id="gallery"
-            className="min-h-screen"
+            className="min-h-fit"
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 1.0 }}
@@ -225,7 +225,7 @@ function UnifiedScroll() {
       {/* Section 7: FAQ - Smooth Animation */}
       <motion.div 
         id="faq"
-        className="min-h-screen"
+        className="min-h-fit"
         initial={{ opacity: 0, y: 100 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, ease: "easeOut", delay: 1.2 }}
