@@ -1,60 +1,93 @@
-/**
- * Admin Authentication API
- * Validates credentials against database ONLY
- */
-
 import { NextRequest, NextResponse } from 'next/server'
+import { db } from '@/lib/firebase'
+import { collection, getDocs } from 'firebase/firestore'
 import { SignJWT } from 'jose'
-import { createClient } from '@supabase/supabase-js'
 
-const SECRET = new TextEncoder().encode(process.env.NEXTAUTH_SECRET || 'fallback-secret-key')
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const supabase = createClient(supabaseUrl, supabaseKey)
+interface AdminRecord {
+  email?: string
+  password?: string
+  role?: string
+}
+
+const SECRET = new TextEncoder().encode(
+process.env.NEXTAUTH_SECRET || 'fallback-secret-key'
+)
 
 export async function POST(request: NextRequest) {
-  try {
-    const { email, password } = await request.json()
+try {
+const body = await request.json()
 
-    // Authenticate from database ONLY
-    const { data: admin, error } = await supabase
-      .from('admins')
-      .select('*')
-      .eq('email', email)
-      .eq('password', password)
-      .single()
 
-    if (admin && !error) {
-      // Update last login timestamp
-      await supabase
-        .from('admins')
-        .update({ last_login: new Date().toISOString() })
-        .eq('id', admin.id)
+const email = body.email?.trim()
+const password = body.password?.trim()
 
-      // Generate JWT token
-      const token = await new SignJWT({ email, role: admin.role, name: admin.name })
-        .setProtectedHeader({ alg: 'HS256' })
-        .setIssuedAt()
-        .setExpirationTime('7d') // Token expires in 7 days
-        .sign(SECRET)
+// ✅ Only email + password required
+if (!email || !password) {
+  return NextResponse.json(
+    { success: false, error: 'Email and password required' },
+    { status: 400 }
+  )
+}
 
-      return NextResponse.json({
-        success: true,
-        token,
-        user: { email, role: admin.role, name: admin.name }
-      }, { status: 200 })
-    }
+// 🔥 Fetch admins
+const snapshot = await getDocs(collection(db, 'admins'))
 
-    // No fallback - database only!
-    return NextResponse.json({
-      success: false,
-      error: 'Invalid email or password'
-    }, { status: 401 })
-  } catch (error) {
-    console.error('Login error:', error)
-    return NextResponse.json({
-      success: false,
-      error: 'Authentication failed'
-    }, { status: 500 })
+// Convert docs safely
+const admins = snapshot.docs.map(doc => doc.data() as AdminRecord)
+
+// 🔥 Match ONLY email + password
+const admin = admins.find(
+  (a) =>
+    a.email?.trim() === email &&
+    a.password?.trim() === password
+)
+
+if (!admin) {
+  return NextResponse.json(
+    { success: false, error: 'Invalid credentials' },
+    { status: 401 }
+  )
+}
+
+// ✅ Minimal JWT (no dependency on extra fields)
+const token = await new SignJWT({
+  email: admin.email,
+  role: admin.role || 'admin'
+})
+  .setProtectedHeader({ alg: 'HS256' })
+  .setIssuedAt()
+  .setExpirationTime('7d')
+  .sign(SECRET)
+
+const response = NextResponse.json({
+  success: true,
+  token,
+  user: {
+    email: admin.email,
+    role: admin.role || 'admin'
   }
+})
+
+response.cookies.set('admin_token', token, {
+  httpOnly: true,
+  sameSite: 'lax',
+  secure: process.env.NODE_ENV === 'production',
+  path: '/',
+  maxAge: 60 * 60 * 24 * 7
+})
+
+return response
+
+
+} catch (error) {
+console.error('Login error:', error)
+
+
+return NextResponse.json(
+  { success: false, error: 'Authentication failed' },
+  { status: 500 }
+)
+
+
+}
 }

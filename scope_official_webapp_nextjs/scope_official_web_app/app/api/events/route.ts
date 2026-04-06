@@ -1,121 +1,27 @@
 /**
- * Events API Route
- * Handles CRUD operations for events
+ * Events API Route (Firebase Version)
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { db } from '@/lib/firebase'
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc
+} from 'firebase/firestore'
 
-// Create Supabase client with service role for admin operations
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-)
-
-/**
- * Helper function to extract storage path from Supabase URL
- */
-function extractStoragePath(imageUrl: string, bucketName: string): string | null {
+// GET - Fetch all events
+export async function GET() {
   try {
-    const url = new URL(imageUrl)
-    const pathMatch = url.pathname.match(new RegExp(`/storage/v1/object/public/${bucketName}/(.+)`))
-    if (pathMatch && pathMatch[1]) {
-      return decodeURIComponent(pathMatch[1])
-    }
-    return null
-  } catch (error) {
-    console.error('Error extracting storage path:', error)
-    return null
-  }
-}
-
-// GET - Fetch all events (with optional filters)
-export async function GET(request: NextRequest) {
-  try {
-    const searchParams = request.nextUrl.searchParams
-    const status = searchParams.get('status') // published, draft, completed
-    const type = searchParams.get('type') // workshop, hackathon, etc.
-    const featured = searchParams.get('featured') // true/false
-    const upcoming = searchParams.get('upcoming') // true for upcoming events only
-  const preview = searchParams.get('preview') // preview mode (bypass upcoming/status filters)
-
-    let query = supabase
-      .from('events')
-      .select('*')
-      .order('event_date', { ascending: true })
-
-    // Apply filters
-    if (status) {
-      query = query.eq('status', status)
-    }
+    const snapshot = await getDocs(collection(db, 'events'))
     
-    if (type) {
-      query = query.eq('event_type', type)
-    }
-    
-    if (featured === 'true') {
-      query = query.eq('is_featured', true)
-    }
-
-    // If preview mode is enabled, we allow returning events regardless of status/upcoming
-    // (useful for admin preview/testing on localhost). WARNING: exposing drafts publicly
-    // is insecure—use only for development or behind admin auth.
-    if (preview !== 'true') {
-      if (upcoming === 'true') {
-        // When requesting upcoming events, we'll fetch published events and
-        // perform a full datetime filter server-side using event_date + event_time.
-        // This is more accurate than date-only comparisons and handles events
-        // with specific times (and timezone differences).
-        query = query.eq('status', 'published')
-      }
-    } else {
-      console.warn('Events API: preview=true used — returning events without upcoming/status filtering')
-    }
-
-    const { data, error } = await query
-
-    if (error) {
-      console.error('Supabase error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    // If the client requested upcoming events, filter them by full datetime
-    // (event_date + event_time). This ensures that events on previous dates
-    // (e.g., yesterday) are excluded even if their date string comparison
-    // might be ambiguous due to timezone differences.
-    type ApiEvent = {
-      event_date?: string | null
-      event_time?: string | null
-      [key: string]: unknown
-    }
-
-    let events: ApiEvent[] = (data || []) as ApiEvent[]
-    if (upcoming === 'true' && preview !== 'true') {
-      const now = Date.now()
-      events = events.filter((ev) => {
-        try {
-          const datePart = (ev.event_date as string) || ''
-          const timePart = (ev.event_time as string) || '00:00:00'
-          const dt = new Date(`${datePart}T${timePart}`)
-          return dt.getTime() >= now
-        } catch {
-          return false
-        }
-      })
-
-      // Sort by ascending datetime just in case
-      events = events.sort((a, b) => {
-        const aTime = new Date(`${(a.event_date as string) || ''}T${(a.event_time as string) || '00:00:00'}`).getTime()
-        const bTime = new Date(`${(b.event_date as string) || ''}T${(b.event_time as string) || '00:00:00'}`).getTime()
-        return aTime - bTime
-      })
-    }
+    const events = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
 
     return NextResponse.json({ events }, { status: 200 })
   } catch (error) {
@@ -124,60 +30,106 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST - Create new event
+// POST - Create new event OR upload image
 export async function POST(request: NextRequest) {
   try {
+    const contentType = request.headers.get('content-type') || ''
+
+    // 🔥 CASE 1: IMAGE UPLOAD (form-data)
+    if (contentType.includes('multipart/form-data')) {
+      const formData = await request.formData()
+      const file = formData.get('file') as File | null
+
+      if (!file) {
+        return NextResponse.json({ error: 'No file provided' }, { status: 400 })
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        return NextResponse.json({ error: 'File must be an image' }, { status: 400 })
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        return NextResponse.json({ error: 'File must be less than 5MB' }, { status: 400 })
+      }
+
+      // Convert file → base64
+      const bytes = await file.arrayBuffer()
+      const buffer = Buffer.from(bytes)
+      const base64 = buffer.toString('base64')
+
+      const apiKey = process.env.IMGBB_API_KEY
+
+      if (!apiKey) {
+        console.error('IMGBB_API_KEY is not configured in environment variables')
+        return NextResponse.json({ error: 'Image upload service not configured' }, { status: 500 })
+      }
+
+      const res = await fetch(
+        `https://api.imgbb.com/1/upload?key=${apiKey}`,
+        {
+          method: 'POST',
+          body: new URLSearchParams({ image: base64 })
+        }
+      )
+
+      const data = await res.json()
+
+      if (!data.success) {
+        console.error('ImgBB error:', data)
+        return NextResponse.json({ error: 'Image upload failed: ' + (data.error?.message || 'Unknown error') }, { status: 500 })
+      }
+
+      return NextResponse.json({
+        success: true,
+        imageUrl: data.data.url
+      })
+    }
+
+    // 🔥 CASE 2: CREATE EVENT (JSON)
     const body = await request.json()
 
-    // Validate required fields
     if (!body.title || !body.description || !body.event_date) {
       return NextResponse.json(
-        { error: 'Missing required fields: title, description, event_date' },
+        { error: 'Missing required fields: title, description, and event_date are required' },
         { status: 400 }
       )
     }
 
-    const { data, error } = await supabase
-      .from('events')
-      .insert([body])
-      .select()
-      .single()
+    const docRef = await addDoc(collection(db, 'events'), {
+      ...body,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    })
 
-    if (error) {
-      console.error('Supabase error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ event: data }, { status: 201 })
+    return NextResponse.json(
+      { success: true, id: docRef.id, message: 'Event created successfully' },
+      { status: 201 }
+    )
   } catch (error) {
     console.error('API error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+    return NextResponse.json({ error: 'Internal server error: ' + (error as Error).message }, { status: 500 })
   }
 }
 
-// PUT - Update existing event
+// PUT - Update event
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
     const { id, ...updates } = body
 
     if (!id) {
-      return NextResponse.json({ error: 'Event ID is required' }, { status: 400 })
+      return NextResponse.json({ error: 'Event ID required' }, { status: 400 })
     }
 
-    const { data, error } = await supabase
-      .from('events')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
+    const ref = doc(db, 'events', id)
+    await updateDoc(ref, {
+      ...updates,
+      updatedAt: new Date().toISOString()
+    })
 
-    if (error) {
-      console.error('Supabase error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ event: data }, { status: 200 })
+    return NextResponse.json({ success: true, message: 'Event updated successfully' }, { status: 200 })
   } catch (error) {
     console.error('API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -187,64 +139,15 @@ export async function PUT(request: NextRequest) {
 // DELETE - Delete event
 export async function DELETE(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams
-    const id = searchParams.get('id')
+    const id = request.nextUrl.searchParams.get('id')
 
     if (!id) {
-      return NextResponse.json({ error: 'Event ID is required' }, { status: 400 })
+      return NextResponse.json({ error: 'Event ID required' }, { status: 400 })
     }
 
-    // First, get the event data to find the storage path
-    const { data: eventData, error: fetchError } = await supabase
-      .from('events')
-      .select('image_url')
-      .eq('id', id)
-      .single()
+    await deleteDoc(doc(db, 'events', id))
 
-    if (fetchError) {
-      console.error('Supabase fetch error:', fetchError)
-      return NextResponse.json({ error: fetchError.message }, { status: 500 })
-    }
-
-    console.log('[DELETE events] Event data:', eventData)
-
-    // Delete from database
-    const { error } = await supabase
-      .from('events')
-      .delete()
-      .eq('id', id)
-
-    if (error) {
-      console.error('Supabase error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    // Delete from storage if image exists
-    if (eventData?.image_url) {
-      try {
-        const storagePath = extractStoragePath(eventData.image_url, 'event-images')
-        
-        if (storagePath) {
-          console.log('[DELETE events] Deleting from storage:', storagePath)
-          
-          const { error: storageError } = await supabase.storage
-            .from('event-images')
-            .remove([storagePath])
-
-          if (storageError) {
-            console.error('Storage deletion error:', storageError)
-          } else {
-            console.log('[DELETE events] Successfully deleted from storage')
-          }
-        } else {
-          console.warn('[DELETE events] Could not extract storage path from URL:', eventData.image_url)
-        }
-      } catch (storageErr) {
-        console.error('Storage cleanup error:', storageErr)
-      }
-    }
-
-    return NextResponse.json({ message: 'Event deleted successfully' }, { status: 200 })
+    return NextResponse.json({ success: true, message: 'Event deleted successfully' }, { status: 200 })
   } catch (error) {
     console.error('API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

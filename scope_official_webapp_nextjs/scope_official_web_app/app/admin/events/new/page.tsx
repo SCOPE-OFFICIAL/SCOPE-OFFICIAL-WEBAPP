@@ -1,8 +1,3 @@
-/**
- * Add/Create New Event Page
- * Form with image upload
- */
-
 'use client'
 
 import { useState } from 'react'
@@ -18,6 +13,7 @@ export default function NewEventPage() {
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [bannerPreview, setBannerPreview] = useState<string | null>(null)
   const [posterPreview, setPosterPreview] = useState<string | null>(null)
+  const [uploadError, setUploadError] = useState<string | null>(null)
   
   const [formData, setFormData] = useState({
     title: '',
@@ -47,40 +43,61 @@ export default function NewEventPage() {
     }))
   }
 
+  const uploadImageToImgBB = async (file: File) => {
+    const fd = new FormData()
+    fd.append('file', file)
+
+    const res = await fetch('/api/events', {
+      method: 'POST',
+      body: fd
+    })
+
+    if (!res.ok) {
+      const error = await res.json()
+      throw new Error(error.error || 'Upload failed')
+    }
+
+    const data = await res.json()
+
+    if (!data.success) {
+      throw new Error(data.error || 'Upload failed')
+    }
+
+    return data.imageUrl
+  }
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Show preview
+    setUploadError(null)
+
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please upload an image file')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('Image must be less than 5MB')
+      return
+    }
+
     const reader = new FileReader()
     reader.onloadend = () => {
       setImagePreview(reader.result as string)
     }
     reader.readAsDataURL(file)
 
-    // Upload to server
     try {
       setUploading(true)
-      const formDataUpload = new FormData()
-      formDataUpload.append('file', file)
-      formDataUpload.append('bucket', 'event-images')
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formDataUpload
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setFormData(prev => ({ ...prev, image_url: data.url }))
-        alert('Image uploaded successfully!')
-      } else {
-        alert('Failed to upload image: ' + data.error)
-      }
+      const url = await uploadImageToImgBB(file)
+      setFormData(prev => ({ ...prev, image_url: url }))
+      alert('Image uploaded successfully!')
     } catch (error) {
       console.error('Upload error:', error)
-      alert('Error uploading image')
+      setUploadError((error as Error).message)
+      alert('Error uploading image: ' + (error as Error).message)
+      setImagePreview(null)
     } finally {
       setUploading(false)
     }
@@ -90,36 +107,34 @@ export default function NewEventPage() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Show preview
+    setUploadError(null)
+
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please upload an image file')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('Image must be less than 5MB')
+      return
+    }
+
     const reader = new FileReader()
     reader.onloadend = () => {
       setBannerPreview(reader.result as string)
     }
     reader.readAsDataURL(file)
 
-    // Upload to server
     try {
       setUploadingBanner(true)
-      const formDataUpload = new FormData()
-      formDataUpload.append('file', file)
-      formDataUpload.append('bucket', 'event-images')
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formDataUpload
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setFormData(prev => ({ ...prev, banner_image_url: data.url }))
-        alert('Banner image uploaded successfully!')
-      } else {
-        alert('Failed to upload banner image: ' + data.error)
-      }
+      const url = await uploadImageToImgBB(file)
+      setFormData(prev => ({ ...prev, banner_image_url: url }))
+      alert('Banner image uploaded successfully!')
     } catch (error) {
       console.error('Upload error:', error)
-      alert('Error uploading banner image')
+      setUploadError((error as Error).message)
+      alert('Error uploading banner image: ' + (error as Error).message)
+      setBannerPreview(null)
     } finally {
       setUploadingBanner(false)
     }
@@ -129,36 +144,34 @@ export default function NewEventPage() {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Show preview
+    setUploadError(null)
+
+    if (!file.type.startsWith('image/')) {
+      setUploadError('Please upload an image file')
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('Image must be less than 5MB')
+      return
+    }
+
     const reader = new FileReader()
     reader.onloadend = () => {
       setPosterPreview(reader.result as string)
     }
     reader.readAsDataURL(file)
 
-    // Upload to server
     try {
       setUploadingPoster(true)
-      const formDataUpload = new FormData()
-      formDataUpload.append('file', file)
-      formDataUpload.append('bucket', 'event-images')
-
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formDataUpload
-      })
-
-      const data = await response.json()
-
-      if (response.ok) {
-        setFormData(prev => ({ ...prev, poster_image_url: data.url }))
-        alert('Poster image uploaded successfully!')
-      } else {
-        alert('Failed to upload poster image: ' + data.error)
-      }
+      const url = await uploadImageToImgBB(file)
+      setFormData(prev => ({ ...prev, poster_image_url: url }))
+      alert('Poster image uploaded successfully!')
     } catch (error) {
       console.error('Upload error:', error)
-      alert('Error uploading poster image')
+      setUploadError((error as Error).message)
+      alert('Error uploading poster image: ' + (error as Error).message)
+      setPosterPreview(null)
     } finally {
       setUploadingPoster(false)
     }
@@ -174,22 +187,29 @@ export default function NewEventPage() {
 
     try {
       setLoading(true)
+
       const response = await fetch('/api/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
 
-      if (response.ok) {
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to create event')
+      }
+
+      const data = await response.json()
+
+      if (data.success) {
         alert('Event created successfully!')
         router.push('/admin/events')
       } else {
-        const data = await response.json()
         alert('Failed to create event: ' + data.error)
       }
     } catch (error) {
       console.error('Submit error:', error)
-      alert('Error creating event')
+      alert('Error creating event: ' + (error as Error).message)
     } finally {
       setLoading(false)
     }
@@ -197,7 +217,6 @@ export default function NewEventPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#040a28] via-[#0d1b3d] to-[#040a28] p-8">
-      {/* Header */}
       <div className="mb-8">
         <button
           onClick={() => router.back()}
@@ -211,7 +230,12 @@ export default function NewEventPage() {
         <p className="text-gray-400 mt-2">Fill in the details to add a new event</p>
       </div>
 
-      {/* Form */}
+      {uploadError && (
+        <div className="mb-4 p-4 bg-red-500/10 border border-red-500/50 rounded-lg text-red-400">
+          <strong>Upload Error:</strong> {uploadError}
+        </div>
+      )}
+
       <motion.form
         onSubmit={handleSubmit}
         initial={{ opacity: 0, y: 20 }}
@@ -219,7 +243,6 @@ export default function NewEventPage() {
         className="max-w-4xl bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-8"
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Title */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Event Title <span className="text-red-400">*</span>
@@ -235,7 +258,6 @@ export default function NewEventPage() {
             />
           </div>
 
-          {/* Short Description */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Short Description (for hexagon preview)
@@ -251,7 +273,6 @@ export default function NewEventPage() {
             />
           </div>
 
-          {/* Description */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Full Description <span className="text-red-400">*</span>
@@ -267,7 +288,6 @@ export default function NewEventPage() {
             />
           </div>
 
-          {/* Event Date */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Event Date <span className="text-red-400">*</span>
@@ -282,7 +302,6 @@ export default function NewEventPage() {
             />
           </div>
 
-          {/* Event Time */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Event Time
@@ -296,7 +315,6 @@ export default function NewEventPage() {
             />
           </div>
 
-          {/* Location */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Location
@@ -311,7 +329,6 @@ export default function NewEventPage() {
             />
           </div>
 
-          {/* Registration Link */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Registration Link
@@ -326,7 +343,6 @@ export default function NewEventPage() {
             />
           </div>
 
-          {/* Speaker */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Speaker / Host
@@ -341,7 +357,6 @@ export default function NewEventPage() {
             />
           </div>
 
-          {/* Registration Fee */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Registration Fee
@@ -356,7 +371,6 @@ export default function NewEventPage() {
             />
           </div>
 
-          {/* What to Expect */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-2">
               What to Expect
@@ -371,7 +385,6 @@ export default function NewEventPage() {
             />
           </div>
 
-          {/* What You Get */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-2">
               What You&apos;ll Get
@@ -386,7 +399,6 @@ export default function NewEventPage() {
             />
           </div>
 
-          {/* Event Type */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Event Type
@@ -395,18 +407,17 @@ export default function NewEventPage() {
               name="event_type"
               value={formData.event_type}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] [&>option]:bg-[#0d1b3d] [&>option]:text-white"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] [&>option]:bg-[#0d1b3d]"
             >
-              <option value="workshop" className="bg-[#0d1b3d] text-white">Workshop</option>
-              <option value="hackathon" className="bg-[#0d1b3d] text-white">Hackathon</option>
-              <option value="webinar" className="bg-[#0d1b3d] text-white">Webinar</option>
-              <option value="competition" className="bg-[#0d1b3d] text-white">Competition</option>
-              <option value="meetup" className="bg-[#0d1b3d] text-white">Meetup</option>
-              <option value="other" className="bg-[#0d1b3d] text-white">Other</option>
+              <option value="workshop">Workshop</option>
+              <option value="hackathon">Hackathon</option>
+              <option value="webinar">Webinar</option>
+              <option value="competition">Competition</option>
+              <option value="meetup">Meetup</option>
+              <option value="other">Other</option>
             </select>
           </div>
 
-          {/* Status */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Status
@@ -415,16 +426,15 @@ export default function NewEventPage() {
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] [&>option]:bg-[#0d1b3d] [&>option]:text-white"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] [&>option]:bg-[#0d1b3d]"
             >
-              <option value="published" className="bg-[#0d1b3d] text-white">Published</option>
-              <option value="draft" className="bg-[#0d1b3d] text-white">Draft</option>
-              <option value="completed" className="bg-[#0d1b3d] text-white">Completed</option>
-              <option value="cancelled" className="bg-[#0d1b3d] text-white">Cancelled</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
             </select>
           </div>
 
-          {/* Featured */}
           <div className="md:col-span-2 flex items-center gap-3">
             <input
               type="checkbox"
@@ -439,7 +449,6 @@ export default function NewEventPage() {
             </label>
           </div>
 
-          {/* Image Upload */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Event Image (Main)
@@ -449,7 +458,7 @@ export default function NewEventPage() {
               accept="image/*"
               onChange={handleImageUpload}
               disabled={uploading}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#2C97FF] file:text-white file:cursor-pointer hover:file:bg-[#1a7de0]"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#2C97FF] file:text-white file:cursor-pointer hover:file:bg-[#1a7de0] disabled:opacity-50"
             />
             {uploading && <p className="text-yellow-400 text-sm mt-2">Uploading...</p>}
             {imagePreview && (
@@ -459,7 +468,6 @@ export default function NewEventPage() {
             )}
           </div>
 
-          {/* Banner Image Upload */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Banner Image (for event card header)
@@ -469,7 +477,7 @@ export default function NewEventPage() {
               accept="image/*"
               onChange={handleBannerUpload}
               disabled={uploadingBanner}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#F24DC2] file:text-white file:cursor-pointer hover:file:bg-[#d83da7]"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#F24DC2] file:text-white file:cursor-pointer hover:file:bg-[#d83da7] disabled:opacity-50"
             />
             {uploadingBanner && <p className="text-yellow-400 text-sm mt-2">Uploading banner...</p>}
             {bannerPreview && (
@@ -479,7 +487,6 @@ export default function NewEventPage() {
             )}
           </div>
 
-          {/* Poster Image Upload */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Poster Image (slides in event card)
@@ -489,7 +496,7 @@ export default function NewEventPage() {
               accept="image/*"
               onChange={handlePosterUpload}
               disabled={uploadingPoster}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gradient-to-r file:from-[#F24DC2] file:to-[#2C97FF] file:text-white file:cursor-pointer hover:file:opacity-90"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-gradient-to-r file:from-[#F24DC2] file:to-[#2C97FF] file:text-white file:cursor-pointer hover:file:opacity-90 disabled:opacity-50"
             />
             {uploadingPoster && <p className="text-yellow-400 text-sm mt-2">Uploading poster...</p>}
             {posterPreview && (
@@ -500,7 +507,6 @@ export default function NewEventPage() {
           </div>
         </div>
 
-        {/* Submit Buttons */}
         <div className="mt-8 flex gap-4 justify-end">
           <button
             type="button"
@@ -512,7 +518,7 @@ export default function NewEventPage() {
           <button
             type="submit"
             disabled={loading || uploading || uploadingBanner || uploadingPoster}
-            className="px-8 py-3 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] text-white rounded-lg hover:opacity-90 transition-all font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-8 py-3 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] text-white rounded-lg hover:opacity-90 transition-all font-bold disabled:opacity-50"
           >
             {loading ? 'Creating...' : '✨ Create Event'}
           </button>

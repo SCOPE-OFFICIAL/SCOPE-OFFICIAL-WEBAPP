@@ -4,6 +4,13 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import {
+  buildLoginHref,
+  clearAdminSession,
+  getAdminToken,
+  resolveAdminSession,
+  storePostLoginRedirect
+} from '@/app/admin/utils/auth';
 
 interface Partner {
   id: string;
@@ -29,8 +36,13 @@ export default function ManagePartners() {
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  const redirectToLogin = (path = '/admin/partners') => {
+    storePostLoginRedirect(path);
+    router.replace(buildLoginHref(path));
+  };
+
   const getAuthHeaders = () => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
+    const token = getAdminToken();
     if (!token) return null;
     return {
       'Content-Type': 'application/json',
@@ -39,15 +51,34 @@ export default function ManagePartners() {
   };
 
   const loadPartners = async () => {
-    const headers = getAuthHeaders();
-    if (!headers) {
-      console.warn('No authentication token found');
-      router.push('/admin/login');
-      return;
-    }
+    setLoading(true);
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => controller.abort(), 10000);
 
     try {
-      const res = await fetch('/api/admin/partners', { headers });
+      const authenticated = await resolveAdminSession(8000);
+      if (!authenticated) {
+        console.warn('[partners] auth check failed, redirecting to login');
+        clearAdminSession();
+        redirectToLogin('/admin/partners');
+        return;
+      }
+
+      const headers = getAuthHeaders();
+      if (!headers) {
+        console.warn('[partners] no auth headers after session resolve');
+        redirectToLogin('/admin/partners');
+        return;
+      }
+
+      const res = await fetch('/api/admin/partners', {
+        headers,
+        credentials: 'include',
+        cache: 'no-store',
+        signal: controller.signal
+      });
+      console.log('[partners] GET /api/admin/partners status', res.status);
+
       if (res.ok) {
         const data = await res.json();
         if (data && data.partners) {
@@ -55,12 +86,13 @@ export default function ManagePartners() {
         }
       } else if (res.status === 401) {
         console.warn('Session expired, redirecting to login');
-        localStorage.removeItem('admin_token');
-        router.push('/admin/login');
+        clearAdminSession();
+        redirectToLogin('/admin/partners');
       }
     } catch (err) {
       console.error('Failed to load partners', err);
     } finally {
+      window.clearTimeout(timeoutId);
       setLoading(false);
     }
   };
@@ -93,6 +125,7 @@ export default function ManagePartners() {
       const res = await fetch('/api/admin/partners', {
         method: 'POST',
         headers,
+        credentials: 'include',
         body: JSON.stringify(newPartner)
       });
 
@@ -122,7 +155,8 @@ export default function ManagePartners() {
     try {
       const res = await fetch(`/api/admin/partners?id=${encodeURIComponent(id)}`, {
         method: 'DELETE',
-        headers
+        headers,
+        credentials: 'include'
       });
 
       if (res.ok) {
@@ -179,6 +213,7 @@ export default function ManagePartners() {
       const res = await fetch(`/api/admin/partners?id=${encodeURIComponent(partner.id)}`, {
         method: 'PATCH',
         headers,
+        credentials: 'include',
         body: JSON.stringify(updates)
       });
 
@@ -211,6 +246,7 @@ export default function ManagePartners() {
       const res = await fetch(`/api/admin/partners?id=${encodeURIComponent(id)}`, {
         method: 'PATCH',
         headers,
+        credentials: 'include',
         body: JSON.stringify({ visible: !currentVisible })
       });
 
@@ -252,6 +288,7 @@ export default function ManagePartners() {
           fetch(`/api/admin/partners?id=${encodeURIComponent(partner.id)}`, {
             method: 'PATCH',
             headers,
+            credentials: 'include',
             body: JSON.stringify({ sort_order: i })
           })
         )
@@ -271,34 +308,25 @@ export default function ManagePartners() {
     setUploading(true);
     
     try {
-      const dataUrl = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-
-      const base64 = dataUrl.split(',')[1];
-      const filename = `${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-
-      const headers = getAuthHeaders();
-      if (!headers) {
-        alert('Not authenticated');
-        return;
+      const token = getAdminToken();
+      const uploadHeaders: HeadersInit = {};
+      if (token) {
+        uploadHeaders.Authorization = `Bearer ${token}`;
       }
+
+      const formData = new FormData();
+      formData.append('file', file);
 
       const res = await fetch('/api/admin/partners/upload', {
         method: 'POST',
-        headers,
-        body: JSON.stringify({ 
-          filename, 
-          contentType: file.type, 
-          base64 
-        })
+        headers: uploadHeaders,
+        credentials: 'include',
+        body: formData
       });
 
       if (!res.ok) {
-        throw new Error('Upload failed');
+        const failure = await res.json().catch(() => null);
+        throw new Error(failure?.error || 'Upload failed');
       }
 
       const data = await res.json();
@@ -309,7 +337,8 @@ export default function ManagePartners() {
       }
     } catch (err) {
       console.error('Upload error', err);
-      alert('Upload failed. Please try again.');
+      const message = err instanceof Error ? err.message : 'Upload failed. Please try again.';
+      alert(message);
     } finally {
       setUploading(false);
     }

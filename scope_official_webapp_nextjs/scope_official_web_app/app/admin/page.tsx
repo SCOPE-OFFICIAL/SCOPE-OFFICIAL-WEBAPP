@@ -7,16 +7,17 @@
 
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { getAdminToken } from '@/app/admin/utils/auth'
 
 export default function AdminPage() {
   const router = useRouter()
 
   useEffect(() => {
-    const token = localStorage.getItem('admin_token')
+    const token = getAdminToken()
     if (token) {
-      router.push('/admin/dashboard')
+      router.replace('/admin/dashboard')
     } else {
-      router.push('/admin/login')
+      router.replace('/admin/login')
     }
   }, [router])
 

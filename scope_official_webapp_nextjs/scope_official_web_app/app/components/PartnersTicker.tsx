@@ -10,6 +10,7 @@ interface Partner {
   name: string;
   image_url: string;
   link?: string;
+  show_on_website?: boolean;
 }
 
 export default function PartnersTicker({ className = '' }: { className?: string }) {
@@ -19,8 +20,10 @@ export default function PartnersTicker({ className = '' }: { className?: string 
     const fetchPartners = async () => {
       try {
         const res = await fetch('/api/partners');
+        console.log('PartnersTicker: /api/partners status', res.status);
         if (res.ok) {
           const data = await res.json();
+          console.log('PartnersTicker: partners payload', data);
           if (data?.partners) setPartners(data.partners);
         } else {
           console.error('PartnersTicker: failed to fetch partners', res.status);
@@ -33,12 +36,14 @@ export default function PartnersTicker({ className = '' }: { className?: string 
     fetchPartners();
   }, []);
 
-  if (!partners || partners.length === 0) return null;
+  const visiblePartners = partners.filter((partner) => partner.show_on_website === true);
+
+  if (!visiblePartners || visiblePartners.length === 0) return null;
 
   // We must wrap the component and the style tag in a single fragment
   return (
     <>
-      <section className={`py-12 px-6 partners-root ${className}`}>
+      <section className={`py-12 px-6 partners-root min-h-[260px] ${className}`}>
         <div className="max-w-7xl mx-auto">
           <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] mb-6">OUR PARTNERS</h3>
 
@@ -55,7 +60,7 @@ export default function PartnersTicker({ className = '' }: { className?: string 
             >
               {/* Render two sets for seamless loop */}
               {Array.from({ length: 2 }).flatMap((_, r) =>
-                partners.map((p) => (
+                visiblePartners.map((p) => (
                   
                   // Use the new CSS class for the item
                   <div className="logo-item-css" key={`${p.id}-${r}`}>
