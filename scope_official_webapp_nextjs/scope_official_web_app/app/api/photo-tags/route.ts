@@ -1,44 +1,38 @@
 /**
- * Photo Tags API Route
+ * Photo Tags API Route (Firebase Version)
+ * Converted from Supabase to Firebase Firestore
  * Handles tagging people in group photos
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { db } from '@/lib/firebase'
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc
+} from 'firebase/firestore'
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-)
-
-// GET - Fetch tags for a photo
+// GET - Fetch tags (optionally filtered by photoId)
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
     const photoId = searchParams.get('photoId')
 
-    let query = supabase
-      .from('photo_tags')
-      .select('*')
+    const snapshot = await getDocs(collection(db, 'photo_tags'))
+
+    let tags = snapshot.docs.map(docSnap => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    })) as any[]
 
     if (photoId) {
-      query = query.eq('photo_id', photoId)
+      tags = tags.filter(tag => tag.photo_id === photoId)
     }
 
-    const { data, error } = await query
-
-    if (error) {
-      console.error('Supabase error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ tags: data }, { status: 200 })
+    return NextResponse.json({ tags }, { status: 200 })
   } catch (error) {
     console.error('API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -50,32 +44,37 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
 
-    if (!body.photo_id || !body.person_name || body.position_x === undefined || body.position_y === undefined) {
+    if (
+      !body.photo_id ||
+      !body.person_name ||
+      body.position_x === undefined ||
+      body.position_y === undefined
+    ) {
       return NextResponse.json(
         { error: 'Missing required fields: photo_id, person_name, position_x, position_y' },
         { status: 400 }
       )
     }
 
-    const { data, error } = await supabase
-      .from('photo_tags')
-      .insert([body])
-      .select()
-      .single()
+    const docRef = await addDoc(collection(db, 'photo_tags'), {
+      photo_id: body.photo_id,
+      person_name: body.person_name,
+      position_x: body.position_x,
+      position_y: body.position_y,
+      createdAt: new Date().toISOString()
+    })
 
-    if (error) {
-      console.error('Supabase error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ tag: data }, { status: 201 })
+    return NextResponse.json(
+      { tag: { id: docRef.id, ...body } },
+      { status: 201 }
+    )
   } catch (error) {
     console.error('API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-// PUT - Update tag
+// PUT - Update tag position or name
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json()
@@ -85,19 +84,19 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Tag ID is required' }, { status: 400 })
     }
 
-    const { data, error } = await supabase
-      .from('photo_tags')
-      .update(updates)
-      .eq('id', id)
-      .select()
-      .single()
+    const allowedFields = ['person_name', 'position_x', 'position_y']
+    const filteredUpdates: any = { updatedAt: new Date().toISOString() }
 
-    if (error) {
-      console.error('Supabase error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    for (const field of allowedFields) {
+      if (updates[field] !== undefined) {
+        filteredUpdates[field] = updates[field]
+      }
     }
 
-    return NextResponse.json({ tag: data }, { status: 200 })
+    const ref = doc(db, 'photo_tags', id)
+    await updateDoc(ref, filteredUpdates)
+
+    return NextResponse.json({ tag: { id, ...filteredUpdates } }, { status: 200 })
   } catch (error) {
     console.error('API error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -107,22 +106,13 @@ export async function PUT(request: NextRequest) {
 // DELETE - Delete tag
 export async function DELETE(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams
-    const id = searchParams.get('id')
+    const id = request.nextUrl.searchParams.get('id')
 
     if (!id) {
       return NextResponse.json({ error: 'Tag ID is required' }, { status: 400 })
     }
 
-    const { error } = await supabase
-      .from('photo_tags')
-      .delete()
-      .eq('id', id)
-
-    if (error) {
-      console.error('Supabase error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+    await deleteDoc(doc(db, 'photo_tags', id))
 
     return NextResponse.json({ message: 'Tag deleted successfully' }, { status: 200 })
   } catch (error) {

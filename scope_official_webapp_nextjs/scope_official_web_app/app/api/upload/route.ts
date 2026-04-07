@@ -1,109 +1,86 @@
 /**
- * Image Upload API Route
- * Handles file uploads to Supabase Storage
+ * Image Upload API Route (ImgBB Version)
+ * Converted from Supabase Storage to ImgBB
+ * Handles file uploads — returns a hosted image URL from ImgBB
+ *
+ * Note: ImgBB free plan does not support programmatic deletion.
+ * The DELETE handler is kept for API compatibility but returns a notice.
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
-  }
-)
 
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData()
-    const file = formData.get('file') as File
-    const bucket = formData.get('bucket') as string || 'event-images'
-    const folder = formData.get('folder') as string || ''
+    const file = formData.get('file') as File | null
+    // `bucket` and `folder` params are accepted but unused — kept for
+    // drop-in compatibility with existing callers that pass them.
+    // const bucket = formData.get('bucket') as string || ''
+    // const folder = formData.get('folder') as string || ''
 
     if (!file) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 })
     }
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
       return NextResponse.json({ error: 'Only image files are allowed' }, { status: 400 })
     }
 
-    // Validate file size (5MB limit)
     const maxSize = 5 * 1024 * 1024 // 5MB
     if (file.size > maxSize) {
       return NextResponse.json({ error: 'File size must be less than 5MB' }, { status: 400 })
     }
 
-    // Generate unique filename
-    const timestamp = Date.now()
-    const randomString = Math.random().toString(36).substring(2, 8)
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${timestamp}-${randomString}.${fileExt}`
-    const filePath = folder ? `${folder}/${fileName}` : fileName
-
-    // Convert File to ArrayBuffer for upload
-    const arrayBuffer = await file.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
-
-    // Upload to Supabase Storage
-    const { error } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, buffer, {
-        contentType: file.type,
-        cacheControl: '3600',
-        upsert: false
-      })
-
-    if (error) {
-      console.error('Supabase storage error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
+    const apiKey = process.env.IMGBB_API_KEY
+    if (!apiKey) {
+      console.error('IMGBB_API_KEY is not set in environment variables')
+      return NextResponse.json({ error: 'Image upload service not configured' }, { status: 500 })
     }
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath)
+    // Convert to base64 and upload to ImgBB
+    const bytes = await file.arrayBuffer()
+    const base64 = Buffer.from(bytes).toString('base64')
 
-    return NextResponse.json({
-      success: true,
-      url: publicUrl,
-      path: filePath,
-      bucket: bucket
-    }, { status: 200 })
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+      method: 'POST',
+      body: new URLSearchParams({ image: base64 })
+    })
 
+    const data = await res.json()
+
+    if (!data.success) {
+      console.error('ImgBB upload error:', data)
+      return NextResponse.json(
+        { error: 'Image upload failed: ' + (data.error?.message || 'Unknown error') },
+        { status: 500 }
+      )
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        url: data.data.url,         // direct image URL  (used by callers expecting `data.url`)
+        imageUrl: data.data.url,    // alias kept for callers expecting `data.imageUrl`
+        deleteUrl: data.data.delete_url // ImgBB manual delete link (not programmatic)
+      },
+      { status: 200 }
+    )
   } catch (error) {
     console.error('Upload error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-// DELETE - Remove uploaded image
-export async function DELETE(request: NextRequest) {
-  try {
-    const { bucket, path } = await request.json()
-
-    if (!bucket || !path) {
-      return NextResponse.json({ error: 'Bucket and path are required' }, { status: 400 })
-    }
-
-    const { error } = await supabase.storage
-      .from(bucket)
-      .remove([path])
-
-    if (error) {
-      console.error('Supabase storage error:', error)
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
-
-    return NextResponse.json({ message: 'File deleted successfully' }, { status: 200 })
-
-  } catch (error) {
-    console.error('Delete error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
-  }
+// DELETE - ImgBB free plan does not support API-based deletion.
+// This stub is kept so existing code that calls DELETE /api/upload doesn't crash.
+export async function DELETE(_request: NextRequest) {
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        'Programmatic deletion is not supported by ImgBB on the free plan. ' +
+        'Use the deleteUrl returned at upload time to remove the image manually.'
+    },
+    { status: 501 }
+  )
 }

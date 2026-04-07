@@ -1,6 +1,5 @@
 /**
- * Edit Past Event Page
- * Update event name, poster, order, and visibility
+ * Edit Past Event Page (Firebase + ImgBB Version)
  */
 
 'use client'
@@ -19,7 +18,7 @@ export default function EditPastEventPage() {
   const [fetching, setFetching] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [posterPreview, setPosterPreview] = useState<string | null>(null)
-  
+
   const [formData, setFormData] = useState({
     event_name: '',
     poster_image_url: '',
@@ -30,82 +29,74 @@ export default function EditPastEventPage() {
   })
 
   useEffect(() => {
-    if (id) {
-      fetchPastEvent()
-    }
+    if (id) fetchPastEvent()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 
   const fetchPastEvent = async () => {
     try {
       setFetching(true)
-      const response = await fetch('/api/past-events')
-      const data = await response.json()
+      const res = await fetch('/api/past-events')
+      const data = await res.json()
       const event = data.pastEvents?.find((e: { id: string }) => e.id === id)
-      
+
       if (event) {
         setFormData({
-          event_name: event.event_name,
-          poster_image_url: event.poster_image_url,
-          display_order: event.display_order,
-          is_visible: event.is_visible,
-          description: event.description || '',
-          gallery_folder: event.gallery_folder || ''
+          event_name: event.event_name ?? '',
+          poster_image_url: event.poster_image_url ?? '',
+          display_order: event.display_order ?? 0,
+          is_visible: event.is_visible ?? true,
+          description: event.description ?? '',
+          gallery_folder: event.gallery_folder ?? ''
         })
-        setPosterPreview(event.poster_image_url)
+        setPosterPreview(event.poster_image_url ?? null)
       } else {
         alert('Past event not found')
         router.push('/admin/events')
       }
-    } catch (error) {
-      console.error('Fetch error:', error)
+    } catch (err) {
+      console.error('Fetch error:', err)
       alert('Error loading past event')
     } finally {
       setFetching(false)
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value, type, checked } = e.target as HTMLInputElement
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value, type } = e.target
+    const checked = (e.target as HTMLInputElement).checked
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : type === 'number' ? parseInt(value) || 0 : value
     }))
   }
 
-  
-
   const handlePosterUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
 
-    // Show preview
     const reader = new FileReader()
-    reader.onloadend = () => {
-      setPosterPreview(reader.result as string)
-    }
+    reader.onloadend = () => setPosterPreview(reader.result as string)
     reader.readAsDataURL(file)
 
-    // Upload to server
     try {
       setUploading(true)
-      const formDataUpload = new FormData()
-      formDataUpload.append('file', file)
-      formDataUpload.append('bucket', 'past-event-posters')
+      const upload = new FormData()
+      upload.append('file', file)
+      upload.append('bucket', 'past-event-posters') // compatibility param, unused by ImgBB
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formDataUpload
-      })
+      const res = await fetch('/api/upload', { method: 'POST', body: upload })
+      const data = await res.json()
 
-      const data = await response.json()
-      if (data.url) {
+      if (res.ok && data.url) {
         setFormData(prev => ({ ...prev, poster_image_url: data.url }))
       } else {
-        alert('Upload failed: ' + data.error)
+        alert('Upload failed: ' + (data.error || 'Unknown error'))
       }
-    } catch (error) {
-      console.error('Upload error:', error)
+    } catch (err) {
+      console.error('Upload error:', err)
       alert('Error uploading poster')
     } finally {
       setUploading(false)
@@ -122,21 +113,21 @@ export default function EditPastEventPage() {
 
     try {
       setLoading(true)
-      const response = await fetch(`/api/past-events?id=${id}`, {
+      const res = await fetch(`/api/past-events?id=${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
       })
 
-      if (response.ok) {
+      if (res.ok) {
         alert('Past event updated successfully!')
         router.push('/admin/events')
       } else {
-        const data = await response.json()
+        const data = await res.json()
         alert('Failed to update past event: ' + data.error)
       }
-    } catch (error) {
-      console.error('Submit error:', error)
+    } catch (err) {
+      console.error('Submit error:', err)
       alert('Error updating past event')
     } finally {
       setLoading(false)
@@ -147,7 +138,7 @@ export default function EditPastEventPage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-[#040a28] via-[#0d1b3d] to-[#040a28] flex items-center justify-center">
         <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto" />
           <p className="mt-4">Loading past event...</p>
         </div>
       </div>
@@ -189,12 +180,12 @@ export default function EditPastEventPage() {
               value={formData.event_name}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2C97FF]"
               placeholder="e.g., MATLAB Workshop 2024"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2C97FF]"
             />
           </div>
 
-          {/* Poster Image Upload */}
+          {/* Poster Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Event Poster <span className="text-red-400">*</span>
@@ -206,7 +197,12 @@ export default function EditPastEventPage() {
               disabled={uploading}
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#F24DC2] file:text-white file:cursor-pointer hover:file:bg-[#d83da7]"
             />
-            {uploading && <p className="text-yellow-400 text-sm mt-2">Uploading poster...</p>}
+            {uploading && (
+              <p className="text-yellow-400 text-sm mt-2">⏳ Uploading to ImgBB...</p>
+            )}
+            {!uploading && formData.poster_image_url && (
+              <p className="text-green-400 text-sm mt-2">✅ Image ready</p>
+            )}
             {posterPreview && (
               <div className="mt-4 rounded-lg overflow-hidden border border-white/10">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -226,8 +222,8 @@ export default function EditPastEventPage() {
               value={formData.display_order}
               onChange={handleChange}
               min="0"
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF]"
               placeholder="0"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF]"
             />
             <p className="text-gray-500 text-xs mt-1">Lower numbers appear first in the carousel</p>
           </div>
@@ -240,10 +236,10 @@ export default function EditPastEventPage() {
             <textarea
               name="description"
               value={formData.description}
-              onChange={handleChange as any}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2C97FF]"
+              onChange={handleChange}
               rows={4}
               placeholder="Short description for the past event"
+              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2C97FF]"
             />
           </div>
 
@@ -276,7 +272,7 @@ export default function EditPastEventPage() {
           </div>
         </div>
 
-        {/* Submit Buttons */}
+        {/* Actions */}
         <div className="mt-8 flex gap-4 justify-end">
           <button
             type="button"
