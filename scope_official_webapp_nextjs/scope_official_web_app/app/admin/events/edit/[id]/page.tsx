@@ -1,5 +1,5 @@
 /**
- * Edit Event Page
+ * Edit Event Page (Firebase + ImgBB Version)
  * Update existing event with all fields
  */
 
@@ -13,12 +13,12 @@ export default function EditEventPage() {
   const router = useRouter()
   const params = useParams()
   const eventId = params.id as string
-  
+
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
-  
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -39,49 +39,47 @@ export default function EditEventPage() {
       router.push('/admin/login')
       return
     }
-
     fetchEvent()
-  }, [eventId, router])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventId])
 
   const fetchEvent = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/events')
-      const data = await response.json()
-      
+      const res = await fetch('/api/events')
+      const data = await res.json()
       const event = data.events?.find((e: any) => e.id === eventId)
-      
+
       if (event) {
         setFormData({
-          title: event.title || '',
-          description: event.description || '',
-          short_description: event.short_description || '',
-          event_date: event.event_date || '',
-          event_time: event.event_time || '',
-          location: event.location || '',
-          image_url: event.image_url || '',
-          registration_link: event.registration_link || '',
-          event_type: event.event_type || 'workshop',
-          status: event.status || 'published',
-          is_featured: event.is_featured || false
+          title: event.title ?? '',
+          description: event.description ?? '',
+          short_description: event.short_description ?? '',
+          event_date: event.event_date ?? '',
+          event_time: event.event_time ?? '',
+          location: event.location ?? '',
+          image_url: event.image_url ?? '',
+          registration_link: event.registration_link ?? '',
+          event_type: event.event_type ?? 'workshop',
+          status: event.status ?? 'published',
+          is_featured: event.is_featured ?? false
         })
-        
-        if (event.image_url) {
-          setImagePreview(event.image_url)
-        }
+        if (event.image_url) setImagePreview(event.image_url)
       } else {
         alert('Event not found')
         router.push('/admin/events')
       }
-    } catch (error) {
-      console.error('Failed to fetch event:', error)
+    } catch (err) {
+      console.error('Failed to fetch event:', err)
       alert('Error loading event')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value, type } = e.target
     setFormData(prev => ({
       ...prev,
@@ -94,32 +92,25 @@ export default function EditEventPage() {
     if (!file) return
 
     const reader = new FileReader()
-    reader.onloadend = () => {
-      setImagePreview(reader.result as string)
-    }
+    reader.onloadend = () => setImagePreview(reader.result as string)
     reader.readAsDataURL(file)
 
     try {
       setUploading(true)
-      const formDataUpload = new FormData()
-      formDataUpload.append('file', file)
-      formDataUpload.append('bucket', 'event-images')
+      const upload = new FormData()
+      upload.append('file', file)
+      upload.append('bucket', 'event-images') // compatibility param, unused by ImgBB
 
-      const response = await fetch('/api/upload', {
-        method: 'POST',
-        body: formDataUpload
-      })
+      const res = await fetch('/api/upload', { method: 'POST', body: upload })
+      const data = await res.json()
 
-      const data = await response.json()
-
-      if (response.ok) {
+      if (res.ok && data.url) {
         setFormData(prev => ({ ...prev, image_url: data.url }))
-        alert('Image uploaded successfully!')
       } else {
-        alert('Failed to upload image: ' + data.error)
+        alert('Failed to upload image: ' + (data.error || 'Unknown error'))
       }
-    } catch (error) {
-      console.error('Upload error:', error)
+    } catch (err) {
+      console.error('Upload error:', err)
       alert('Error uploading image')
     } finally {
       setUploading(false)
@@ -136,21 +127,21 @@ export default function EditEventPage() {
 
     try {
       setSaving(true)
-      const response = await fetch('/api/events', {
+      const res = await fetch('/api/events', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: eventId, ...formData })
       })
 
-      if (response.ok) {
+      if (res.ok) {
         alert('Event updated successfully!')
         router.push('/admin/events')
       } else {
-        const data = await response.json()
+        const data = await res.json()
         alert('Failed to update event: ' + data.error)
       }
-    } catch (error) {
-      console.error('Submit error:', error)
+    } catch (err) {
+      console.error('Submit error:', err)
       alert('Error updating event')
     } finally {
       setSaving(false)
@@ -217,7 +208,7 @@ export default function EditEventPage() {
             />
           </div>
 
-          {/* Description */}
+          {/* Full Description */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Full Description <span className="text-red-400">*</span>
@@ -232,6 +223,7 @@ export default function EditEventPage() {
             />
           </div>
 
+          {/* Date */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Event Date <span className="text-red-400">*</span>
@@ -246,6 +238,7 @@ export default function EditEventPage() {
             />
           </div>
 
+          {/* Time */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Event Time
@@ -259,6 +252,7 @@ export default function EditEventPage() {
             />
           </div>
 
+          {/* Location */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Location
@@ -272,6 +266,7 @@ export default function EditEventPage() {
             />
           </div>
 
+          {/* Registration Link */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Registration Link
@@ -285,6 +280,7 @@ export default function EditEventPage() {
             />
           </div>
 
+          {/* Event Type */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Event Type
@@ -295,15 +291,16 @@ export default function EditEventPage() {
               onChange={handleChange}
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] [&>option]:bg-[#0d1b3d] [&>option]:text-white"
             >
-              <option value="workshop" className="bg-[#0d1b3d] text-white">Workshop</option>
-              <option value="hackathon" className="bg-[#0d1b3d] text-white">Hackathon</option>
-              <option value="webinar" className="bg-[#0d1b3d] text-white">Webinar</option>
-              <option value="competition" className="bg-[#0d1b3d] text-white">Competition</option>
-              <option value="meetup" className="bg-[#0d1b3d] text-white">Meetup</option>
-              <option value="other" className="bg-[#0d1b3d] text-white">Other</option>
+              <option value="workshop">Workshop</option>
+              <option value="hackathon">Hackathon</option>
+              <option value="webinar">Webinar</option>
+              <option value="competition">Competition</option>
+              <option value="meetup">Meetup</option>
+              <option value="other">Other</option>
             </select>
           </div>
 
+          {/* Status */}
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Status
@@ -314,13 +311,14 @@ export default function EditEventPage() {
               onChange={handleChange}
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] [&>option]:bg-[#0d1b3d] [&>option]:text-white"
             >
-              <option value="published" className="bg-[#0d1b3d] text-white">Published</option>
-              <option value="draft" className="bg-[#0d1b3d] text-white">Draft</option>
-              <option value="completed" className="bg-[#0d1b3d] text-white">Completed</option>
-              <option value="cancelled" className="bg-[#0d1b3d] text-white">Cancelled</option>
+              <option value="published">Published</option>
+              <option value="draft">Draft</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
             </select>
           </div>
 
+          {/* Featured */}
           <div className="md:col-span-2 flex items-center gap-3">
             <input
               type="checkbox"
@@ -335,6 +333,7 @@ export default function EditEventPage() {
             </label>
           </div>
 
+          {/* Image Upload */}
           <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-300 mb-2">
               Event Image
@@ -346,15 +345,22 @@ export default function EditEventPage() {
               disabled={uploading}
               className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#2C97FF] file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#2C97FF] file:text-white file:cursor-pointer hover:file:bg-[#1a7de0]"
             />
-            {uploading && <p className="text-yellow-400 text-sm mt-2">Uploading...</p>}
+            {uploading && (
+              <p className="text-yellow-400 text-sm mt-2">⏳ Uploading to ImgBB...</p>
+            )}
+            {!uploading && formData.image_url && (
+              <p className="text-green-400 text-sm mt-2">✅ Image ready</p>
+            )}
             {imagePreview && (
               <div className="mt-4 rounded-lg overflow-hidden border border-white/10">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={imagePreview} alt="Preview" className="w-full h-64 object-cover" />
               </div>
             )}
           </div>
         </div>
 
+        {/* Actions */}
         <div className="mt-8 flex gap-4 justify-end">
           <button
             type="button"

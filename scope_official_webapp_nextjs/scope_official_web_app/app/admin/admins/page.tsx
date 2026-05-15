@@ -288,9 +288,13 @@ export default function AdminManagementPage() {
                     <td className="p-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] flex items-center justify-center text-white font-bold">
-                          {admin.name.charAt(0).toUpperCase()}
+                          {/* FIX: fallback chain handles missing name or email */}
+                          {(admin.name || admin.email || 'A').charAt(0).toUpperCase()}
                         </div>
-                        <span className="text-white font-medium">{admin.name}</span>
+                        {/* FIX: show email or placeholder if name is missing */}
+                        <span className="text-white font-medium">
+                          {admin.name || admin.email || 'Unnamed Admin'}
+                        </span>
                       </div>
                     </td>
                     <td className="p-4">
@@ -397,8 +401,8 @@ export default function AdminManagementPage() {
                   type="button"
                   onClick={() => {
                     setShowAddModal(false)
-                  setFormData({ email: '', password: '', name: '', role: 'super_admin' })
-                  setError('')
+                    setFormData({ email: '', password: '', name: '', role: 'super_admin' })
+                    setError('')
                   }}
                   className="flex-1 px-4 py-3 bg-gray-500/20 hover:bg-gray-500/30 text-gray-300 rounded-lg border border-gray-500/30 transition-all"
                 >

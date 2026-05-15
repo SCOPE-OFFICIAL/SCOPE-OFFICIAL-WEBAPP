@@ -878,5 +878,5 @@ export default function HomePage() {
         <Image src="/images/circuit-deco.png" alt="Circuit Decoration" width={256} height={256} />
       </div>
     </div>
-  )
-}
+  );
+} 
