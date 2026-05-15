@@ -55,7 +55,21 @@ export default function HomePage() {
   const [paused, setPaused] = useState(false)
   const progressRef = useRef<NodeJS.Timeout | null>(null)
   const [progressPct, setProgressPct] = useState(0)
-  const SLIDE_DURATION = 20000 // 20 seconds per slide
+  const SLIDE_DURATION = 20000
+
+  // ── Past Events horizontal scroll state ───────────────────────────────
+  const tickerRef = useRef<HTMLDivElement>(null)
+  const [tickerPaused, setTickerPaused] = useState(false)
+  const [showPastModal, setShowPastModal] = useState(false)
+  const [selectedPastIndex, setSelectedPastIndex] = useState<number | null>(null)
+  const [pastModalClosing, setPastModalClosing] = useState(false)
+  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null)
+  // Track animation position for smooth pause/resume
+  const animFrameRef = useRef<number | null>(null)
+  const positionRef = useRef(0)
+  const [tickerOffset, setTickerOffset] = useState(0)
+
+  const router = useRouter()
 
   // Fetch upcoming events
   useEffect(() => {
@@ -117,7 +131,33 @@ export default function HomePage() {
     fetchPastEvents()
   }, [])
 
-  // ── Slide navigation helpers ──────────────────────────────────────────
+  // ── Ticker scroll animation ───────────────────────────────────────────
+  // Smooth JS-driven scroll so we can pause exactly where the user hovers
+  const TICKER_SPEED = 0.6 // px per frame
+
+  useEffect(() => {
+    if (pastEvents.length === 0) return
+
+    const animate = () => {
+      if (!tickerPaused) {
+        positionRef.current += TICKER_SPEED
+        // Each card is ~300px wide + 20px gap = 320px; reset after half (since we duplicate)
+        const halfWidth = pastEvents.length * 320
+        if (positionRef.current >= halfWidth) {
+          positionRef.current = 0
+        }
+        setTickerOffset(positionRef.current)
+      }
+      animFrameRef.current = requestAnimationFrame(animate)
+    }
+
+    animFrameRef.current = requestAnimationFrame(animate)
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
+    }
+  }, [tickerPaused, pastEvents.length])
+
+  // ── Upcoming Events slide helpers ──────────────────────────────────────
   const goTo = useCallback((index: number, dir: Direction) => {
     setDirection(dir)
     setActiveIndex(index)
@@ -134,51 +174,21 @@ export default function HomePage() {
     goTo((activeIndex - 1 + upcomingEvents.length) % upcomingEvents.length, 'right')
   }, [activeIndex, upcomingEvents.length, goTo])
 
-  // Auto-advance with progress bar
+  // Auto-advance upcoming events with progress bar
   useEffect(() => {
     if (upcomingEvents.length <= 1 || paused || loading) return
-
     const step = 100 / (SLIDE_DURATION / 100)
     let pct = 0
-
     const tick = setInterval(() => {
       pct += step
       setProgressPct(Math.min(pct, 100))
-      if (pct >= 100) {
-        clearInterval(tick)
-        goNext()
-      }
+      if (pct >= 100) { clearInterval(tick); goNext() }
     }, 100)
-
     progressRef.current = tick
     return () => clearInterval(tick)
   }, [activeIndex, paused, loading, upcomingEvents.length, goNext])
 
-  // ── Past Events carousel state (unchanged) ────────────────────────────
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [hoverIndex, setHoverIndex] = useState<number | null>(null)
-  const [touchStartX, setTouchStartX] = useState(0)
-  const [isTransitioning, setIsTransitioning] = useState(false)
-  const swipeThreshold = 50
-  const [showPastModal, setShowPastModal] = useState(false)
-  const [selectedPastIndex, setSelectedPastIndex] = useState<number | null>(null)
-  const [pastModalClosing, setPastModalClosing] = useState(false)
-  const [pendingNavigation, setPendingNavigation] = useState<string | null>(null)
-
-  const router = useRouter()
-
-  const handleSeeGalleryClick = (path: string, folderName?: string) => {
-    try {
-      if (typeof window !== 'undefined' && folderName) {
-        localStorage.setItem('galleryHighlightFolder', folderName)
-      }
-    } catch (err) {
-      console.warn('Could not set galleryFolder in localStorage', err)
-    }
-    setPendingNavigation('/#gallery')
-    setPastModalClosing(true)
-  }
-
+  // Fonts
   useEffect(() => {
     const orbitronLink = document.createElement("link")
     orbitronLink.href = "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
@@ -194,45 +204,34 @@ export default function HomePage() {
     }
   }, [])
 
-  const handlePrev = useCallback(() => {
-    if (isTransitioning) return
-    setIsTransitioning(true)
-    setCurrentIndex((prev) => prev === 0 ? pastEvents.length - 1 : prev - 1)
-    setTimeout(() => setIsTransitioning(false), 600)
-  }, [isTransitioning, pastEvents.length])
+  // ── Past modal helpers ────────────────────────────────────────────────
+  const handleSeeGalleryClick = (path: string, folderName?: string) => {
+    try {
+      if (typeof window !== 'undefined' && folderName) {
+        localStorage.setItem('galleryHighlightFolder', folderName)
+      }
+    } catch (err) {
+      console.warn('Could not set galleryFolder in localStorage', err)
+    }
+    setPendingNavigation('/#gallery')
+    setPastModalClosing(true)
+  }
 
-  const handleNext = useCallback(() => {
-    if (isTransitioning) return
-    setIsTransitioning(true)
-    setCurrentIndex((prev) => prev === pastEvents.length - 1 ? 0 : prev + 1)
-    setTimeout(() => setIsTransitioning(false), 600)
-  }, [isTransitioning, pastEvents.length])
-
-  const handleImageClick = (index: number) => {
-    setCurrentIndex(index)
-    setSelectedPastIndex(index)
+  const handlePastCardClick = (index: number) => {
+    // index into the original (non-duplicated) list
+    const realIndex = index % pastEvents.length
+    setSelectedPastIndex(realIndex)
     setShowPastModal(true)
   }
 
-  useEffect(() => {
-    if (!pastEvents || pastEvents.length <= 1) return
-    const id = setInterval(() => {
-      if (isTransitioning || hoverIndex !== null) return
-      handleNext()
-    }, 5000)
-    return () => clearInterval(id)
-  }, [pastEvents, pastEvents.length, isTransitioning, hoverIndex, handleNext])
-
-  // ── Helpers ──────────────────────────────────────────────────────────
+  // ── Shared helpers ────────────────────────────────────────────────────
   const formatDate = (dateString: string) => {
+    if (!dateString) return { dayNum: '--', month: '---', year: '----' }
     const date = new Date(dateString)
     const day = date.getDate()
     const month = date.toLocaleString('default', { month: 'short' }).toUpperCase()
     const year = date.getFullYear()
-    const suffix = day === 1 || day === 21 || day === 31 ? 'st'
-      : day === 2 || day === 22 ? 'nd'
-      : day === 3 || day === 23 ? 'rd' : 'th'
-    return { day: `${day}${suffix}`, dayNum: day.toString().padStart(2, '0'), month, year }
+    return { dayNum: day.toString().padStart(2, '0'), month, year }
   }
 
   const categoryStyle: Record<string, { bg: string; text: string; glow: string }> = {
@@ -242,9 +241,9 @@ export default function HomePage() {
     TALK:        { bg: 'bg-yellow-500/20 border border-yellow-500/50', text: 'text-yellow-400', glow: 'rgba(234,179,8,0.3)' },
     OTHER:       { bg: 'bg-white/10 border border-white/20', text: 'text-gray-300', glow: 'rgba(255,255,255,0.1)' },
   }
-  const getCat = (type: string) => categoryStyle[type?.toUpperCase()] || categoryStyle['OTHER']
+  const getCat = (type?: string) => categoryStyle[(type || '').toUpperCase()] || categoryStyle['OTHER']
 
-  // Framer variants for slide in/out
+  // Slide variants for upcoming events
   const slideVariants = {
     enterLeft:  { x: '100%', opacity: 0 },
     enterRight: { x: '-100%', opacity: 0 },
@@ -253,15 +252,14 @@ export default function HomePage() {
     exitRight:  { x: '100%', opacity: 0 },
   }
 
-  // ── Countdown timer ───────────────────────────────────────────────────
+  // Countdown for upcoming events
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, mins: 0, secs: 0 })
   useEffect(() => {
     if (!upcomingEvents[activeIndex]?.event_date) return
     const update = () => {
       const ev = upcomingEvents[activeIndex]
       const target = new Date(`${ev.event_date}T${ev.event_time || '00:00:00'}`).getTime()
-      const now = Date.now()
-      const dist = target - now
+      const dist = target - Date.now()
       if (dist > 0) {
         setCountdown({
           days: Math.floor(dist / 86400000),
@@ -278,7 +276,6 @@ export default function HomePage() {
     return () => clearInterval(iv)
   }, [activeIndex, upcomingEvents])
 
-  // ── Countdown box component ───────────────────────────────────────────
   const CountBox = ({ value, label }: { value: number; label: string }) => (
     <div className="flex flex-col items-center">
       <div className="bg-black/60 border border-red-500/40 rounded-lg px-3 py-2 min-w-[48px] text-center">
@@ -291,6 +288,93 @@ export default function HomePage() {
     </div>
   )
 
+  // ── Past Event Card (used inside ticker) ──────────────────────────────
+  const PastEventCard = ({ evt, cardIndex }: { evt: PastEvent; cardIndex: number }) => {
+    const { dayNum, month, year } = formatDate(evt.event_date || '')
+    const cat = getCat(undefined) // past events don't have event_type, use neutral style
+
+    return (
+      <div
+        className="flex-shrink-0 w-[280px] flex flex-col bg-[#0a0f2e] border border-white/10 rounded-2xl overflow-hidden cursor-pointer transition-all duration-300 hover:border-[#F24DC2]/40 hover:shadow-[0_0_30px_rgba(242,77,194,0.15)] hover:scale-[1.02]"
+        onClick={() => handlePastCardClick(cardIndex)}
+      >
+        {/* Poster image */}
+        <div className="relative h-48 bg-gradient-to-br from-[#1a1c3a] to-[#0d1b3d] overflow-hidden flex-shrink-0">
+          <Image
+            src={evt.poster_image_url}
+            alt={evt.title || 'Past Event'}
+            fill
+            className="object-cover opacity-85 transition-transform duration-500 hover:scale-105"
+            sizes="280px"
+            draggable={false}
+          />
+          {/* Bottom gradient fade */}
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f2e] via-transparent to-transparent" />
+
+          {/* "PAST EVENT" badge */}
+          <div className="absolute top-3 left-3 z-10">
+            <span className="text-[9px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full bg-white/10 border border-white/20 text-gray-300 backdrop-blur-md">
+              Past Event
+            </span>
+          </div>
+
+          {/* Title overlay */}
+          <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
+            <h3 className="text-white font-extrabold text-sm leading-tight line-clamp-2">
+              {evt.title || 'Past Event'}
+            </h3>
+          </div>
+        </div>
+
+        {/* Bottom info */}
+        <div className="p-3 flex flex-col gap-2 flex-1">
+          {/* Date row */}
+          <div className="flex items-center gap-2">
+            {evt.event_date ? (
+              <div className="flex-shrink-0 text-center bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 min-w-[48px]">
+                <p className="text-white font-extrabold text-base leading-none">{dayNum}</p>
+                <p className="font-bold text-[10px] mt-0.5 text-[#2C97FF]">{month}</p>
+                <p className="text-gray-500 text-[9px] mt-0.5">{year}</p>
+              </div>
+            ) : (
+              <div className="flex-shrink-0 text-center bg-white/5 border border-white/10 rounded-lg px-2.5 py-1.5 min-w-[48px]">
+                <p className="text-gray-500 text-[10px]">Date N/A</p>
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              {evt.description && (
+                <p className="text-gray-400 text-[11px] leading-relaxed line-clamp-2">
+                  {evt.description}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Click to view button */}
+          <div className="flex items-center justify-between mt-auto pt-1">
+            <span className="flex items-center gap-1.5 text-xs text-[#F24DC2] font-semibold">
+              View Details
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </span>
+            {evt.gallery_folder && (
+              <span className="text-[10px] text-gray-500 flex items-center gap-1">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+                </svg>
+                Gallery
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Duplicate cards for seamless infinite scroll
+  const duplicatedPastEvents = pastEvents.length > 0 ? [...pastEvents, ...pastEvents] : []
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#040a28] via-[#0d1b3d] to-[#040a28] text-gray-200 font-sans relative overflow-hidden">
       <BackgroundBalls />
@@ -299,6 +383,7 @@ export default function HomePage() {
 
         {/* ══════════════════════════════════════════════════════════════════
             UPCOMING EVENTS — Single showcase box with sliding events
+            (UNCHANGED from second pasted code)
         ══════════════════════════════════════════════════════════════════ */}
         <section className="relative w-full">
           <BackgroundBalls />
@@ -356,7 +441,7 @@ export default function HomePage() {
               <div className="h-[2px] w-16 bg-gradient-to-l from-transparent to-[#2C97FF] rounded-full" />
             </motion.div>
 
-            {/* ── Loading skeleton ── */}
+            {/* Loading skeleton */}
             {loading && (
               <div className="max-w-5xl mx-auto">
                 <div className="bg-white/5 border border-white/10 rounded-3xl overflow-hidden animate-pulse">
@@ -375,7 +460,7 @@ export default function HomePage() {
               </div>
             )}
 
-            {/* ── Empty state ── */}
+            {/* Empty state */}
             {!loading && upcomingEvents.length === 0 && (
               <motion.div className="flex flex-col items-center justify-center py-24 text-gray-500"
                 initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -388,23 +473,20 @@ export default function HomePage() {
               </motion.div>
             )}
 
-            {/* ══════════════════════════════════════════════════════════════
-                THE SHOWCASE BOX — single card, events slide inside it
-            ══════════════════════════════════════════════════════════════ */}
+            {/* Showcase box */}
             {!loading && upcomingEvents.length > 0 && (
               <motion.div
                 className="max-w-5xl mx-auto"
                 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.55 }}
               >
-                {/* Outer showcase box */}
                 <div
                   className="relative rounded-3xl border border-white/10 overflow-hidden shadow-2xl"
                   style={{ background: 'linear-gradient(135deg, #0a0f2e 0%, #0d1b3d 50%, #0a0f2e 100%)' }}
                   onMouseEnter={() => setPaused(true)}
                   onMouseLeave={() => setPaused(false)}
                 >
-                  {/* Progress bar at very top */}
+                  {/* Progress bar */}
                   {upcomingEvents.length > 1 && (
                     <div className="absolute top-0 left-0 right-0 h-[3px] bg-white/10 z-30">
                       <motion.div
@@ -415,7 +497,7 @@ export default function HomePage() {
                     </div>
                   )}
 
-                  {/* Sliding content area */}
+                  {/* Sliding content */}
                   <div className="relative overflow-hidden" style={{ minHeight: '480px' }}>
                     <AnimatePresence initial={false} custom={direction} mode="wait">
                       {upcomingEvents[activeIndex] && (() => {
@@ -434,7 +516,7 @@ export default function HomePage() {
                             transition={{ type: 'tween', ease: [0.25, 0.46, 0.45, 0.94], duration: 0.55 }}
                             className="absolute inset-0 flex flex-col lg:flex-row"
                           >
-                            {/* LEFT: image panel */}
+                            {/* LEFT: image */}
                             <div className="relative lg:w-[45%] h-56 lg:h-full flex-shrink-0 overflow-hidden">
                               {ev.poster_image_url || ev.image_url ? (
                                 <Image
@@ -450,17 +532,12 @@ export default function HomePage() {
                                   <span className="text-7xl">🎪</span>
                                 </div>
                               )}
-                              {/* Gradient overlay — fades into right panel on desktop */}
                               <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/60 lg:bg-gradient-to-r lg:from-transparent lg:to-[#0a0f2e]" />
-
-                              {/* Category badge over image */}
                               <div className="absolute top-4 left-4 z-10">
                                 <span className={`text-[10px] font-bold tracking-widest uppercase px-3 py-1.5 rounded-full backdrop-blur-md ${cat.bg} ${cat.text}`}>
                                   {ev.event_type || 'EVENT'}
                                 </span>
                               </div>
-
-                              {/* Event number indicator */}
                               {upcomingEvents.length > 1 && (
                                 <div className="absolute bottom-4 left-4 z-10 text-white/60 text-xs font-mono">
                                   {activeIndex + 1} / {upcomingEvents.length}
@@ -468,13 +545,9 @@ export default function HomePage() {
                               )}
                             </div>
 
-                            {/* RIGHT: details panel */}
+                            {/* RIGHT: details */}
                             <div className="flex-1 flex flex-col justify-between p-6 lg:p-8 lg:pl-6 overflow-y-auto">
-
-                              {/* Top section */}
                               <div className="space-y-4">
-
-                                {/* Date row */}
                                 <div className="flex items-center gap-3">
                                   <div className="flex-shrink-0 text-center bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 min-w-[64px]">
                                     <p className="text-white font-extrabold text-2xl leading-none">{dayNum}</p>
@@ -501,21 +574,16 @@ export default function HomePage() {
                                   </div>
                                 </div>
 
-                                {/* Title */}
-                                <div>
-                                  <h3 className="text-2xl lg:text-3xl font-extrabold text-white leading-tight uppercase tracking-tight">
-                                    {ev.title}
-                                  </h3>
-                                </div>
+                                <h3 className="text-2xl lg:text-3xl font-extrabold text-white leading-tight uppercase tracking-tight">
+                                  {ev.title}
+                                </h3>
 
-                                {/* Description */}
                                 {(ev.short_description || ev.description) && (
                                   <p className="text-gray-400 text-sm leading-relaxed line-clamp-3">
                                     {ev.short_description || ev.description}
                                   </p>
                                 )}
 
-                                {/* Speaker + fee row */}
                                 <div className="flex flex-wrap gap-3">
                                   {ev.speaker && (
                                     <div className="flex items-center gap-1.5 text-gray-300 text-xs bg-white/5 border border-white/10 rounded-lg px-3 py-1.5">
@@ -525,26 +593,15 @@ export default function HomePage() {
                                       {ev.speaker}
                                     </div>
                                   )}
-                                  {ev.registration_fee && (
-                                    <div className="text-green-400 font-bold text-sm bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-1.5">
-                                      {ev.registration_fee}
-                                    </div>
-                                  )}
-                                  {!ev.registration_fee && (
-                                    <div className="text-green-400 font-bold text-sm bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-1.5">
-                                      FREE
-                                    </div>
-                                  )}
+                                  <div className="text-green-400 font-bold text-sm bg-green-500/10 border border-green-500/20 rounded-lg px-3 py-1.5">
+                                    {ev.registration_fee || 'FREE'}
+                                  </div>
                                 </div>
                               </div>
 
-                              {/* Bottom section */}
                               <div className="space-y-4 mt-4">
-                                {/* Countdown */}
                                 <div className="bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border border-blue-500/30 rounded-xl p-3">
-                                  <p className="text-[10px] text-gray-400 uppercase tracking-widest text-center mb-2">
-                                    Event Starts In
-                                  </p>
+                                  <p className="text-[10px] text-gray-400 uppercase tracking-widest text-center mb-2">Event Starts In</p>
                                   <div className="flex justify-center items-center gap-2">
                                     <CountBox value={countdown.days} label="Days" />
                                     <span className="text-red-400 font-bold text-lg mb-4">:</span>
@@ -556,15 +613,13 @@ export default function HomePage() {
                                   </div>
                                 </div>
 
-                                {/* Register button */}
                                 <a
                                   href={ev.registration_link || '#'}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="flex items-center justify-center gap-2 w-full py-3.5 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-xl text-white font-bold text-sm hover:opacity-90 active:scale-[0.98] transition-all duration-200"
                                 >
-                                  CLICK HERE TO REGISTER
-                                  <span className="text-base">👆</span>
+                                  CLICK HERE TO REGISTER <span className="text-base">👆</span>
                                 </a>
                               </div>
                             </div>
@@ -574,33 +629,21 @@ export default function HomePage() {
                     </AnimatePresence>
                   </div>
 
-                  {/* Prev / Next arrow buttons */}
+                  {/* Prev / Next arrows */}
                   {upcomingEvents.length > 1 && (
                     <>
-                      <button
-                        onClick={goPrev}
+                      <button onClick={goPrev}
                         className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center text-white transition-all duration-200"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(242,77,194,0.15), rgba(44,151,255,0.15))',
-                          border: '1px solid rgba(255,255,255,0.15)',
-                          backdropFilter: 'blur(8px)',
-                        }}
-                        aria-label="Previous event"
-                      >
+                        style={{ background: 'linear-gradient(135deg, rgba(242,77,194,0.15), rgba(44,151,255,0.15))', border: '1px solid rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}
+                        aria-label="Previous event">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M15 18l-6-6 6-6"/>
                         </svg>
                       </button>
-                      <button
-                        onClick={goNext}
+                      <button onClick={goNext}
                         className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center text-white transition-all duration-200"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(242,77,194,0.15), rgba(44,151,255,0.15))',
-                          border: '1px solid rgba(255,255,255,0.15)',
-                          backdropFilter: 'blur(8px)',
-                        }}
-                        aria-label="Next event"
-                      >
+                        style={{ background: 'linear-gradient(135deg, rgba(242,77,194,0.15), rgba(44,151,255,0.15))', border: '1px solid rgba(255,255,255,0.15)', backdropFilter: 'blur(8px)' }}
+                        aria-label="Next event">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                           <path d="M9 18l6-6-6-6"/>
                         </svg>
@@ -613,16 +656,13 @@ export default function HomePage() {
                 {upcomingEvents.length > 1 && (
                   <div className="flex justify-center gap-2 mt-5">
                     {upcomingEvents.map((_, i) => (
-                      <button
-                        key={i}
+                      <button key={i}
                         onClick={() => goTo(i, i > activeIndex ? 'left' : 'right')}
                         className="transition-all duration-300 rounded-full"
                         style={{
                           width: i === activeIndex ? '28px' : '8px',
                           height: '8px',
-                          background: i === activeIndex
-                            ? 'linear-gradient(90deg, #F24DC2, #2C97FF)'
-                            : 'rgba(255,255,255,0.2)',
+                          background: i === activeIndex ? 'linear-gradient(90deg, #F24DC2, #2C97FF)' : 'rgba(255,255,255,0.2)',
                         }}
                         aria-label={`Go to event ${i + 1}`}
                       />
@@ -630,7 +670,6 @@ export default function HomePage() {
                   </div>
                 )}
 
-                {/* Pause indicator */}
                 {paused && upcomingEvents.length > 1 && (
                   <p className="text-center text-gray-600 text-xs mt-2">Auto-sliding paused</p>
                 )}
@@ -640,130 +679,127 @@ export default function HomePage() {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════
-            PAST EVENTS SECTION — completely unchanged
+            PAST EVENTS — Horizontal auto-scrolling ticker row
+            Cards slide continuously; pauses on hover so user can click
         ══════════════════════════════════════════════════════════════════ */}
         <motion.section
-          className="text-center py-24 px-4 relative"
+          className="py-24 px-0 relative overflow-hidden"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut', type: 'tween' }}
           viewport={{ once: true, margin: '-150px' }}
         >
+          {/* Section divider */}
           <motion.div
-            className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#0072FF] to-transparent my-16"
+            className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#0072FF] to-transparent mb-16"
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             viewport={{ once: true }}
           />
+
+          {/* Heading */}
           <motion.h2
-            className="mb-12 text-center text-4xl md:text-5xl font-bold text-gray-100"
+            className="mb-3 text-center text-4xl md:text-5xl font-bold text-gray-100 px-4"
             style={{ textShadow: '0 0 20px rgba(138, 64, 255, 0.4)', letterSpacing: '2px', fontFamily: '"Orbitron", sans-serif' }}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             viewport={{ once: true }}
-            whileHover={{ scale: 1.05, textShadow: '0 0 30px rgba(138, 64, 255, 0.6)', transition: { duration: 0.3 } }}
+            whileHover={{ scale: 1.03, textShadow: '0 0 30px rgba(138, 64, 255, 0.6)', transition: { duration: 0.3 } }}
           >
             PAST EVENTS
           </motion.h2>
 
-          <motion.div
-            className="relative w-full max-w-6xl mx-auto"
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            viewport={{ once: true }}
+          <motion.p
+            className="text-center text-gray-400 text-sm mb-10 px-4"
+            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }} viewport={{ once: true }}
           >
-            <style jsx>{`
-              .arrow-btn { position: absolute; top: 50%; z-index: 20; color: white; font-size: 1.6rem; padding: 0.25rem 0.5rem; display: block; background: rgba(0,0,0,0.25); border-radius: 8px; backdrop-filter: blur(6px); }
-              .arrow-btn:focus { outline: none; }
-              @media (min-width: 768px) { .arrow-btn { font-size: 2.2rem; padding: 0.5rem; background: transparent; } }
-              .arrow-btn.left  { left: 0.5rem;  transform: translate(-25%, -50%); }
-              .arrow-btn.right { right: 0.5rem; transform: translate(25%, -50%); }
-              .arrow-btn:hover { color: #d1d5db; }
-              .arrow-btn.left:hover  { transform: translate(-30%, -50%) scale(1.06); }
-              .arrow-btn.right:hover { transform: translate(30%, -50%) scale(1.06); }
-            `}</style>
+            A look back at our events — hover to pause, click to explore
+          </motion.p>
 
-            <button onClick={handlePrev} className="arrow-btn left" aria-label="Previous">&lt;</button>
-            <motion.div
-              className="flex justify-center items-center relative h-[650px] overflow-visible cursor-grab active:cursor-grabbing"
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-              viewport={{ once: true }}
-              onTouchStart={(e) => setTouchStartX(e.touches[0].clientX)}
-              onTouchEnd={(e) => {
-                const diff = touchStartX - e.changedTouches[0].clientX
-                if (diff > swipeThreshold) handleNext()
-                else if (diff < -swipeThreshold) handlePrev()
-              }}
-              onMouseDown={(e) => setTouchStartX(e.clientX)}
-              onMouseUp={(e) => {
-                const diff = touchStartX - e.clientX
-                if (diff > swipeThreshold) handleNext()
-                else if (diff < -swipeThreshold) handlePrev()
-              }}
-            >
-              {pastEvents.map((evt, index) => {
-                const src = evt.poster_image_url || '/images/past-event-1.jpg'
-                const relativeIndex = (index + pastEvents.length - currentIndex) % pastEvents.length
-                const isHovered = hoverIndex === index
-                const isCenter = relativeIndex === 0 && hoverIndex === null
-                let styleClass = "absolute transition-all duration-700 ease-in-out rounded-xl shadow-xl object-cover "
-
-                if (relativeIndex === 0) {
-                  styleClass += isHovered || isCenter
-                    ? "w-64 h-[420px] sm:w-80 sm:h-[550px] lg:w-96 lg:h-[700px] z-30 scale-100 opacity-100"
-                    : "w-64 h-[420px] sm:w-80 sm:h-[550px] lg:w-96 lg:h-[700px] z-20 scale-95 opacity-90"
-                } else if (relativeIndex === 1) {
-                  styleClass += isHovered
-                    ? "sm:translate-x-[230px] translate-x-[170px] scale-100 z-30 opacity-100 w-64 h-[420px] sm:w-80 sm:h-[550px] lg:w-96 lg:h-[700px]"
-                    : "sm:translate-x-[220px] translate-x-[160px] scale-90 z-10 opacity-60 w-64 h-[420px] sm:w-80 sm:h-[550px] lg:w-96 lg:h-[700px]"
-                } else if (relativeIndex === pastEvents.length - 1) {
-                  styleClass += isHovered
-                    ? "sm:-translate-x-[230px] -translate-x-[170px] scale-100 z-30 opacity-100 w-64 h-[420px] sm:w-80 sm:h-[550px] lg:w-96 lg:h-[700px]"
-                    : "sm:-translate-x-[220px] -translate-x-[160px] scale-90 z-10 opacity-60 w-64 h-[420px] sm:w-80 sm:h-[550px] lg:w-96 lg:h-[700px]"
-                } else {
-                  styleClass += "opacity-0 pointer-events-none"
-                }
-
-                return (
-                  <Image
-                    key={evt.id || index}
-                    src={src}
-                    alt={evt.title || `Past Event ${index + 1}`}
-                    width={320} height={420}
-                    className={styleClass}
-                    draggable={false}
-                    onMouseEnter={() => setHoverIndex(index)}
-                    onMouseLeave={() => setHoverIndex(null)}
-                    onClick={() => handleImageClick(index)}
-                  />
-                )
-              })}
-            </motion.div>
-            <button onClick={handleNext} className="arrow-btn right" aria-label="Next">&gt;</button>
+          {/* Decorative divider dots */}
+          <motion.div className="flex items-center justify-center gap-2 mb-10 px-4"
+            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
+            transition={{ delay: 0.35 }} viewport={{ once: true }}>
+            <div className="h-[2px] w-16 bg-gradient-to-r from-transparent to-[#0072FF] rounded-full" />
+            <div className="w-2 h-2 rounded-full bg-gradient-to-br from-[#0072FF] to-[#a78bfa]" />
+            <div className="h-[2px] w-16 bg-gradient-to-l from-transparent to-[#a78bfa] rounded-full" />
           </motion.div>
 
-          <Link href="/#gallery">
-            <motion.button
-              className="mt-12 bg-[#004c94] hover:bg-[#003E7A] border-[#004c94] px-6 py-3 rounded-full font-bold text-white"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.5 }}
-              viewport={{ once: true }}
-              whileHover={{ scale: 1.05, backgroundColor: '#003E7A', transition: { duration: 0.2 } }}
-              whileTap={{ scale: 0.95 }}
+          {/* ── Ticker container ── */}
+          {pastEvents.length > 0 && (
+            <div
+              className="relative w-full overflow-hidden"
+              onMouseEnter={() => setTickerPaused(true)}
+              onMouseLeave={() => setTickerPaused(false)}
+              onTouchStart={() => setTickerPaused(true)}
+              onTouchEnd={() => setTickerPaused(false)}
             >
-              KNOW MORE
-            </motion.button>
-          </Link>
+              {/* Left fade mask */}
+              <div className="absolute left-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
+                style={{ background: 'linear-gradient(to right, #040a28, transparent)' }} />
+              {/* Right fade mask */}
+              <div className="absolute right-0 top-0 bottom-0 w-24 z-10 pointer-events-none"
+                style={{ background: 'linear-gradient(to left, #040a28, transparent)' }} />
+
+              {/* The scrolling track — JS-driven via tickerOffset */}
+              <div
+                ref={tickerRef}
+                className="flex gap-5 py-4 px-6"
+                style={{
+                  transform: `translateX(-${tickerOffset}px)`,
+                  width: 'max-content',
+                  willChange: 'transform',
+                }}
+              >
+                {duplicatedPastEvents.map((evt, i) => (
+                  <PastEventCard key={`${evt.id}-${i}`} evt={evt} cardIndex={i} />
+                ))}
+              </div>
+
+              {/* Pause overlay hint */}
+              {tickerPaused && (
+                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+                  <span className="text-[10px] text-gray-500 bg-black/40 backdrop-blur-sm px-3 py-1 rounded-full">
+                    ⏸ Paused — click a card to view details
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Empty state */}
+          {pastEvents.length === 0 && (
+            <div className="flex flex-col items-center justify-center py-16 text-gray-600">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" className="mb-4 opacity-30">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+              </svg>
+              <p className="text-sm">No past events yet.</p>
+            </div>
+          )}
+
+          {/* Know More button */}
+          <div className="flex justify-center mt-10 px-4">
+            <Link href="/#gallery">
+              <motion.button
+                className="bg-[#004c94] hover:bg-[#003E7A] px-6 py-3 rounded-full font-bold text-white"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.5 }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.05, backgroundColor: '#003E7A', transition: { duration: 0.2 } }}
+                whileTap={{ scale: 0.95 }}
+              >
+                KNOW MORE
+              </motion.button>
+            </Link>
+          </div>
         </motion.section>
       </main>
 
-      {/* Past Event Poster Modal — unchanged */}
+      {/* Past Event Detail Modal */}
       {showPastModal && selectedPastIndex !== null && (
         <motion.div
           className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
