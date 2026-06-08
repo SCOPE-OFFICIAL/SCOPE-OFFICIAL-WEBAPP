@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
+import { db } from '@/lib/firebase'
+import { addDoc, collection } from 'firebase/firestore'
 
 type ContactPayload = {
   name?: string
@@ -51,53 +53,70 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid email address.' }, { status: 400 })
     }
 
-    const requiredEnvVars = [
-      'SMTP_HOST',
-      'SMTP_PORT',
-      'SMTP_USER',
-      'SMTP_PASS',
-      'SMTP_FROM_EMAIL',
-      'CONTACT_RECEIVER_EMAIL',
-    ]
-
-    const missingEnvVar = requiredEnvVars.find((key) => !process.env[key])
-    if (missingEnvVar) {
-      console.error(`Missing email configuration: ${missingEnvVar}`)
-      return NextResponse.json(
-        { error: 'Email service is not configured. Please contact the administrator.' },
-        { status: 500 }
-      )
-    }
-
-    const transporter = createTransporter()
-
-    await transporter.sendMail({
-      from: {
-        name: process.env.SMTP_FROM_NAME || 'SCOPE Website',
-        address: process.env.SMTP_FROM_EMAIL!,
-      },
-      to: process.env.CONTACT_RECEIVER_EMAIL!,
-      replyTo: email,
-      subject: `New Contact Question from ${name}`,
-      text: [
-        'New question submitted from the website contact form.',
-        '',
-        `Name: ${name}`,
-        `Email: ${email}`,
-        '',
-        'Question:',
-        question,
-      ].join('\n'),
-      html: `
-        <h2>New Contact / Ask a Question Submission</h2>
-        <p><strong>Name:</strong> ${escapeHtml(name)}</p>
-        <p><strong>Email:</strong> ${escapeHtml(email)}</p>
-        <p><strong>Question:</strong></p>
-        <p>${escapeHtml(question).replace(/\n/g, '<br/>')}</p>
-      `,
+    const questionRef = await addDoc(collection(db, 'user-questions'), {
+      user_name: name,
+      user_email: email,
+      question,
+      answer: null,
+      category: 'contact',
+      status: 'pending',
+      is_public: false,
+      submitted_at: new Date().toISOString(),
+      answered_at: null,
+      source: 'contact-form',
     })
 
-    return NextResponse.json({ message: 'Question submitted successfully.' }, { status: 200 })
+    const smtpConfigured = Boolean(
+      process.env.SMTP_HOST &&
+      process.env.SMTP_PORT &&
+      process.env.SMTP_USER &&
+      process.env.SMTP_PASS &&
+      process.env.SMTP_FROM_EMAIL &&
+      process.env.CONTACT_RECEIVER_EMAIL
+    )
+
+    if (smtpConfigured) {
+      try {
+        const transporter = createTransporter()
+
+        await transporter.sendMail({
+          from: {
+            name: process.env.SMTP_FROM_NAME || 'SCOPE Website',
+            address: process.env.SMTP_FROM_EMAIL!,
+          },
+          to: process.env.CONTACT_RECEIVER_EMAIL!,
+          replyTo: email,
+          subject: `New Contact Question from ${name}`,
+          text: [
+            'New question submitted from the website contact form.',
+            '',
+            `Name: ${name}`,
+            `Email: ${email}`,
+            '',
+            'Question:',
+            question,
+          ].join('\n'),
+          html: `
+            <h2>New Contact / Ask a Question Submission</h2>
+            <p><strong>Name:</strong> ${escapeHtml(name)}</p>
+            <p><strong>Email:</strong> ${escapeHtml(email)}</p>
+            <p><strong>Question:</strong></p>
+            <p>${escapeHtml(question).replace(/\n/g, '<br/>')}</p>
+          `,
+        })
+      } catch (mailError) {
+        console.error('Contact email delivery failed, but question was stored:', mailError)
+      }
+    }
+
+    return NextResponse.json(
+      {
+        message: 'Question submitted successfully.',
+        id: questionRef.id,
+        emailSent: smtpConfigured,
+      },
+      { status: 200 }
+    )
   } catch (error) {
     console.error('Contact API error:', error)
     return NextResponse.json(

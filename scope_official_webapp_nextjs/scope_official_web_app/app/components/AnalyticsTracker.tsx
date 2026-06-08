@@ -26,7 +26,7 @@ async function trackPageView(path: string, title: string) {
     const sessionId = getSessionId()
     const referrer = document.referrer || 'direct'
 
-    await fetch('/api/track/page-view', {
+    await fetch('/api/analytics', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
