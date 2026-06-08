@@ -3,7 +3,6 @@
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap");
-@import url("https://fonts.cdnfonts.com/css/mango-grotesque");
 
 /* Tailwind CSS directives */
 @tailwind base;
@@ -37,7 +36,7 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-dm-sans), "Helvetica Neue", Helvetica, Arial, sans-serif;
   background-color: var(--background-dark);
   color: var(--text-light);
   line-height: 1.6;
@@ -523,7 +522,7 @@ a:hover {
 }
 
 .section-title {
-  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-orbitron), "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 3.2rem; /* Updated to match new elegant size */
   font-weight: 600; /* Slightly lighter for elegance */
   margin-bottom: 1.5rem; /* More generous spacing */

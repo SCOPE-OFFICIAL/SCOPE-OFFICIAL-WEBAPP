@@ -306,7 +306,7 @@ export default function FaqPage() {
             <h2 
               className="text-3xl font-bold text-white mb-4"
               style={{
-                fontFamily: '"Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif',
+                fontFamily: 'var(--font-orbitron), "Helvetica Neue", Helvetica, Arial, sans-serif',
                 textShadow: '0 0 20px rgba(138, 64, 255, 0.4)',
               }}
             >

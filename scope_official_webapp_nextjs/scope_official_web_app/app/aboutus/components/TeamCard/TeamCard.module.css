@@ -79,7 +79,7 @@
 }
 
 .teamName {
-  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-orbitron), "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 28px;
   font-weight: 500;
   line-height: 100%;

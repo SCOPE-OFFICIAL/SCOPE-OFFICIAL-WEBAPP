@@ -47,7 +47,7 @@
 }
 
 .connectText {
-  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-orbitron), "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 24px;
   font-weight: 700;
   color: var(--text-light);

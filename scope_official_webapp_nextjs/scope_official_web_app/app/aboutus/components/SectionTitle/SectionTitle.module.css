@@ -28,7 +28,7 @@
 }
 
 .title {
-  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-orbitron), "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 3.2rem; /* Slightly larger for more presence */
   font-weight: 600; /* Slightly lighter for elegance */
   color: var(--text-light);
@@ -39,7 +39,7 @@
   text-transform: uppercase;
 }
 .subtitle {
-  font-family: "Mango Grotesque", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-orbitron), "Helvetica Neue", Helvetica, Arial, sans-serif;
   font-size: 1.1rem;
   color: var(--text-light);
   text-align: center;
