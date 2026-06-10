@@ -6,7 +6,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
-export default function AdminPage() {
-  const token = cookies().get('admin_token')?.value
+export default async function AdminPage() {
+  const token = (await cookies()).get('admin_token')?.value
   redirect(token ? '/admin/dashboard' : '/admin/login')
 }
