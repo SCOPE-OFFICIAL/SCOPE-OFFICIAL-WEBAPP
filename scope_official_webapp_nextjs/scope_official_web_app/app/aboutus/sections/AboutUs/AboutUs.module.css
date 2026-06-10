@@ -21,21 +21,23 @@
   box-sizing: border-box;
 }
 
-/* Background effects removed to eliminate scrolling issues */
+/* Force any bottom margin on SectionTitle's inner elements to be small */
+.container > div[class*="sectionTitle"],
+.container > div[class*="SectionTitle"],
+.container h2,
+.container > h2 {
+  margin-bottom: 4px !important;
+}
 
 .subHeadline {
   text-align: center;
-  font-size: 26px;
-  font-weight: 500;
-  color: var(--text-light);
-  opacity: 0.9;
-  margin-top: -20px;
-  margin-bottom: 70px;
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: #9ca3af;
+  margin-top: -1rem;
+  margin-bottom: 2.5rem;
   letter-spacing: 0.5px;
-  background: linear-gradient(135deg, #ffffff 0%, #a5b4fc 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  line-height: 1.6;
 }
 
 .contentWrapper {
@@ -78,7 +80,6 @@
   transition: all 0.4s ease;
 }
 
-/* Enhanced hover effect with gradient borders */
 .missionBox:hover::before {
   background: linear-gradient(135deg, #2C97FF, #00ff88);
 }
@@ -159,7 +160,6 @@
   flex: 1;
 }
 
-/* Enhanced Call to Action Button */
 .ctaWrapper {
   text-align: center;
   margin-top: 70px;
@@ -209,12 +209,6 @@
   left: 100%;
 }
 
-.ctaButton:hover::after {
-  content: '→';
-  transform: translateX(5px);
-}
-
-/* Responsive Adjustments */
 @media (max-width: 992px) {
   .contentWrapper {
     gap: 30px;
@@ -231,7 +225,7 @@
   }
   
   .subHeadline {
-    font-size: 18px;
+    font-size: 0.875rem;
     margin-bottom: 40px;
   }
   

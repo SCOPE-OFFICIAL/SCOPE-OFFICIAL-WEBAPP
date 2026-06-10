@@ -7,10 +7,39 @@ import AnimatedButton from '../components/AnimatedButton';
 import FooterComponent from '../components/FooterComponent';
 import { FAQ } from '@/lib/types/database';
 
+const DEFAULT_FAQS = [
+  {
+    question: "What is the difference between analog and digital signals?",
+    answer:
+      "Analog signals are continuous waveforms that vary smoothly over time (e.g., sound waves, temperature readings), while digital signals represent data as discrete binary values (0s and 1s). Analog signals are more susceptible to noise but carry richer information, whereas digital signals are easier to process, store, and transmit with high accuracy.",
+  },
+  {
+    question: "What is Ohm's Law and why is it fundamental in electronics?",
+    answer:
+      "Ohm's Law states that the current (I) through a conductor is directly proportional to the voltage (V) across it and inversely proportional to its resistance (R): V = IR. It is the cornerstone of circuit analysis, allowing engineers to calculate voltages, currents, and resistances in both simple and complex circuits.",
+  },
+  {
+    question: "What is the role of a transistor in electronic circuits?",
+    answer:
+      "A transistor is a semiconductor device that acts as a switch or amplifier. In digital circuits, it switches between ON and OFF states to represent binary logic. In analog circuits, it amplifies weak signals. Modern ICs like microprocessors contain billions of transistors working together.",
+  },
+  {
+    question: "What is the difference between a microprocessor and a microcontroller?",
+    answer:
+      "A microprocessor is a CPU on a single chip, requiring external components (RAM, ROM, I/O ports) to function — used in PCs and high-performance systems. A microcontroller integrates the CPU, memory, and I/O peripherals on one chip, making it ideal for embedded systems like washing machines, Arduino boards, and IoT devices.",
+  },
+  {
+    question: "What are passive and active components in electronics?",
+    answer:
+      "Passive components (resistors, capacitors, inductors) do not require an external power source to operate and cannot amplify signals — they only store, dissipate, or filter energy. Active components (transistors, diodes, op-amps, ICs) require an external power source and can amplify or switch signals.",
+  },
+  
+];
+
 export default function FaqPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const [adminFaqs, setAdminFaqs] = useState<FAQ[]>([]);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     user_name: '',
@@ -27,13 +56,10 @@ export default function FaqPage() {
 
   const fetchFAQs = async () => {
     try {
-      // Fetch admin FAQs
       const adminRes = await fetch('/api/faq');
       const adminData = await adminRes.json();
       const visibleAdminFaqs = (adminData.faqs || []).filter((faq: FAQ) => faq.is_visible);
       setAdminFaqs(visibleAdminFaqs);
-
-  // (Intentionally do not fetch public user questions here — public FAQ displays only admin FAQs)
     } catch (error) {
       console.error('Error fetching FAQs:', error);
     }
@@ -42,22 +68,19 @@ export default function FaqPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitError(null);
-    
+
     if (!formData.question.trim()) {
       setSubmitError('Please enter your question.');
       return;
     }
-
     if (!formData.user_name.trim()) {
       setSubmitError('Please enter your name.');
       return;
     }
-
     if (!formData.user_email.trim()) {
       setSubmitError('Please enter your email.');
       return;
     }
-
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.user_email.trim())) {
       setSubmitError('Please enter a valid email address.');
@@ -94,22 +117,24 @@ export default function FaqPage() {
     }
   };
 
-  // Public FAQ should only display curated admin FAQs.
-  // User-submitted questions are stored separately and moderated from the admin panel.
-  const allFaqs = adminFaqs.map(faq => ({
-    question: faq.question,
-    answer: faq.answer,
-    type: 'admin' as const
-  }));
+  // Admin FAQs take priority; defaults fill in when admin list is empty
+  const allFaqs =
+    adminFaqs.length > 0
+      ? adminFaqs.map((faq) => ({
+          question: faq.question,
+          answer: faq.answer,
+          type: 'admin' as const,
+        }))
+      : DEFAULT_FAQS.map((faq) => ({ ...faq, type: 'default' as const }));
 
   const toggleFAQ = (index: number) => {
     setOpenFAQ(openFAQ === index ? null : index);
   };
 
   return (
-    <motion.div 
-      id="faq-section" 
-      data-section="faq" 
+    <motion.div
+      id="faq-section"
+      data-section="faq"
       className="flex flex-col min-h-screen text-white font-sans relative overflow-hidden"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -117,29 +142,29 @@ export default function FaqPage() {
     >
       {/* Static Vibrant Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#040A28] via-[#0d1b3d] to-[#040A28]">
-        <div 
+        <div
           className="absolute inset-0"
           style={{
             background: `radial-gradient(circle at 50% 50%, 
               rgba(147, 51, 234, 0.3) 0%, 
               rgba(79, 70, 229, 0.25) 30%, 
               rgba(44, 151, 255, 0.3) 60%, 
-              rgba(15, 23, 42, 0.9) 100%)`
+              rgba(15, 23, 42, 0.9) 100%)`,
           }}
         />
       </div>
-      
-      {/* Animated Background Elements (Balls) - Reduced for performance */}
+
+      {/* Animated Background Elements (Balls) */}
       <div className="absolute inset-0 overflow-hidden">
         {[...Array(4)].map((_, i) => {
           const positions = [
             { left: '10%', top: '20%' },
             { left: '80%', top: '10%' },
             { left: '20%', top: '80%' },
-            { left: '70%', top: '60%' }
+            { left: '70%', top: '60%' },
           ];
           const durations = [30, 35, 28, 32];
-          
+
           return (
             <motion.div
               key={i}
@@ -149,44 +174,35 @@ export default function FaqPage() {
                 left: positions[i].left,
                 top: positions[i].top,
               }}
-              animate={{
-                x: [0, 80, 0],
-                y: [0, -80, 0],
-              }}
-              transition={{
-                duration: durations[i],
-                repeat: Infinity,
-                ease: "linear",
-              }}
+              animate={{ x: [0, 80, 0], y: [0, -80, 0] }}
+              transition={{ duration: durations[i], repeat: Infinity, ease: "linear" }}
             />
           );
         })}
       </div>
 
-      {/* Animated Background Particles - Reduced for performance */}
+      {/* Animated Background Particles */}
       <div className="absolute inset-0 pointer-events-none">
         {[...Array(8)].map((_, i) => {
           const particlePositions = [
-            { left: '5%', top: '15%' }, { left: '25%', top: '25%' }, 
-            { left: '65%', top: '15%' }, { left: '85%', top: '25%' },
-            { left: '35%', top: '65%' }, { left: '55%', top: '75%' },
-            { left: '95%', top: '45%' }, { left: '25%', top: '85%' }
+            { left: '5%', top: '15%' },
+            { left: '25%', top: '25%' },
+            { left: '65%', top: '15%' },
+            { left: '85%', top: '25%' },
+            { left: '35%', top: '65%' },
+            { left: '55%', top: '75%' },
+            { left: '95%', top: '45%' },
+            { left: '25%', top: '85%' },
           ];
           const particleDurations = [20, 18, 22, 19, 21, 23, 19, 20];
           const particleDelays = [0, 0.5, 1, 1.5, 0.3, 0.8, 0.2, 0.7];
-          
+
           return (
             <motion.div
               key={i}
               className="absolute w-1 h-1 bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] rounded-full"
-              style={{
-                left: particlePositions[i].left,
-                top: particlePositions[i].top,
-              }}
-              animate={{
-                y: [0, -5, 0],
-                opacity: [0.3, 0.5, 0.3],
-              }}
+              style={{ left: particlePositions[i].left, top: particlePositions[i].top }}
+              animate={{ y: [0, -5, 0], opacity: [0.3, 0.5, 0.3] }}
               transition={{
                 duration: particleDurations[i],
                 repeat: Infinity,
@@ -198,14 +214,14 @@ export default function FaqPage() {
         })}
       </div>
 
-      <motion.main 
+      <motion.main
         className="flex-grow container mx-auto px-6 py-20 pb-64 relative z-10"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8 }}
       >
-        {/* Centered Heading Section */}
-        <motion.div 
+        {/* Heading */}
+        <motion.div
           className="text-center mb-12 max-w-7xl mx-auto mt-8"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
@@ -218,7 +234,7 @@ export default function FaqPage() {
               fontWeight: 600,
               color: 'var(--text-light)',
               textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
-              letterSpacing: '2px'
+              letterSpacing: '2px',
             }}
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -228,24 +244,23 @@ export default function FaqPage() {
           </motion.h1>
         </motion.div>
 
-        <motion.div 
+        <motion.div
           className="max-w-4xl mx-auto mb-16"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
-          <motion.p 
+          <motion.p
             className="text-gray-300 leading-relaxed text-center text-sm sm:text-base md:text-lg mb-12 px-4"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
-            Navigating Your Queries with Precision. Explore answers to common
-            questions about circuits, components, electronics fundamentals and
-            the upcoming events.
+            Navigating Your Queries with Precision. Explore answers to common questions about
+            circuits, components, electronics fundamentals and the upcoming events.
           </motion.p>
 
-          {/* FAQ Items - Simplified animations */}
+          {/* FAQ Items */}
           <div className="space-y-4">
             {allFaqs.map((faq, index) => (
               <motion.div
@@ -260,9 +275,7 @@ export default function FaqPage() {
                   onClick={() => toggleFAQ(index)}
                 >
                   <div className="flex-1 pr-4">
-                    <h3 className="text-lg font-semibold text-white">
-                      {faq.question}
-                    </h3>
+                    <h3 className="text-lg font-semibold text-white">{faq.question}</h3>
                   </div>
                   <motion.div
                     className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] flex items-center justify-center"
@@ -272,7 +285,7 @@ export default function FaqPage() {
                     <span className="text-white text-lg font-bold">+</span>
                   </motion.div>
                 </button>
-                
+
                 <AnimatePresence>
                   {openFAQ === index && (
                     <motion.div
@@ -283,9 +296,7 @@ export default function FaqPage() {
                       className="overflow-hidden"
                     >
                       <div className="px-6 pb-5 pt-2">
-                        <p className="text-gray-300 leading-relaxed">
-                          {faq.answer}
-                        </p>
+                        <p className="text-gray-300 leading-relaxed">{faq.answer}</p>
                       </div>
                     </motion.div>
                   )}
@@ -303,7 +314,7 @@ export default function FaqPage() {
           transition={{ duration: 0.8, delay: 0.8 }}
         >
           <div className="text-center mb-12">
-            <h2 
+            <h2
               className="text-3xl font-bold text-white mb-4"
               style={{
                 fontFamily: 'var(--font-orbitron), "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -312,20 +323,18 @@ export default function FaqPage() {
             >
               Still Have Questions?
             </h2>
-            <p className="text-gray-300 text-lg">
-              Need more help? Reach out to us directly!
-            </p>
+            <p className="text-gray-300 text-lg">Need more help? Reach out to us directly!</p>
           </div>
 
-          <motion.div 
-            className="flex flex-col lg:flex-row gap-16 items-start md:items-center lg:items-start"
+          <motion.div
+            className="flex flex-col lg:flex-row gap-16 items-center"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.0 }}
           >
-            
-            <motion.div 
-              className="lg:w-1/2 space-y-8"
+            {/* Form */}
+            <motion.div
+              className="w-full lg:w-1/2 space-y-8"
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8, delay: 1.1 }}
@@ -336,8 +345,12 @@ export default function FaqPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="bg-green-900/30 border border-green-600 rounded-lg p-4 mb-4"
                 >
-                  <p className="text-green-300 font-semibold">Your question has been sent successfully.</p>
-                  <p className="text-green-200 text-sm mt-2">Please check your inbox (and spam folder) for follow-up messages.</p>
+                  <p className="text-green-300 font-semibold">
+                    Your question has been sent successfully.
+                  </p>
+                  <p className="text-green-200 text-sm mt-2">
+                    Please check your inbox (and spam folder) for follow-up messages.
+                  </p>
                 </motion.div>
               )}
 
@@ -351,141 +364,132 @@ export default function FaqPage() {
                 </motion.div>
               )}
 
-              <form 
+              <form
                 onSubmit={handleSubmit}
                 className="space-y-6 bg-white/5 backdrop-blur-sm rounded-2xl p-8 border border-white/10"
               >
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-300 mb-2"
-                  >
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    value={formData.user_name}
-                    onChange={(e) => setFormData({ ...formData, user_name: e.target.value })}
-                    placeholder="Your name"
-                    className="w-full bg-gray-200 rounded-lg border border-transparent focus:border-blue-400 focus:ring-0 px-4 py-3 text-black placeholder-gray-500 transition-all duration-300"
-                  />
-                </div>
-                
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-300 mb-2"
-                  >
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    value={formData.user_email}
-                    onChange={(e) => setFormData({ ...formData, user_email: e.target.value })}
-                    placeholder="your@email.com"
-                    className="w-full bg-gray-200 rounded-lg border border-transparent focus:border-blue-400 focus:ring-0 px-4 py-3 text-black placeholder-gray-500 transition-all duration-300"
-                  />
-                </div>
-              </div>
-              
-              <div>
-                <label
-                  htmlFor="query"
-                  className="block text-sm font-medium text-gray-300 mb-2"
-                >
-                  Post Your Question Here *
-                </label>
-                <textarea
-                  id="query"
-                  rows={5}
-                  value={formData.question}
-                  onChange={(e) => setFormData({ ...formData, question: e.target.value })}
-                  required
-                  placeholder="Ask your question..."
-                  className="w-full bg-gray-200 rounded-lg border border-transparent focus:border-blue-400 focus:ring-0 px-4 py-3 text-black placeholder-gray-500 transition-all duration-300"
-                />
-                <p className="text-gray-400 text-xs mt-2">
-                  💡 Tip: If you provide your email, we&apos;ll send you a notification when your question is answered. 
-                  <span className="text-yellow-400"> Remember to check your spam folder</span> and mark our email as &quot;Not Spam&quot;!
-                </p>
-              </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
+                      Name
+                    </label>
+                    <input
+                      type="text"
+                      id="name"
+                      value={formData.user_name}
+                      onChange={(e) => setFormData({ ...formData, user_name: e.target.value })}
+                      placeholder="Your name"
+                      className="w-full bg-gray-200 rounded-lg border border-transparent focus:border-blue-400 focus:ring-0 px-4 py-3 text-black placeholder-gray-500 transition-all duration-300"
+                    />
+                  </div>
 
-              <AnimatedButton
-                type="submit"
-                variant="primary"
-                size="lg"
-                className="w-full sm:w-auto"
-                disabled={submitting}
-              >
-                {submitting ? 'Submitting...' : 'Submit Question'}
-              </AnimatedButton>
-            </form>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      value={formData.user_email}
+                      onChange={(e) => setFormData({ ...formData, user_email: e.target.value })}
+                      placeholder="your@email.com"
+                      className="w-full bg-gray-200 rounded-lg border border-transparent focus:border-blue-400 focus:ring-0 px-4 py-3 text-black placeholder-gray-500 transition-all duration-300"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="query" className="block text-sm font-medium text-gray-300 mb-2">
+                    Post Your Question Here *
+                  </label>
+                  <textarea
+                    id="query"
+                    rows={5}
+                    value={formData.question}
+                    onChange={(e) => setFormData({ ...formData, question: e.target.value })}
+                    required
+                    placeholder="Ask your question..."
+                    className="w-full bg-gray-200 rounded-lg border border-transparent focus:border-blue-400 focus:ring-0 px-4 py-3 text-black placeholder-gray-500 transition-all duration-300"
+                  />
+                  <p className="text-gray-400 text-xs mt-2">
+                    💡 Tip: If you provide your email, we&apos;ll send you a notification when your
+                    question is answered.{' '}
+                    <span className="text-yellow-400">Remember to check your spam folder</span> and
+                    mark our email as &quot;Not Spam&quot;!
+                  </p>
+                </div>
+
+                <AnimatedButton
+                  type="submit"
+                  variant="primary"
+                  size="lg"
+                  className="w-full sm:w-auto"
+                  disabled={submitting}
+                >
+                  {submitting ? 'Submitting...' : 'Submit Question'}
+                </AnimatedButton>
+              </form>
             </motion.div>
 
-            {/* Animated Illustration - Simplified */}
-            <motion.div 
+            {/* ── Illustration ─────────────────────────────────────────────────── */}
+            {/* 
+              FIX: Replaced the nested relative/aspect-ratio wrapper with a simpler
+              approach. The outer div uses `relative` with an explicit height so the
+              image always has a real containing block at every breakpoint, and the
+              floating question marks are clamped inside it.
+            */}
+            <motion.div
               className="w-full lg:w-1/2 flex items-center justify-center mt-8 lg:mt-0"
               initial={{ opacity: 0, x: 50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <div className="relative hover:scale-105 transition-transform duration-300 w-full max-w-[260px] sm:max-w-[320px] md:max-w-[380px] mx-auto">
-                  <div className="relative w-full aspect-[380/410]">
-                    <Image
-                      src="/images/faq_pic.png"
-                      alt="Illustration of a person with a large question mark"
-                      fill
-                      sizes="(max-width: 640px) 80vw, (max-width: 1024px) 40vw, 380px"
-                      className="object-contain"
-                    />
-                  </div>
+              <div className="relative w-full max-w-[260px] sm:max-w-[320px] md:max-w-[380px] mx-auto h-[260px] sm:h-[320px] md:h-[410px] hover:scale-105 transition-transform duration-300">
+                <Image
+                  src="/images/faq_pic.png"
+                  alt="Illustration of a person with a large question mark"
+                  fill
+                  sizes="(max-width: 640px) 80vw, (max-width: 1024px) 40vw, 380px"
+                  className="object-contain"
+                />
 
-                  {/* Floating question marks animation - hidden on very small screens to avoid overflow */}
-                  <div className="absolute inset-0 pointer-events-none">
-                    {['?', '?', '?'].map((mark, i) => {
-                      const questionPositions = [
-                        { left: '62%', top: '18%' },
-                        { left: '88%', top: '22%' },
-                        { left: '45%', top: '55%' }
-                      ];
-                    
-                      return (
-                        <motion.div
-                          key={i}
-                          className="hidden sm:block absolute text-3xl sm:text-4xl text-[#F24DC2] opacity-30"
-                          style={{
-                            left: questionPositions[i].left,
-                            top: questionPositions[i].top,
-                          }}
-                          animate={{
-                            y: [0, -12, 0],
-                            opacity: [0.2, 0.45, 0.2],
-                          }}
-                          transition={{
-                            duration: 3.5 + i,
-                            repeat: Infinity,
-                            delay: i * 0.45,
-                            ease: "easeInOut",
-                          }}
-                        >
-                          {mark}
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-                </div>
+                {/* Floating question marks */}
+                {['?', '?', '?'].map((mark, i) => {
+                  const questionPositions = [
+                    { left: '62%', top: '18%' },
+                    { left: '88%', top: '22%' },
+                    { left: '45%', top: '55%' },
+                  ];
+
+                  return (
+                    <motion.div
+                      key={i}
+                      className="hidden sm:block absolute text-3xl sm:text-4xl text-[#F24DC2] opacity-30 pointer-events-none"
+                      style={{
+                        left: questionPositions[i].left,
+                        top: questionPositions[i].top,
+                      }}
+                      animate={{ y: [0, -12, 0], opacity: [0.2, 0.45, 0.2] }}
+                      transition={{
+                        duration: 3.5 + i,
+                        repeat: Infinity,
+                        delay: i * 0.45,
+                        ease: "easeInOut",
+                      }}
+                    >
+                      {mark}
+                    </motion.div>
+                  );
+                })}
+              </div>
             </motion.div>
           </motion.div>
         </motion.div>
       </motion.main>
-      
-      {/* Spacer to ensure gap between FAQ and Footer */}
-      <div className="h-32 md:h-48"></div>
-      
-      {/* Footer - Only appears at the end of the website */}
+
+      {/* Spacer */}
+      <div className="h-32 md:h-48" />
+
       <FooterComponent />
     </motion.div>
   );

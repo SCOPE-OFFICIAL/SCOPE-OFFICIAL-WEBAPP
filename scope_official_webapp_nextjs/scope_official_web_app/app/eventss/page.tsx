@@ -46,7 +46,6 @@ export default function HomePage() {
   const [pastEvents, setPastEvents] = useState<PastEvent[]>([])
   const [loading, setLoading] = useState(true)
 
-  // ── Upcoming Events Slider state ──────────────────────────────────────
   const [activeIndex, setActiveIndex] = useState(0)
   const [direction, setDirection] = useState<Direction>('left')
   const [paused, setPaused] = useState(false)
@@ -54,7 +53,6 @@ export default function HomePage() {
   const [progressPct, setProgressPct] = useState(0)
   const SLIDE_DURATION = 20000
 
-  // ── Past Events ticker state ───────────────────────────────────────────
   const [tickerPaused, setTickerPaused] = useState(false)
   const [showPastModal, setShowPastModal] = useState(false)
   const [selectedPastIndex, setSelectedPastIndex] = useState<number | null>(null)
@@ -63,7 +61,6 @@ export default function HomePage() {
 
   const router = useRouter()
 
-  // Fetch upcoming events
   useEffect(() => {
     async function fetchEvents() {
       const start = Date.now()
@@ -88,7 +85,6 @@ export default function HomePage() {
     fetchEvents()
   }, [])
 
-  // Fetch past events
   useEffect(() => {
     async function fetchPastEvents() {
       try {
@@ -123,7 +119,6 @@ export default function HomePage() {
     fetchPastEvents()
   }, [])
 
-  // ── Upcoming slide helpers ────────────────────────────────────────────
   const goTo = useCallback((index: number, dir: Direction) => {
     setDirection(dir)
     setActiveIndex(index)
@@ -140,7 +135,6 @@ export default function HomePage() {
     goTo((activeIndex - 1 + upcomingEvents.length) % upcomingEvents.length, 'right')
   }, [activeIndex, upcomingEvents.length, goTo])
 
-  // Auto-advance upcoming events
   useEffect(() => {
     if (upcomingEvents.length <= 1 || paused || loading) return
     const step = 100 / (SLIDE_DURATION / 100)
@@ -154,7 +148,6 @@ export default function HomePage() {
     return () => clearInterval(tick)
   }, [activeIndex, paused, loading, upcomingEvents.length, goNext])
 
-  // Fonts
   useEffect(() => {
     const orbitronLink = document.createElement("link")
     orbitronLink.href = "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap"
@@ -170,7 +163,6 @@ export default function HomePage() {
     }
   }, [])
 
-  // ── Past modal helpers ────────────────────────────────────────────────
   const handleSeeGalleryClick = (path: string, folderName?: string) => {
     try {
       if (typeof window !== 'undefined' && folderName) {
@@ -188,7 +180,6 @@ export default function HomePage() {
     setShowPastModal(true)
   }
 
-  // ── Helpers ───────────────────────────────────────────────────────────
   const formatDate = (dateString: string) => {
     if (!dateString) return { dayNum: '--', month: '---', year: '----' }
     const date = new Date(dateString)
@@ -217,7 +208,6 @@ export default function HomePage() {
     exitRight:  { x: '100%', opacity: 0 },
   }
 
-  // Countdown for upcoming events
   const [countdown, setCountdown] = useState({ days: 0, hours: 0, mins: 0, secs: 0 })
   useEffect(() => {
     if (!upcomingEvents[activeIndex]?.event_date) return
@@ -253,18 +243,14 @@ export default function HomePage() {
     </div>
   )
 
-  // ── Past Event Card ───────────────────────────────────────────────────
-  // "View Details" button removed per request — click anywhere on card opens modal
   const PastEventCard = ({ evt, realIndex }: { evt: PastEvent; realIndex: number }) => {
     const { dayNum, month, year } = formatDate(evt.event_date || '')
-
     return (
       <div
         className="flex-shrink-0 w-[272px] flex flex-col bg-[#0a0f2e] border border-white/10 rounded-2xl overflow-hidden cursor-pointer select-none
                    transition-all duration-300 hover:border-[#F24DC2]/50 hover:shadow-[0_0_32px_rgba(242,77,194,0.18)] hover:-translate-y-1"
         onClick={() => handlePastCardClick(realIndex)}
       >
-        {/* Poster image */}
         <div className="relative h-44 bg-gradient-to-br from-[#1a1c3a] to-[#0d1b3d] overflow-hidden flex-shrink-0">
           <Image
             src={evt.poster_image_url}
@@ -274,27 +260,19 @@ export default function HomePage() {
             sizes="272px"
             draggable={false}
           />
-          {/* Bottom fade */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#0a0f2e] via-[#0a0f2e]/10 to-transparent" />
-
-          {/* Badge */}
           <div className="absolute top-3 left-3 z-10">
             <span className="text-[9px] font-bold tracking-widest uppercase px-2.5 py-1 rounded-full bg-white/10 border border-white/20 text-gray-300 backdrop-blur-md">
               Past Event
             </span>
           </div>
-
-          {/* Title overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-3 z-10">
             <h3 className="text-white font-extrabold text-sm leading-snug line-clamp-2">
               {evt.title || 'Past Event'}
             </h3>
           </div>
         </div>
-
-        {/* Card body */}
         <div className="p-3 flex items-start gap-3 flex-1">
-          {/* Date block */}
           {evt.event_date ? (
             <div className="flex-shrink-0 text-center bg-white/5 border border-white/10 rounded-lg px-2.5 py-2 min-w-[50px]">
               <p className="text-white font-extrabold text-base leading-none">{dayNum}</p>
@@ -306,13 +284,9 @@ export default function HomePage() {
               <p className="text-gray-600 text-[9px] text-center">No date</p>
             </div>
           )}
-
-          {/* Description */}
           <div className="flex-1 min-w-0">
             {evt.description ? (
-              <p className="text-gray-400 text-[11px] leading-relaxed line-clamp-3">
-                {evt.description}
-              </p>
+              <p className="text-gray-400 text-[11px] leading-relaxed line-clamp-3">{evt.description}</p>
             ) : (
               <p className="text-gray-600 text-[11px] italic">Click to view poster</p>
             )}
@@ -322,18 +296,26 @@ export default function HomePage() {
     )
   }
 
-  // Ensure enough cards to fill the viewport by repeating — minimum 3 full sets
   const minSets = pastEvents.length > 0 ? Math.max(3, Math.ceil(6 / pastEvents.length)) : 3
   const tickerItems: Array<{ evt: PastEvent; realIndex: number }> = []
   for (let s = 0; s < minSets * 2; s++) {
     pastEvents.forEach((evt, i) => tickerItems.push({ evt, realIndex: i }))
   }
 
+  // Shared heading style used by BOTH section titles
+  const sectionHeadingStyle: React.CSSProperties = {
+    fontFamily: '"Orbitron", sans-serif',
+    fontSize: '3rem',       // = 48px, equivalent to text-5xl — uniform on all screens
+    fontWeight: 700,
+    letterSpacing: '2px',
+    textShadow: '0 0 20px rgba(138,64,255,0.4)',
+    color: '#ffffff',
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#040a28] via-[#0d1b3d] to-[#040a28] text-gray-200 font-sans relative overflow-hidden">
       <BackgroundBalls />
 
-      {/* ── Ticker keyframe injected once ── */}
       <style>{`
         @keyframes ticker-scroll {
           0%   { transform: translateX(0); }
@@ -353,7 +335,7 @@ export default function HomePage() {
       <main className="relative z-10">
 
         {/* ══════════════════════════════════════════════════════════════════
-            UPCOMING EVENTS — Single showcase box with sliding events
+            UPCOMING EVENTS
         ══════════════════════════════════════════════════════════════════ */}
         <section className="relative w-full">
           <BackgroundBalls />
@@ -382,30 +364,24 @@ export default function HomePage() {
               </span>
             </motion.div>
 
+            {/* ── Unified heading ── */}
             <motion.h2
-              className="mb-3 text-center font-extrabold text-gray-100 leading-tight"
-              style={{ fontSize: 'clamp(2.2rem, 5vw, 4rem)', textShadow: '0 0 30px rgba(242,77,194,0.25)', letterSpacing: '1px' }}
+              className="mb-3 text-center uppercase text-white"
+              style={sectionHeadingStyle}
               initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.35 }}
+              whileHover={{ scale: 1.03, textShadow: '0 0 30px rgba(242,77,194,0.6)', transition: { duration: 0.3 } }}
             >
-              Upcoming{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#F24DC2] to-[#2C97FF]">Events</span>
+              UPCOMING EVENTS
             </motion.h2>
 
             <motion.p
-              className="text-center text-gray-400 text-sm md:text-base mb-6 max-w-xl mx-auto"
+              className="text-center text-gray-400 text-sm md:text-base mb-10 max-w-xl mx-auto"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.45 }}
             >
-              Explore our upcoming events and be a part of innovation, learning and growth.
+              
             </motion.p>
-
-            <motion.div className="flex items-center justify-center gap-2 mb-10"
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
-              <div className="h-[2px] w-16 bg-gradient-to-r from-transparent to-[#F24DC2] rounded-full" />
-              <div className="w-2 h-2 rounded-full bg-gradient-to-br from-[#F24DC2] to-[#2C97FF]" />
-              <div className="h-[2px] w-16 bg-gradient-to-l from-transparent to-[#2C97FF] rounded-full" />
-            </motion.div>
 
             {/* Loading skeleton */}
             {loading && (
@@ -451,7 +427,6 @@ export default function HomePage() {
                   onMouseEnter={() => setPaused(true)}
                   onMouseLeave={() => setPaused(false)}
                 >
-                  {/* Progress bar */}
                   {upcomingEvents.length > 1 && (
                     <div className="absolute top-0 left-0 right-0 h-[3px] bg-white/10 z-30">
                       <motion.div
@@ -462,7 +437,6 @@ export default function HomePage() {
                     </div>
                   )}
 
-                  {/* Sliding content */}
                   <div className="relative overflow-hidden" style={{ minHeight: '480px' }}>
                     <AnimatePresence initial={false} custom={direction} mode="wait">
                       {upcomingEvents[activeIndex] && (() => {
@@ -481,7 +455,6 @@ export default function HomePage() {
                             transition={{ type: 'tween', ease: [0.25, 0.46, 0.45, 0.94], duration: 0.55 }}
                             className="absolute inset-0 flex flex-col lg:flex-row"
                           >
-                            {/* Image panel */}
                             <div className="relative lg:w-[45%] h-56 lg:h-full flex-shrink-0 overflow-hidden">
                               {ev.poster_image_url || ev.image_url ? (
                                 <Image
@@ -510,7 +483,6 @@ export default function HomePage() {
                               )}
                             </div>
 
-                            {/* Details panel */}
                             <div className="flex-1 flex flex-col justify-between p-6 lg:p-8 lg:pl-6 overflow-y-auto">
                               <div className="space-y-4">
                                 <div className="flex items-center gap-3">
@@ -594,7 +566,6 @@ export default function HomePage() {
                     </AnimatePresence>
                   </div>
 
-                  {/* Prev / Next arrows */}
                   {upcomingEvents.length > 1 && (
                     <>
                       <button onClick={goPrev}
@@ -617,7 +588,6 @@ export default function HomePage() {
                   )}
                 </div>
 
-                {/* Dot indicators */}
                 {upcomingEvents.length > 1 && (
                   <div className="flex justify-center gap-2 mt-5">
                     {upcomingEvents.map((_, i) => (
@@ -646,8 +616,7 @@ export default function HomePage() {
         </section>
 
         {/* ══════════════════════════════════════════════════════════════════
-            PAST EVENTS — Smooth CSS infinite horizontal ticker
-            Pauses on hover; click any card to open detail modal
+            PAST EVENTS
         ══════════════════════════════════════════════════════════════════ */}
         <motion.section
           className="py-24 px-0 relative overflow-hidden"
@@ -656,7 +625,6 @@ export default function HomePage() {
           transition={{ duration: 0.5, ease: 'easeOut', type: 'tween' }}
           viewport={{ once: true, margin: '-150px' }}
         >
-          {/* Divider */}
           <motion.div
             className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#0072FF] to-transparent mb-16"
             initial={{ scaleX: 0 }}
@@ -665,15 +633,15 @@ export default function HomePage() {
             viewport={{ once: true }}
           />
 
-          {/* Heading */}
+          {/* ── Unified heading ── */}
           <motion.h2
-            className="mb-3 text-center text-4xl md:text-5xl font-bold text-gray-100 px-4"
-            style={{ textShadow: '0 0 20px rgba(138,64,255,0.4)', letterSpacing: '2px', fontFamily: '"Orbitron", sans-serif' }}
+            className="mb-3 text-center uppercase text-white px-4"
+            style={sectionHeadingStyle}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
             viewport={{ once: true }}
-            whileHover={{ scale: 1.03, textShadow: '0 0 30px rgba(138,64,255,0.6)', transition: { duration: 0.3 } }}
+            
           >
             PAST EVENTS
           </motion.h2>
@@ -686,16 +654,6 @@ export default function HomePage() {
             A look back at what we've built — hover to pause, click to explore
           </motion.p>
 
-          {/* Decorative divider dots */}
-          <motion.div className="flex items-center justify-center gap-2 mb-10 px-4"
-            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.3 }} viewport={{ once: true }}>
-            <div className="h-[2px] w-16 bg-gradient-to-r from-transparent to-[#0072FF] rounded-full" />
-            <div className="w-2 h-2 rounded-full bg-gradient-to-br from-[#0072FF] to-[#a78bfa]" />
-            <div className="h-[2px] w-16 bg-gradient-to-l from-transparent to-[#a78bfa] rounded-full" />
-          </motion.div>
-
-          {/* ── Ticker ── */}
           {pastEvents.length > 0 && (
             <div
               className="relative w-full overflow-hidden py-4"
@@ -704,18 +662,11 @@ export default function HomePage() {
               onTouchStart={() => setTickerPaused(true)}
               onTouchEnd={() => setTickerPaused(false)}
             >
-              {/* Edge fade masks */}
               <div className="absolute left-0 top-0 bottom-0 w-20 md:w-32 z-10 pointer-events-none"
                 style={{ background: 'linear-gradient(to right, #040a28 0%, transparent 100%)' }} />
               <div className="absolute right-0 top-0 bottom-0 w-20 md:w-32 z-10 pointer-events-none"
                 style={{ background: 'linear-gradient(to left, #040a28 0%, transparent 100%)' }} />
 
-              {/*
-                CSS-driven infinite scroll:
-                - tickerItems is 2× the real list (duplicate for seamless loop)
-                - animation moves by -50% (exactly one full copy width) then resets
-                - GPU-accelerated, no JS frame loop needed → zero jitter
-              */}
               <div
                 className={`ticker-track${tickerPaused ? ' paused' : ''}`}
                 style={{ paddingLeft: '20px' }}
@@ -725,7 +676,6 @@ export default function HomePage() {
                 ))}
               </div>
 
-              {/* Hover hint */}
               {tickerPaused && (
                 <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
                   <span className="text-[10px] text-gray-400 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-white/10">
@@ -736,7 +686,6 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Empty state */}
           {pastEvents.length === 0 && (
             <div className="flex flex-col items-center justify-center py-16 text-gray-600">
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" className="mb-4 opacity-30">
@@ -747,7 +696,6 @@ export default function HomePage() {
             </div>
           )}
 
-          {/* Know More */}
           <div className="flex justify-center mt-10 px-4">
             <Link href="/#gallery">
               <motion.button

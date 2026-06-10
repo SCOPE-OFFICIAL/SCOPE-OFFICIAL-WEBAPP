@@ -144,12 +144,19 @@ export default function Navigation() {
             className="flex-shrink-0"
           >
             <Link href="/" className="flex items-center cursor-pointer">
-              <motion.img 
-                src="/images/scope_logo.png" 
-                alt="SCOPE Logo" 
-                className="h-10 w-10 object-contain"
+              <motion.div
+                className="relative h-16 w-16 sm:h-20 sm:w-20 lg:h-24 lg:w-24"
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              />
+              >
+                <Image
+                  src="/images/scope_logo.png"
+                  alt="SCOPE Logo"
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 64px, (max-width: 1024px) 80px, 96px"
+                  className="object-contain drop-shadow-[0_0_18px_rgba(255,255,255,0.35)]"
+                />
+              </motion.div>
             </Link>
           </motion.div>
 

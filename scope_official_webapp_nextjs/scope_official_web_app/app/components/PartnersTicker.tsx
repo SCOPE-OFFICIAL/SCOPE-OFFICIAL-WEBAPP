@@ -45,7 +45,7 @@ export default function PartnersTicker({ className = '' }: { className?: string 
     <>
       <section className={`py-12 px-6 partners-root min-h-[260px] ${className}`}>
         <div className="max-w-7xl mx-auto">
-          <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] mb-6">OUR PARTNERS</h3>
+          <h3 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#c0babe] to-[#c4cbd2] mb-6">OUR PARTNERS</h3>
 
           {/* Use the new CSS class for the container */}
           <div className="ticker-container-css">
@@ -92,6 +92,13 @@ export default function PartnersTicker({ className = '' }: { className?: string 
       {/* This <style jsx> tag injects the CSS directly.
         It is scoped to this component, so it won't clash with other styles.
       */}
+       {/* Blue gradient divider line — matches Past Events page */}
+        <div style={{
+          width: '100%',
+          height: '1px',
+          background: 'linear-gradient(to right, transparent, #0072FF, transparent)',
+          marginBottom: '2rem',
+        }} />
       <style jsx>{`
         /* The main container - 'overflow: hidden' is the key */
         .ticker-container-css {

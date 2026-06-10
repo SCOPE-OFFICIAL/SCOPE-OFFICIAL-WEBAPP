@@ -775,6 +775,8 @@ export default function TeamPage() {
                         {GitHubIcon}
                       </a>
                     )}
+                     {/* Blue gradient divider line — matches Past Events page */}
+       
                   </div>
                 </div>
               </div>
@@ -782,6 +784,12 @@ export default function TeamPage() {
           </div>
         )}
       </AnimatePresence>
+       <div style={{
+          width: '100%',
+          height: '1px',
+          background: 'linear-gradient(to right, transparent, #0072FF, transparent)',
+          marginBottom: '2rem',
+        }} />
     </div>
   );
 }

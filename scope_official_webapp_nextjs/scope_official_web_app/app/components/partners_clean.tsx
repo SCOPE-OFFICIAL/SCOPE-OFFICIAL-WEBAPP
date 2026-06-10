@@ -57,6 +57,7 @@ export default function Partners() {
   useContinuousScroll(trackRef, { speed: 40, id: 'partners' });
 
   return (
+    
     <section className="py-12 px-6 partners-root">
       <div className={`max-w-7xl mx-auto ${whatStyles.container}`}>
         <h3 className={whatStyles.programsTitle}>OUR PARTNERS</h3>
@@ -70,6 +71,13 @@ export default function Partners() {
                   </a>
                 ))
               )}
+               {/* Blue gradient divider line — matches Past Events page */}
+        <div style={{
+          width: '100%',
+          height: '1px',
+          background: 'linear-gradient(to right, transparent, #0072FF, transparent)',
+          marginBottom: '2rem',
+        }} />
             </div>
           </div>
         </div>

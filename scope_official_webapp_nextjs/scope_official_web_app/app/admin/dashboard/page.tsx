@@ -512,6 +512,12 @@ export default function AdminDashboard() {
           </div>
         </div>
       </motion.div>
+       <div style={{
+          width: '100%',
+          height: '1px',
+          background: 'linear-gradient(to right, transparent, #0072FF, transparent)',
+          marginBottom: '2rem',
+        }} />
     </div>
   )
 }

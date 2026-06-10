@@ -41,11 +41,15 @@ const WhatWeDo: React.FC = () => {
           msOverflowStyle: 'none'
         }}
       >
+         <div style={{
+          width: '100%',
+          height: '1px',
+          background: 'linear-gradient(to right, transparent, #0072FF, transparent)',
+          marginBottom: '2rem',
+        }} />
       {/* Main Title of the section: WHAT WE OFFER */}
       <SectionTitle title="WHAT WE OFFER" showLines={false} />
       
-      {/* Sub-Headline: LEARN. NETWORK. INNOVATE. */}
-      <p className={styles.subHeadline}>LEARN. NETWORK. INNOVATE.</p>
 
       {/* --- Programs Grid --- */}
       <h2 className={styles.programsTitle}>OUR PROGRAMS</h2>
@@ -78,12 +82,14 @@ const WhatWeDo: React.FC = () => {
         </p>
       </div>
 
-      {/* Decorative Separator Line */}
-      <div className={styles.sectionSeparator}>
-        <div className={styles.separatorLine}></div>
-        <div className={styles.separatorDot}></div>
-        <div className={styles.separatorLine}></div>
-      </div>
+       {/* Blue gradient divider line — matches Past Events page */}
+        <div style={{
+          width: '100%',
+          height: '1px',
+          background: 'linear-gradient(to right, transparent, #0072FF, transparent)',
+          marginBottom: '2rem',
+        }} />
+      
     </div>
     </section>
   );

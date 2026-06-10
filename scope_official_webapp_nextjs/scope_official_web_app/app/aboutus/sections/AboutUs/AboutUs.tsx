@@ -38,36 +38,46 @@ export default function AboutUs() {
   ];
 
   return (
-    // Section wrapper spans full width so decorative balls can bleed outside the content container
     <section className={styles.sectionWrapper}>
       <BackgroundBalls />
-      <div 
-        className={styles.container} 
-        style={{ 
-          overflow: 'visible', 
-          height: 'auto', 
+      <div
+        className={styles.container}
+        style={{
+          overflow: 'visible',
+          height: 'auto',
           minHeight: 'auto',
           scrollbarWidth: 'none',
           msOverflowStyle: 'none'
         }}
       >
-        <SectionTitle title="ABOUT US" showLines={true} />
-      <p className={styles.subHeadline}>
-        Empowering the next generation of innovators
-      </p>
+        {/* Blue gradient divider line — matches Past Events page */}
+        <div style={{
+          width: '100%',
+          height: '1px',
+          background: 'linear-gradient(to right, transparent, #0072FF, transparent)',
+          marginBottom: '2rem',
+        }} />
 
-      <div className={styles.contentWrapper}>
-        {infoBoxes.map((box) => (
-          <InfoBox
-            key={box.title}
-            title={box.title}
-            content={box.content}
-            icon={box.icon}
-            type={box.type}
-          />
-        ))}
+        {/* Wrap heading + paragraph together so margin-bottom on SectionTitle
+            doesn't push the paragraph away — we control the gap here instead */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <SectionTitle title="ABOUT US" showLines={false} />
+
+          
+        </div>
+
+        <div className={styles.contentWrapper}>
+          {infoBoxes.map((box) => (
+            <InfoBox
+              key={box.title}
+              title={box.title}
+              content={box.content}
+              icon={box.icon}
+              type={box.type}
+            />
+          ))}
+        </div>
       </div>
-    </div>
     </section>
   );
 }

@@ -1,16 +1,14 @@
 import React from "react";
+import Image from "next/image";
 import styles from "./Navbar.module.css"; // Import the CSS module
 
 const Navbar: React.FC = () => {
   return (
     <nav className={styles.navbar}>
       <div className={styles.container}>
-        {/* 
         <div className={styles.logo}>
-          Using scope-logo.png
-          <img src="/scope-logo.png" alt="SCOPE Logo" />
-        </div> 
-        */}
+          <Image src="/images/scope_logo.png" alt="SCOPE Logo" width={140} height={140} priority />
+        </div>
         <ul className={styles.navLinks}>
           <li>
             <a href="#home">Home</a>

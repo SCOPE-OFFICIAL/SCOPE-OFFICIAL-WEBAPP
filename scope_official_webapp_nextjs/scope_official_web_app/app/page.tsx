@@ -144,8 +144,11 @@ function OriginalHome() {
 
 // SMOOTH ANIMATED Unified Scroll
 function UnifiedScroll() {
+  
   return (
+    
     <div className="unified-scroll-container">
+      
       {/* Animated Background Container for all sections except FAQ */}
       <motion.div 
         className="min-h-screen bg-gradient-to-br from-[#040a28] via-[#0d1b3d] to-[#040a28] relative overflow-hidden"
@@ -208,6 +211,12 @@ function UnifiedScroll() {
           >
             <TeamMembers />
           </motion.div>
+           <div style={{
+          width: '100%',
+          height: '1px',
+          background: 'linear-gradient(to right, transparent, #0072FF, transparent)',
+          marginBottom: '2rem',
+        }} />
 
           {/* Section 6: Gallery */}
           <motion.div 
@@ -221,6 +230,12 @@ function UnifiedScroll() {
           </motion.div>
         </div>
       </motion.div>
+       <div style={{
+          width: '100%',
+          height: '1px',
+          background: 'linear-gradient(to right, transparent, #0072FF, transparent)',
+          marginBottom: '2rem',
+        }} />
 
       {/* Section 7: FAQ - Smooth Animation */}
       <motion.div 
@@ -232,6 +247,7 @@ function UnifiedScroll() {
       >
         <FaqPage />
       </motion.div>
+      
     </div>
   );
 }
