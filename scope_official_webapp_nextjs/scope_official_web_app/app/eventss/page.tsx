@@ -305,7 +305,7 @@ export default function HomePage() {
   // Shared heading style used by BOTH section titles
   const sectionHeadingStyle: React.CSSProperties = {
     fontFamily: '"Orbitron", sans-serif',
-    fontSize: '3rem',       // = 48px, equivalent to text-5xl — uniform on all screens
+    fontSize: 'var(--page-title-size)',
     fontWeight: 700,
     letterSpacing: '2px',
     textShadow: '0 0 20px rgba(138,64,255,0.4)',
@@ -341,18 +341,20 @@ export default function HomePage() {
           <BackgroundBalls />
           <motion.section
             className="py-24 px-4 md:px-10 bg-[#040A28] text-white relative"
-            initial={{ opacity: 0, y: 60 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: 'easeOut' }}
           >
             <motion.div
-              className="w-full h-px bg-gradient-to-r from-transparent via-[#F24DC2] to-transparent mb-16"
-              initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
-              transition={{ duration: 1.2, delay: 0.2 }}
-            />
+          className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#0072FF] to-transparent mb-16"
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          // transition={{ duration: 0.6, delay: 0.1 }}
+          viewport={{ once: true }}
+        />
 
             <motion.div className="flex justify-center mb-4"
-              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.3 }}>
               <span className="flex items-center gap-2 px-5 py-2 rounded-full border border-white/20 bg-white/5 backdrop-blur-md text-xs font-bold tracking-widest uppercase text-gray-300">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -368,9 +370,9 @@ export default function HomePage() {
             <motion.h2
               className="mb-3 text-center uppercase text-white"
               style={sectionHeadingStyle}
-              initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }}
               transition={{ duration: 0.7, delay: 0.35 }}
-              whileHover={{ scale: 1.03, textShadow: '0 0 30px rgba(242,77,194,0.6)', transition: { duration: 0.3 } }}
+            //   whileHover={{ scale: 1.03, textShadow: '0 0 30px rgba(242,77,194,0.6)', transition: { duration: 0.3 } }}
             >
               UPCOMING EVENTS
             </motion.h2>
@@ -619,40 +621,31 @@ export default function HomePage() {
             PAST EVENTS
         ══════════════════════════════════════════════════════════════════ */}
         <motion.section
-          className="py-24 px-0 relative overflow-hidden"
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: 'easeOut', type: 'tween' }}
-          viewport={{ once: true, margin: '-150px' }}
-        >
-          <motion.div
-            className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#0072FF] to-transparent mb-16"
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            viewport={{ once: true }}
-          />
+        className="py-24 px-0 relative overflow-hidden"
+        initial={{ opacity: 0 }}            // removed y offset
+        whileInView={{ opacity: 1 }}
+        // transition={{ duration: 0.5, ease: 'easeOut', type: 'tween' }}
+        viewport={{ once: true, margin: "-150px" }}
+      >
+        <motion.div
+          className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#0072FF] to-transparent mb-16"
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          // transition={{ duration: 0.6, delay: 0.1 }}
+          viewport={{ once: true }}
+        />
 
-          {/* ── Unified heading ── */}
-          <motion.h2
-            className="mb-3 text-center uppercase text-white px-4"
-            style={sectionHeadingStyle}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            viewport={{ once: true }}
-            
-          >
-            PAST EVENTS
-          </motion.h2>
+        {/* ── Unified heading ── */}
+           <h2
+             className="mb-3 text-center uppercase text-white px-4"
+             style={sectionHeadingStyle}
+           >
+             PAST EVENTS
+           </h2>
 
-          <motion.p
-            className="text-center text-gray-400 text-sm mb-10 px-4"
-            initial={{ opacity: 0 }} whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.25 }} viewport={{ once: true }}
-          >
-            A look back at what we've built — hover to pause, click to explore
-          </motion.p>
+        <p className="text-center text-gray-400 text-sm mb-10 px-4">
+          A look back at what we&apos;ve built — hover to pause, click to explore
+        </p>
 
           {pastEvents.length > 0 && (
             <div

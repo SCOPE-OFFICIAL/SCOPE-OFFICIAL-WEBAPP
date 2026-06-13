@@ -115,27 +115,28 @@ export default function AdminEventsPage() {
 
       {/* Tabs for Upcoming and Past Events */}
       <div className="mb-6 flex gap-2">
-        <button
-          onClick={() => setActiveTab('upcoming')}
-          className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-            activeTab === 'upcoming'
-              ? 'bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] text-white'
-              : 'bg-white/5 text-gray-400 hover:bg-white/10'
-          }`}
-        >
-          📅 Upcoming Events
-        </button>
-        <button
-          onClick={() => setActiveTab('past')}
-          className={`px-6 py-3 rounded-lg font-semibold transition-all ${
-            activeTab === 'past'
-              ? 'bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] text-white'
-              : 'bg-white/5 text-gray-400 hover:bg-white/10'
-          }`}
-        >
-          📜 Past Events
-        </button>
-      </div>
+  <button
+    onClick={() => setActiveTab('upcoming')}
+    className={`px-6 py-3 rounded-lg text-[30px] font-semibold transition-all ${
+      activeTab === 'upcoming'
+        ? 'bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] text-white'
+        : 'bg-white/5 text-gray-400 hover:bg-white/10'
+    }`}
+  >
+    📅 Upcoming Events
+  </button>
+
+  <button
+    onClick={() => setActiveTab('past')}
+    className={`px-6 py-3 rounded-lg text-[30px] font-semibold transition-all ${
+      activeTab === 'past'
+        ? 'bg-gradient-to-r from-[#F24DC2] to-[#2C97FF] text-white'
+        : 'bg-white/5 text-gray-400 hover:bg-white/10'
+    }`}
+  >
+    📜 Past Events
+  </button>
+</div>
 
       {/* Conditional Rendering Based on Active Tab */}
       {activeTab === 'upcoming' ? (

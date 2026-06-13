@@ -80,7 +80,7 @@
 
 .teamName {
   font-family: var(--font-orbitron), "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 28px;
+  font-size: var(--page-title-size);
   font-weight: 500;
   line-height: 100%;
   letter-spacing: 0%;
@@ -118,7 +118,7 @@
   }
   
   .teamName {
-    font-size: 22px;
+    font-size: var(--page-title-size);
   }
 }
 
@@ -129,7 +129,7 @@
   }
   
   .teamName {
-    font-size: 18px;
+    font-size: var(--page-title-size);
   }
 }
 

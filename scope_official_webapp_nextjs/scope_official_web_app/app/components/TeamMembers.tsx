@@ -195,23 +195,23 @@ export default function TeamMembers() {
         {/* Header */}
         <motion.div
           className="text-center mb-16"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+          // transition={{ duration: 0.8, ease: "easeOut" }}
           viewport={{ once: true }}
         >
           <motion.h1 
             className="mb-4 text-center relative inline-block"
             style={{
               fontFamily: '"Orbitron", sans-serif',
-              fontSize: '2.4rem',
+              fontSize: 'var(--page-title-size)',
               fontWeight: 600,
               color: 'var(--text-light)',
               textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
               letterSpacing: '2px'
             }}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
             viewport={{ once: true }}
           >

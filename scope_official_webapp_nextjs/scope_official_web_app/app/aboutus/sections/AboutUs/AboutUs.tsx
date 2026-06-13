@@ -61,7 +61,7 @@ export default function AboutUs() {
         {/* Wrap heading + paragraph together so margin-bottom on SectionTitle
             doesn't push the paragraph away — we control the gap here instead */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <SectionTitle title="ABOUT US" showLines={false} />
+          <SectionTitle title="ABOUT US" showLines={false} animate={false} />
 
           
         </div>

@@ -21,6 +21,7 @@
   --new-gradient-top: #0a0f2b;
   --new-gradient-middle: #0072ff;
   --new-gradient-bottom: #ec4dc2;
+  --page-title-size: 3rem;
   --glow-gradient-purple: linear-gradient(90deg, #8a40ff 0%, #b940ff 100%);
   --glow-gradient-pink: linear-gradient(90deg, #ff40a8 0%, #ff60c8 100%);
   --card-gradient: linear-gradient(
@@ -523,7 +524,7 @@ a:hover {
 
 .section-title {
   font-family: var(--font-orbitron), "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 3.2rem; /* Updated to match new elegant size */
+  font-size: 40px; /* Updated to match new elegant size */
   font-weight: 600; /* Slightly lighter for elegance */
   margin-bottom: 1.5rem; /* More generous spacing */
   color: var(--text-light); /* Updated to match About Us heading */
@@ -916,7 +917,7 @@ a:hover {
 
 @media (max-width: 480px) {
   .section-title {
-    font-size: 2rem; /* Updated to match About Us heading responsive size */
+    font-size: 30px ; /* Updated to match About Us heading responsive size */
   }
   .team-member-wrapper {
     max-width: 220px;

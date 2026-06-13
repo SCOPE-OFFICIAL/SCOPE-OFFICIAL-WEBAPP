@@ -178,7 +178,7 @@ export default function TeamPage() {
           className="our-team-section"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
+          // transition={{ duration: 0.4, ease: "easeOut" }}
           style={{
             maxWidth: '1400px',
             margin: '0 auto',
@@ -190,8 +190,8 @@ export default function TeamPage() {
             className="intro-text"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
-            transition={{ duration: 0.5, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-100px", amount: 0.3 }}
+            // transition={{ duration: 0.5, ease: "easeOut" }}
+            // viewport={{ once: true, margin: "-100px", amount: 0.3 }}
             style={{ textAlign: 'center', marginBottom: '3rem' }}
           >
             <motion.h1 
@@ -200,14 +200,14 @@ export default function TeamPage() {
                 textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
                 letterSpacing: '2px',
                 fontFamily: '"Orbitron", sans-serif',
-                fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+                fontSize: '3rem',
                 color: 'white',
                 marginBottom: '1rem'
               }}
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
-              viewport={{ once: true, margin: "-100px", amount: 0.3 }}
+              // transition={{ duration: 0.5, ease: "easeOut", delay: 0.1 }}
+              // viewport={{ once: true, margin: "-100px", amount: 0.3 }}
             >
               OUR CORE TEAM
             </motion.h1>
@@ -219,10 +219,10 @@ export default function TeamPage() {
                 maxWidth: '600px',
                 margin: '0 auto'
               }}
-              initial={{ opacity: 0 }}
+              
               whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.4, ease: "easeOut", delay: 0.2 }}
-              viewport={{ once: true, margin: "-100px", amount: 0.3 }}
+              // transition={{ duration: 0.4, ease: "easeOut", delay: 0.2 }}
+              // viewport={{ once: true, margin: "-100px", amount: 0.3 }}
             >
               Introducing the core members of SCOPE and their respective roles.
             </motion.p>
@@ -246,7 +246,6 @@ export default function TeamPage() {
                     color: '#F24DC2', 
                     textTransform: 'uppercase',
                     letterSpacing: '1px',
-                    marginBottom: '0.5rem'
                   }}>
                     {facultyCoordinator.role}
                   </h2>

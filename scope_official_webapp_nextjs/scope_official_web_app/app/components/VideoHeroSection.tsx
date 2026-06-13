@@ -65,8 +65,8 @@ export default function VideoHeroSection({
           <div className="max-w-3xl">
             {/* Animated Title */}
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ duration: 1, delay: 0.5 }}
               className="mb-6"
             >
@@ -75,8 +75,8 @@ export default function VideoHeroSection({
 
             {/* Animated Subtitle */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.8 }}
               className="mb-8"
             >
@@ -85,8 +85,8 @@ export default function VideoHeroSection({
 
             {/* Animated Description */}
             <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 1.1 }}
               className="mb-10"
             >

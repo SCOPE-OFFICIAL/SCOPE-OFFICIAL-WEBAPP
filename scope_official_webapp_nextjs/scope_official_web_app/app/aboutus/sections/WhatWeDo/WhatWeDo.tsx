@@ -48,7 +48,7 @@ const WhatWeDo: React.FC = () => {
           marginBottom: '2rem',
         }} />
       {/* Main Title of the section: WHAT WE OFFER */}
-      <SectionTitle title="WHAT WE OFFER" showLines={false} />
+      <SectionTitle title="WHAT WE OFFER" showLines={false} animate={false} />
       
 
       {/* --- Programs Grid --- */}

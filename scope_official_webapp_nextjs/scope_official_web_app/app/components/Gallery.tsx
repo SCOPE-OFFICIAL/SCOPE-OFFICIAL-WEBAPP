@@ -711,22 +711,22 @@ const Gallery: React.FC = () => {
         {/* Section Header */}
         <motion.div 
           className="text-center mb-16"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
           <motion.h2 
             className="mb-6 text-center relative inline-block"
             style={{
               fontFamily: '"Orbitron", sans-serif',
-              fontSize: '3.2rem',
+              fontSize: 'var(--page-title-size)',
               fontWeight: 600,
               color: 'var(--text-light)',
               textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
               letterSpacing: '2px'
             }}
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             Gallery
@@ -992,8 +992,8 @@ const Gallery: React.FC = () => {
               {getCurrentFolderData() && (
                 <motion.div
                   className="mb-12 bg-white/5 backdrop-blur-sm rounded-3xl p-8 border border-white/10"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
                   transition={{ duration: 0.8, delay: 0.3 }}
                 >
                   {/* Event Header */}
@@ -1002,11 +1002,12 @@ const Gallery: React.FC = () => {
                       className="text-4xl font-bold text-white mb-4"
                       style={{
                         fontFamily: '"Orbitron", sans-serif',
+                        fontSize: 'var(--page-title-size)',
                         textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
                         letterSpacing: '2px'
                       }}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
                       transition={{ duration: 0.6, delay: 0.4 }}
                     >
                       {getCurrentFolderData()!.title}

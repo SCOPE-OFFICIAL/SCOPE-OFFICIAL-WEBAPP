@@ -44,15 +44,15 @@ function OriginalHome() {
       
       <motion.div 
         className="text-center space-y-6 px-4 relative z-10"
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 1, delay: 0.5 }}
       >
         {/* ANIMATED: SCOPE Title */}
         <motion.div 
           className="group cursor-pointer relative"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.8 }}
         >
           <motion.h1 
@@ -67,8 +67,8 @@ function OriginalHome() {
           </motion.h1>
           <motion.p 
             className="text-sm md:text-base text-gray-300 opacity-0 group-hover:opacity-100 absolute top-full -mt-1 text-center left-1/2 transform -translate-x-1/2 z-10 whitespace-nowrap"
-            initial={{ y: -10 }}
-            animate={{ y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 1.0 }}
           >
             Society of Core Oriented Projects
@@ -78,8 +78,8 @@ function OriginalHome() {
         {/* ANIMATED: Tagline */}
         <motion.p 
           className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto font-light"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1.2 }}
         >
           Wired for Innovation, Powered by Passion
@@ -88,8 +88,8 @@ function OriginalHome() {
         {/* ANIMATED: Description */}
         <motion.div 
           className="text-xs sm:text-lg text-gray-400 max-w-2xl mx-auto"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1.4 }}
         >
           Exploring the forefront of technology through collaborative projects, cutting-edge research, and a vibrant community of innovators.
@@ -162,8 +162,8 @@ function UnifiedScroll() {
           <motion.div 
             id="home"
             className="min-h-screen"
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
             <OriginalHomePage />
@@ -173,8 +173,8 @@ function UnifiedScroll() {
           <motion.div 
             id="events"
             className="min-h-screen"
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
           >
             <EventsPage />
@@ -184,9 +184,9 @@ function UnifiedScroll() {
           <motion.div 
             id="about-us"
             className="min-h-fit"
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
+            initial={{ opacity: 0}}
+            animate={{ opacity: 1 }}
+            // transition={{ duration: 0.8, ease: "easeOut", delay: 0.4 }}
           >
             <AboutUsPage />
           </motion.div>
@@ -195,8 +195,8 @@ function UnifiedScroll() {
           <motion.div 
             id="team"
             className="min-h-fit"
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.6 }}
           >
             <TeamsPage />
@@ -205,8 +205,8 @@ function UnifiedScroll() {
           {/* Section 5: Team Members */}
           <motion.div 
             className="min-h-fit"
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.8 }}
           >
             <TeamMembers />
@@ -222,8 +222,8 @@ function UnifiedScroll() {
           <motion.div 
             id="gallery"
             className="min-h-fit"
-            initial={{ opacity: 0, y: 100 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 1.0 }}
           >
             <Gallery />
@@ -241,8 +241,8 @@ function UnifiedScroll() {
       <motion.div 
         id="faq"
         className="min-h-fit"
-        initial={{ opacity: 0, y: 100 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 0.8, ease: "easeOut", delay: 1.2 }}
       >
         <FaqPage />

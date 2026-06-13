@@ -235,6 +235,7 @@ export default function FaqPage() {
               color: 'var(--text-light)',
               textShadow: '0 0 20px rgba(242, 77, 194, 0.4)',
               letterSpacing: '2px',
+              fontSize: 'var(--page-title-size)',
             }}
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
@@ -246,14 +247,14 @@ export default function FaqPage() {
 
         <motion.div
           className="max-w-4xl mx-auto mb-16"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
         >
           <motion.p
             className="text-gray-300 leading-relaxed text-center text-sm sm:text-base md:text-lg mb-12 px-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.6 }}
           >
             Navigating Your Queries with Precision. Explore answers to common questions about
