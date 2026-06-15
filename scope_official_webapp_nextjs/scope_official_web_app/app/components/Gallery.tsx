@@ -729,7 +729,7 @@ const Gallery: React.FC = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            Gallery
+            GALLERY
           </motion.h2>
           <motion.p 
             className="text-xl text-gray-300 max-w-3xl mx-auto"

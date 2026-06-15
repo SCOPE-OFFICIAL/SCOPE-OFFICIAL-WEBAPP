@@ -313,7 +313,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#040a28] via-[#0d1b3d] to-[#040a28] text-gray-200 font-sans relative overflow-hidden">
+    <div className="min-h-screen bg-[#040a28] text-gray-200 font-sans relative overflow-hidden">
       <BackgroundBalls />
 
       <style>{`

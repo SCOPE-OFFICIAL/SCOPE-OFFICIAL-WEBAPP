@@ -9,30 +9,8 @@ import { FAQ } from '@/lib/types/database';
 
 const DEFAULT_FAQS = [
   {
-    question: "What is the difference between analog and digital signals?",
-    answer:
-      "Analog signals are continuous waveforms that vary smoothly over time (e.g., sound waves, temperature readings), while digital signals represent data as discrete binary values (0s and 1s). Analog signals are more susceptible to noise but carry richer information, whereas digital signals are easier to process, store, and transmit with high accuracy.",
-  },
-  {
-    question: "What is Ohm's Law and why is it fundamental in electronics?",
-    answer:
-      "Ohm's Law states that the current (I) through a conductor is directly proportional to the voltage (V) across it and inversely proportional to its resistance (R): V = IR. It is the cornerstone of circuit analysis, allowing engineers to calculate voltages, currents, and resistances in both simple and complex circuits.",
-  },
-  {
-    question: "What is the role of a transistor in electronic circuits?",
-    answer:
-      "A transistor is a semiconductor device that acts as a switch or amplifier. In digital circuits, it switches between ON and OFF states to represent binary logic. In analog circuits, it amplifies weak signals. Modern ICs like microprocessors contain billions of transistors working together.",
-  },
-  {
-    question: "What is the difference between a microprocessor and a microcontroller?",
-    answer:
-      "A microprocessor is a CPU on a single chip, requiring external components (RAM, ROM, I/O ports) to function — used in PCs and high-performance systems. A microcontroller integrates the CPU, memory, and I/O peripherals on one chip, making it ideal for embedded systems like washing machines, Arduino boards, and IoT devices.",
-  },
-  {
-    question: "What are passive and active components in electronics?",
-    answer:
-      "Passive components (resistors, capacitors, inductors) do not require an external power source to operate and cannot amplify signals — they only store, dissipate, or filter energy. Active components (transistors, diodes, op-amps, ICs) require an external power source and can amplify or switch signals.",
-  },
+    question: "What is SCOPE Club?",
+    answer: "SCOPE (Society of Core Oriented Projects in Electronics) is a student organization at REVA University dedicated to fostering a passion for electronics and circuits. We provide resources, workshops, and projects to help students learn and innovate in the field of electronics.",}
   
 ];
 
@@ -141,18 +119,7 @@ export default function FaqPage() {
       transition={{ duration: 0.8, ease: "easeOut" }}
     >
       {/* Static Vibrant Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#040A28] via-[#0d1b3d] to-[#040A28]">
-        <div
-          className="absolute inset-0"
-          style={{
-            background: `radial-gradient(circle at 50% 50%, 
-              rgba(147, 51, 234, 0.3) 0%, 
-              rgba(79, 70, 229, 0.25) 30%, 
-              rgba(44, 151, 255, 0.3) 60%, 
-              rgba(15, 23, 42, 0.9) 100%)`,
-          }}
-        />
-      </div>
+      <div className="absolute inset-0 bg-[#040A28]" />
 
       {/* Animated Background Elements (Balls) */}
       <div className="absolute inset-0 overflow-hidden">

@@ -215,7 +215,7 @@ export default function TeamMembers() {
             transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
             viewport={{ once: true }}
           >
-            Our Team Members
+            OUR TEAM MEMBERS
           </motion.h1>
           <p className="width: '100%',
           height: '1px',

@@ -151,7 +151,7 @@ function UnifiedScroll() {
       
       {/* Animated Background Container for all sections except FAQ */}
       <motion.div 
-        className="min-h-screen bg-gradient-to-br from-[#040a28] via-[#0d1b3d] to-[#040a28] relative overflow-hidden"
+        className="min-h-screen bg-[#040a28] relative overflow-hidden"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1 }}

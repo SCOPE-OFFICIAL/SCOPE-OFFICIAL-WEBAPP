@@ -63,7 +63,7 @@ export default function RootLayout({
           <ConditionalNavigation />
           
           {/* Page Content with Transition Wrapper */}
-          <main className="flex-grow relative z-10">
+          <main className="flex-grow relative z-10 bg-[#040A28]">
             <PageTransitionWrapper>
               {children}
             </PageTransitionWrapper>
