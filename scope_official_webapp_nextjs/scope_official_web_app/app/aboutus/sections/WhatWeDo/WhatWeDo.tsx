@@ -71,7 +71,7 @@ const WhatWeDo: React.FC = () => {
   {/* --- Enhanced Call to Action --- */}
       <div className={styles.callToActionContainer}>
         <h3 className={styles.ctaTitle}>READY TO GET STARTED?</h3>
-        <Link href="/#faq">
+        <Link href="https://docs.google.com/forms/d/e/1FAIpQLSdGPXsOdtKZY715EkBvpvCFeUjL28npOdJ6IETbUySrmqfUWA/viewform?usp=dialog">
           <button className={styles.ctaButton}>
             JOIN OUR COMMUNITY
           </button>
